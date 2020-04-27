@@ -1,0 +1,439 @@
+module vertEofHorzFftOperator_mod
+    use, intrinsic :: iso_c_binding
+    use abstractVector_mod
+    use abstractVectorOperator_mod
+    use vertEofHorzFftVector_mod
+    use linkedList_mod
+    use fftwVector_mod
+    use fftwVectorOperator_mod
+    use localization_mod
+
+    implicit none
+
+    private
+
+    public :: VertEofHorzFftOperator
+
+    type, extends(AbstractVectorOperator) :: VertEofHorzFftOperator
+        !private
+            integer :: nx, ny, nz, nr
+            class(VertEofHorzFftVector), pointer :: C1v, C1pv, Zv, Cpxv, Cxv
+            class(LinkedList),           pointer :: C1op, Cxop
+            real(8), allocatable, dimension(:,:) :: veofs
+            real(8), allocatable, dimension(:)   :: lvals
+
+        contains
+            procedure :: vertEofHorzFftOperatorConstructor
+            final     :: vertEofHorzFftOperatorDestructor
+
+            procedure :: applyOperator => applyOperator_vehf
+            procedure :: applyTranspose => applyTranspose_vehf
+            procedure :: getNumControl
+
+            procedure, private :: createVecOperator
+            procedure, private :: destroyVecOperator
+            procedure, private :: executeVecOperator
+            procedure, private :: executeVecTranspose
+            procedure, private :: setCorrelationsFromL
+    end type
+
+    contains
+
+    subroutine vertEofHorzFftOperatorConstructor(this,nx,ny,nz,nr,veofs,lvals)
+        implicit none
+
+        class(VertEofHorzFftOperator) :: this
+        integer, intent(in) :: nx, ny, nz, nr
+        real(8), dimension(nz,nr) :: veofs
+        real(8), dimension(nr)    :: lvals
+
+        this%nx = nx
+        this%ny = ny
+        this%nz = nz
+        this%nr = nr
+
+        allocate(this%veofs(nz,nr))
+        allocate(this%lvals(nr))
+
+        this%veofs = veofs
+        this%lvals = lvals
+
+        allocate(this%C1v,this%C1pv,this%Zv,this%Cpxv,this%Cxv)
+
+        call this%C1v%vertEofHorzFftVectorConstructor(lvals, nx, ny, nr)
+        call this%C1pv%vertEofHorzFftVectorConstructor(lvals, nx, ny, nr)
+
+        call this%Zv%vertEofHorzFftVectorConstructor(lvals, nx, ny, nr)
+
+        call this%Cpxv%vertEofHorzFftVectorConstructor(lvals, nx, ny, nr)
+        call this%Cxv%vertEofHorzFftVectorConstructor(lvals, nx, ny, nr)
+
+        call this%createVecOperator(this%C1op,this%C1v,this%C1pv)
+        call this%createVecOperator(this%Cxop,this%Cpxv,this%Cxv)
+
+        call this%setCorrelationsFromL(this%C1op,this%C1v,this%C1pv,nr,lvals)
+    end subroutine
+
+    subroutine vertEofHorzFftOperatorDestructor(this)
+        implicit none
+
+        type(VertEofHorzFftOperator)  :: this
+
+        deallocate(this%veofs)
+        deallocate(this%lvals)
+
+        call this%destroyVecOperator(this%C1op,this%C1v,this%C1pv)
+        call this%destroyVecOperator(this%Cxop,this%Cpxv,this%Cxv)
+    end subroutine
+
+    subroutine createVecOperator(this,op,in,out)
+        implicit none
+
+        class(VertEofHorzFftOperator)        :: this
+        class(LinkedList),           pointer :: op
+        class(VertEofHorzFftVector), pointer :: in
+        class(VertEofHorzFftVector), pointer :: out
+
+        class(FftwVector),           pointer :: inv, outv
+        class(FftwVectorOperator),   pointer :: opv
+        class(*),                    pointer :: optr
+
+        integer :: i
+
+        op => LinkedList()
+
+        call in%firstVector()
+        call out%firstVector()
+
+        do i=1,in%numVectors()
+            inv => in%nextVector()
+            outv => out%nextVector()
+            allocate(opv)
+            call opv%fftwVectorOperatorConstructor(inv,outv)
+
+            optr => opv
+
+            call op%add(optr)
+
+            nullify(opv)
+        end do
+    end subroutine
+
+    subroutine destroyVecOperator(this,op,in,out)
+        implicit none
+
+        class(VertEofHorzFftOperator)        :: this
+        class(LinkedList),           pointer :: op
+        class(VertEofHorzFftVector), pointer :: in
+        class(VertEofHorzFftVector), pointer :: out
+
+        class(FftwVector),           pointer :: inv, outv
+        class(FftwVectorOperator),   pointer :: opv
+        class(*),                    pointer :: optr
+
+        integer :: i
+
+        call op%first()
+
+        do i=1,in%numVectors()
+            optr => op%currentValue()
+            select type(optr)
+                class is (FftwVectorOperator)
+                    opv => optr
+                    call op%next()
+            end select
+
+            deallocate(opv)
+            nullify(opv)
+        end do
+
+        deallocate(op)
+        deallocate(in)
+        deallocate(out)
+    end subroutine
+
+    subroutine executeVecOperator(this,op,in,out)
+        implicit none
+
+        class(VertEofHorzFftOperator)        :: this
+        class(LinkedList),           pointer :: op
+        class(VertEofHorzFftVector), pointer :: in
+        class(VertEofHorzFftVector), pointer :: out
+
+        class(FftwVector),           pointer :: inv, outv
+        class(FftwVectorOperator),   pointer :: opv
+        class(*),                    pointer :: optr
+        class(AbstractVector),       pointer :: vec1, vec2
+
+        integer :: i
+
+        call in%firstVector()
+        call out%firstVector()
+        call op%first()
+
+        do i=1,in%numVectors()
+            inv => in%nextVector()
+            outv => out%nextVector()
+
+            optr => op%currentValue()
+            select type(optr)
+                class is (FftwVectorOperator)
+                    opv => optr
+                    call op%next()
+            end select
+
+            vec1 => inv
+            vec2 => outv
+
+            call opv%applyOperator(vec1, vec2)
+        end do
+    end subroutine
+
+    subroutine executeVecTranspose(this,op,in,out)
+        implicit none
+
+        class(VertEofHorzFftOperator)        :: this
+        class(LinkedList),           pointer :: op
+        class(VertEofHorzFftVector), pointer :: in
+        class(VertEofHorzFftVector), pointer :: out
+
+        class(FftwVector),           pointer :: inv, outv
+        class(FftwVectorOperator),   pointer :: opv
+        class(*),                    pointer :: optr
+        class(AbstractVector),       pointer :: vec1, vec2
+
+        integer :: i
+
+        call in%firstVector()
+        call out%firstVector()
+        call op%first()
+
+        do i=1,in%numVectors()
+            inv => in%nextVector()
+            outv => out%nextVector()
+
+            optr => op%currentValue()
+            select type(optr)
+                class is (FftwVectorOperator)
+                    opv => optr
+                    call op%next()
+            end select
+
+            vec1 => inv
+            vec2 => outv
+
+            call opv%applyTranspose(vec1, vec2)
+        end do
+    end subroutine
+
+    subroutine setCorrelationsFromL(this,C1op,in,out,nr,lvals)
+        implicit none
+
+        class(VertEofHorzFftOperator)        :: this
+        class(LinkedList),           pointer :: C1op
+        class(VertEofHorzFftVector), pointer :: in
+        class(VertEofHorzFftVector), pointer :: out
+        integer, intent(in)                  :: nr
+        real(8), dimension(nr)               :: lvals
+
+
+        class(FftwVector),           pointer :: inv
+        class(FftwVector),           pointer :: outv
+        class(FftwVectorOperator),   pointer :: opv
+        class(*),                    pointer :: optr
+
+        complex(C_DOUBLE_COMPLEX), dimension(:,:),   pointer :: C1
+        complex(C_DOUBLE_COMPLEX), dimension(:,:,:), pointer :: data3d
+
+        integer :: i,j,k,ll,r
+        integer :: dx, dy, width, height
+        real(8) :: d
+
+        call in%firstVector()
+
+        ! first column in matrix; calculate distance from (i,j) to (1,1)
+        k = 1
+        ll = 1
+
+        do r=1,in%numVectors()
+            inv => in%nextVector()
+
+            C1 => inv%get2DPointer()
+
+            width = size(C1,1)
+            height = size(C1,2)
+
+            do i=1,width
+                do j=1,height
+
+                    ! x periodic boundary distance from (i,j) to (k,ll)
+                    dx = abs(i - k)
+
+                    if (dx .gt. width/2) then
+                        dx = width - dx
+                    end if
+
+                    ! y periodic boundary distance from (i,j) to (k,ll)
+                    dy = abs(j - ll)
+
+                    if (dy .gt. height/2) then
+                        dy = height - dy
+                    end if
+
+                    d = sqrt(dble(dx**2 + dy**2))
+
+                    C1(i,j) = covfac_gaspari_cohn(d,lvals(r))
+                end do
+            end do
+        end do
+
+        call this%executeVecOperator(C1op,in,out)
+
+        ! now normalize and take the square-root
+        data3d => out%get3DArrayPtr()
+        data3d = sqrt(data3d)/(sqrt(dble(size(data3d,1)*size(data3d,2))))
+    end subroutine
+
+    function getNumControl(this) result(nctrl)
+        implicit none
+
+        class(VertEofHorzFftOperator) :: this
+
+        integer :: nctrl
+
+        nctrl = this%Zv%getSize()
+    end function
+
+    subroutine applyOperator_vehf(this, in, out)
+        implicit none
+
+        class(VertEofHorzFftOperator) :: this
+
+        class(AbstractVector), pointer :: in
+        class(AbstractVector), pointer :: out
+
+        real(8),                   dimension(:),     pointer :: optr
+        real(8),                   dimension(:,:,:), pointer :: dptr1, dptr2
+        complex(C_DOUBLE_COMPLEX), dimension(:,:,:), pointer :: cptr1, cptr2, cptr3
+
+        integer :: i, j, k, psize, fsize, ind1
+
+        ! get the 3D representation of the padded FFT vector of Z
+        cptr1 => this%Zv%get3DArrayPtr()
+
+        ! get the 1D representation of the input pcdata
+        optr => in%get1DArrayPtr()
+
+        ind1 = 1
+
+        ! copy all of the data from the input vector into Z
+        do k=1,size(cptr1,3)
+            do j=1,size(cptr1,2)
+                do i=1,size(cptr1,1)
+                    cptr1(i,j,k) = cmplx(optr(ind1),optr(ind1+1),kind=kind(1.0d0))
+                    ind1 = ind1 + 2
+                end do
+            end do
+        end do
+
+        ! now element-wise multiply Zv by the fft of C1
+        cptr1 => this%Zv%get3DArrayPtr()
+        cptr2 => this%C1pv%get3DArrayPtr()
+        cptr3 => this%Cpxv%get3DArrayPtr()
+
+        do k=1,this%nr
+            cptr3(:,:,k) = cptr1(:,:,k)*cptr2(:,:,k)
+        end do
+
+        ! and finally compute the ifft to get C^{1/2} z
+        call this%executeVecTranspose(this%Cxop,this%Cpxv,this%Cxv)
+
+        ! get the pointer to the output result in pc space
+        cptr1 => this%Cxv%get3DArrayPtr()
+
+        ! get the 1D representation of the input full data
+        optr => out%get1DArrayPtr()
+
+        fsize = this%ny*this%nx*this%nz
+
+        dptr1(1:this%nx,1:this%ny,1:this%nz) => optr(1:fsize)
+
+        ! now apply the vertical EOFs to the PCs to get the full output
+        do j=1,this%ny
+            do i=1,this%nx
+                dptr1(i,j,1:this%nz) = matmul(this%veofs,real(cptr1(i,j,1:this%nr)))
+            end do
+        end do
+    end subroutine
+
+    subroutine applyTranspose_vehf(this, in, out)
+        implicit none
+
+        class(VertEofHorzFftOperator) :: this
+
+        class(AbstractVector), pointer :: in
+        class(AbstractVector), pointer :: out
+
+        real(8),                   dimension(:),     pointer :: optr
+        real(8),                   dimension(:,:,:), pointer :: dptr1, dptr2
+        complex(C_DOUBLE_COMPLEX), dimension(:,:,:), pointer :: cptr1, cptr2, cptr3
+
+        integer :: i, j, k, ind1, psize, fsize
+
+        ! get the 3D representation of the padded Cpxv vector to move the input in to
+        cptr1 => this%Cpxv%get3DArrayPtr()
+
+        ! get the 1D representation of the input full data
+        optr => in%get1DArrayPtr()
+
+        ! the size of the input full data 1d array
+        fsize = this%nx*this%ny*this%nz
+
+        ! convert the full input data 1d array into a 3d array with Fortran pointer slices
+        dptr2(1:this%nx,1:this%ny,1:this%nz) => optr(1:fsize)
+
+        cptr1 = 0.
+
+        ! now apply the transpose of the vertical EOFs to full input to get the PCs
+        do i=1,this%nx
+            do j=1,this%ny
+                cptr1(i,j,1:this%nr) = matmul(transpose(this%veofs),dptr2(i,j,1:this%nz))
+            end do
+        end do
+
+        ! now execute the fft of Cpxv into Cxv
+        call this%executeVecOperator(this%Cxop,this%Cpxv,this%Cxv)
+
+        ! now element-wise multiply of Cxv by the fft of C1
+        cptr1 => this%Cxv%get3DArrayPtr()
+        cptr2 => this%C1pv%get3DArrayPtr()
+        cptr3 => this%Zv%get3DArrayPtr()
+
+        do k=1,this%nr
+            cptr3(:,:,k) = cptr1(:,:,k)*cptr2(:,:,k)
+        end do
+
+        ! Now place Zv into the output array.
+
+        ! get the 1D representation of the input pcdata
+        optr => out%get1DArrayPtr()
+
+        ! the size of the pcdata 1d array
+        ! get the padded FFT data from the Zv output
+        cptr2 => this%Zv%get3DArrayPtr()
+
+        ! index to convert from complex to real array
+        ind1 = 1
+
+        ! copy all of the data from the upper corner of the padded IFFT data into the output
+        do k=1,size(cptr2,3)
+            do j=1,size(cptr2,2)
+                do i=1,size(cptr2,1)
+                    optr(ind1) = dble(cptr2(i,j,k))
+                    optr(ind1+1) = aimag(cptr2(i,j,k))
+                    ind1 = ind1 + 2
+                end do
+            end do
+        end do
+    end subroutine
+end module

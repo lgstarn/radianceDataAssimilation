@@ -1,0 +1,10 @@
+		class(MirroredVariable), pointer :: mvar
+		
+		if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
+            var    => this%addLocalVariable(variableName,dataptr,dShape,initVal,copyData,pinfo)
+        else if (pinfo%getParallelType() == MIRRORED_PARALLEL_TYPE) then
+            mvar   => this%addMirroredVariable(pinfo,variableName,dataptr,dShape,initVal,copyData)
+            var    => mvar
+        else if (pinfo%getParallelType() == DISTRIBUTED_PARALLEL_TYPE) then
+            var    => this%addDistributedVariable(pinfo,variableName,dataptr,dShape,initVal,copyData)
+        end if

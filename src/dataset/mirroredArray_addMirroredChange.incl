@@ -1,0 +1,14 @@
+		call this%DataArray%addChange(ind,nchanges,ndim,value)
+
+        ! now add a message indicating what was changed that can be broadcast later
+        allocate(mpart)
+        
+        mpart%ind = ind
+        
+        call mpart%setValues(value)
+        
+        optr => mpart
+        
+        call this%changes%add(optr)
+
+        this%totalChanges = this%totalChanges + nchanges

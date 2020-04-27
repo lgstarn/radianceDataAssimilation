@@ -1,0 +1,18 @@
+        class(DataShape), pointer :: dShape
+        
+		if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
+		
+            var => this%loadLocalVariable(dTypeNum,variableName,&
+            	dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,pinfo,required,squeeze)
+            	
+        else if (pinfo%getParallelType() == MIRRORED_PARALLEL_TYPE) then
+        
+            var => this%loadMirroredVariable(pinfo,dTypeNum,variableName,&
+            	dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze)
+            	
+        else if (pinfo%getParallelType() == DISTRIBUTED_PARALLEL_TYPE) then
+        
+            var => this%loadDistributedVariable(pinfo,dTypeNum,variableName,&
+            	dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze)
+            	
+        end if

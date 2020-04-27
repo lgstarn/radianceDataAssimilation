@@ -1,0 +1,11 @@
+        class(MirroredArray),  pointer :: mArray
+        class(DataVariable),   pointer :: var
+        
+        allocate(mArray)
+        call mArray%mirroredArrayConstructor(dShape,dataptr,initVal,copyData)
+       	allocate(mvar)
+       	call mvar%mirroredVariableConstructor(variableName,mArray)
+       	
+       	var => mvar
+        
+        call this%addVariablePointer(var)

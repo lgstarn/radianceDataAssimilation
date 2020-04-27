@@ -1,0 +1,40 @@
+        integer :: proc, i, j, indval
+
+        integer, dimension(:,:), pointer :: ind
+
+        integer :: nch, ndim
+        
+        call this%getArray(dptr1d)
+
+        do proc=0,pinfo%getCommSize()-1
+            if (proc == pinfo%getRank()) then
+            	! allocates ind and values
+            	call this%combineChanges(ind,nch,ndim,values)
+        	end if
+        	
+            call bcast1d_varLen(values,proc,pinfo%getCommunicator(), &
+            	& 'distributed message value bcast')
+
+            call bcastnd_varLen(ind,   proc,pinfo%getCommunicator(), &
+            	& 'distributed message ind bcast')
+
+            if (proc /= pinfo%getRank()) then
+                ! make the local changes
+                
+                do j=1,size(ind,2)
+                    ! first get the index into the 1D array
+                    do i=1,size(ind,1)
+                        if (i == 1) then
+                            indval = ind(i,j)
+                        else
+                            indval = indval + (ind(i,j)-1)*product(this%lsizes(1:i-1))
+                        end if
+                    end do
+                    
+                    dptr1d(indval)  = values(j)
+                end do
+            end if
+            
+            deallocate(ind); 	nullify(ind)
+            deallocate(values); nullify(values)
+        end do

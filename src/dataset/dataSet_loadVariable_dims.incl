@@ -1,0 +1,21 @@
+        class(DataShape), pointer :: dShape
+        
+        integer :: nd
+
+		nd = size(shape(dataptr))
+
+        allocate(dShape)
+        if (associated(pinfo%getParallelDecomposition())) then
+	        call dShape%dataShapeConstructor(nd, dim1, dim2, dim3, dim4, dim5, dim6, dim7, &
+	        	decomp=pinfo%getParallelDecomposition())
+        else
+	        call dShape%dataShapeConstructor(nd, dim1, dim2, dim3, dim4, dim5, dim6, dim7)
+        end if
+        
+        var => this%loadVariable(pinfo,variableName,dataptr,dShape,locationInFile,required)
+        
+        if (present(squeeze)) then
+        	if (squeeze) then
+        		call var%squeeze()
+        	end if
+    	end if        

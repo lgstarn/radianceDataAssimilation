@@ -1,0 +1,3 @@
+        call this%dataArrayConstructor(dShape,dptr1d,initVal,copyData)
+
+        call c_f_pointer(c_loc(dptr1d), dptrnd, dShape%getLocalCounts())

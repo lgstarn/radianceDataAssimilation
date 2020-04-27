@@ -1,0 +1,181 @@
+program wrf3DVar
+
+    ! use crtmUtils_mod
+    use nDVarAssimilationStrategy_mod
+    use optimizer_mod
+    use dataSet_mod
+    use arwDataSet_mod
+    use hwrfDataSet_mod
+    use abstractVector_mod
+    use abstractVectorOperator_mod
+    use observer_mod
+    use mpiUtils_mod
+
+    implicit none
+
+!    class(AssimilationStrategy), pointer :: strategy
+!    class(Optimizer), pointer :: opt
+!    class(DataSet), pointer :: state
+!    class(DataSet), pointer :: background
+!    class(MatrixOperator), pointer :: BHalf_matrixOperator
+!    class(MatrixOperator), pointer :: rInvHalf, rInvHalfCcv
+!    class(ObservationOperator), pointer :: obsOpIn, obsOpOut
+!    class(CcvObservation), pointer :: ccvObs
+!    class(Observation), pointer :: obs
+!    class(ObservationData), pointer :: obsData
+!    class(PlatformInfo), pointer :: idealPlatform, assimPlatform, ccvPlatform
+!
+!    class(LinkedList), pointer :: observations
+!    class(*), pointer :: optr
+!
+!    ! number of control variables per column, here the number of principal components
+!    integer :: nctrl = 40
+!    ! maximum number of iterations per 1DVar retrieval
+!    integer :: maxiter = 1000
+!
+!    integer :: time = 1
+!
+!    integer, parameter :: nz = 60
+!
+!    integer, parameter :: mobs = 9
+!
+!    integer, parameter :: nfields=6
+!    ! choose some default fields
+!    character(len=256), dimension(nfields), target :: requestedfields = (/ &
+!            UV10_NAME, &
+!            P_SFC_NAME, &
+!            T_NAME,  &
+!            QVAPOR_NAME, &
+!            W_NAME, &
+!            CWM_NAME/)
+!!    character(len=256), dimension(nfields), target :: requestedfields = (/ &
+!!            UV_NAME, &
+!!            T_NAME,  &
+!!            QVAPOR_NAME, &
+!!            W_NAME, &
+!!            P_SFC_NAME, &
+!!            QCLOUD_NAME, &
+!!            QRAIN_NAME, &
+!!            QICE_NAME, &
+!!            QSNOW_NAME, &
+!!            QGRAUP_NAME, &
+!!            QHAIL_NAME/)
+!
+!    integer, dimension(nfields), target :: fieldNz = (/ &
+!            1,  & ! UV10
+!            1,  & ! PSFC
+!            nz, & ! T
+!            nz, & ! QVAPOR
+!            nz+1, & ! W
+!            nz/)   ! CWM
+!!    integer, dimension(nfields), target :: fieldNz = (/ &
+!!            nz,  & ! UV
+!!            nz, & ! T
+!!            nz, & ! QVAPOR
+!!            nz+1, & ! W
+!!               1, & ! P_SFC
+!!              nz, & ! QCLOUD
+!!              nz, & ! QRAIN
+!!              nz, & ! QICE
+!!              nz, & ! QSNOW
+!!              nz, & ! QGRAUP
+!!              nz/)  ! QHAIL
+!
+!    class(RtmOptions), pointer :: rtmOpts
+!
+!    character(len=1024) :: b_half_file_name = 'BHalf.txt'
+!    character(len=1024) :: rInvHalf_file_name = 'RInvHalf.txt'
+!
+!    real(8), dimension(:), pointer :: xmean
+!
+!    integer :: nz_total, i, j, startx, endx, starty, endy, xstride
+!
+!    inputFile = '/Users/steward/research/satellite/projects/20160320_jacobianForBjorn/wrfout_d03_2005-08-01_18:30:00'
+!
+!    nz_total = sum(fieldNz)
+!
+!    startx = 1
+!    endx = 2
+!    starty = 1
+!    endy = 2
+!    xstride = 1
+!
+!    if (IDEAL_OBS_OP .eq. CCV_OBS_OP .or. ASSIM_OBS_OP .eq. CCV_OBS_OP) then
+!        call radCcvManager%initialize(nplatforms,ccvConfigPath,ccvCoeffsPath,1,6)
+!    end if
+!
+!    opt => getOptimizationStrategy(LMBM_OPT_STRATEGY,nctrl,maxiter)
+!    strategy => getAssimilationStrategy(ONE_D_VAR_STRATEGY,requestedFields,nfields,fieldNz,opt)
+!    state => getDataSet(WRF_ARW_MODEL,inputFile,time,.true.,requestedFields,&
+!        fieldNz)
+!    background => getDataSet(WRF_ARW_MODEL,inputFile,time,.true.,requestedFields,&
+!        fieldNz)
+!
+!    ! read in the mean
+!    allocate(xmean(243))
+!    open(unit=42,file='xmean.txt')
+!    read(42,*) xmean(:)
+!    close(42)
+!
+!!    print *,'Background before mean:',background%data(:,1,1)
+!!
+!!    ! throw away the background and use just a mean field
+!!    do i=1,background%nx
+!!        do j=1,background%ny
+!!            call background%setColumnFields(i,j,.false.,xmean,requestedfields)
+!!        end do
+!!    end do
+!!
+!!    print *,'Background after mean:',background%data(:,1,1)
+!
+!    BHalf_matrixOperator => getMatrixOperator(DEFAULT_MATRIX_OPERATOR,nz_total,nctrl,b_half_file_name,1d2)
+!    rtmOpts => getRtmOptions()
+!    rtmOpts%modelVarNames => requestedFields
+!    rtmOpts%modelVarNz => fieldNz
+!    idealPlatform => getPlatform(PLATFORM_TO_TEST,IDEAL_OBS_OP)
+!    obsOpIn => getObservationOperator(IDEAL_OBS_OP,rtmOpts,idealPlatform)
+!    assimPlatform => getPlatform(PLATFORM_TO_TEST,ASSIM_OBS_OP)
+!    obsOpOut => getObservationOperator(ASSIM_OBS_OP,rtmOpts,assimPlatform)
+!    rInvHalf => getMatrixOperator(DEFAULT_MATRIX_OPERATOR,mobs,mobs,rInvHalf_file_name)
+!
+!    observations => LinkedList()
+!
+!    obsData => ObservationData(assimPlatform,(endx-startx+1)*(endy-starty+1))
+!    call doRtmForward(idealPlatform,state,obsOpIn,obsData,startx=startx,endx=endx,&
+!        starty=starty,endy=endy,xstride=xstride)
+!
+!    if (ASSIM_OBS_OP .eq. CCV_OBS_OP) then
+!        allocate(ccvObs)
+!        ccvPlatform => getPlatform(PLATFORM_TO_TEST,CCV_OBS_OP)
+!        call ccvObs%ccvObservationConstructor(ccvPlatform,hType,useGlobal,obsData,obsOpOut)
+!        obs => ccvObs
+!    else
+!        nullify(ccvPlatform) ! don't have a ccvPlatform in this case
+!        allocate(obs)
+!        call obs%observationConstructor(obsData,obsOpOut,rInvHalf)
+!    end if
+!
+!    optr => obs
+!
+!    call observations%add(optr)
+!
+!    call strategy%assimilate(state,background,BHalf_matrixOperator,observations)
+!
+!    deallocate(opt)
+!    deallocate(strategy)
+!    deallocate(state)
+!    deallocate(background)
+!    deallocate(BHalf_matrixOperator)
+!    deallocate(observations)
+!    deallocate(rtmOpts)
+!    deallocate(obsOpIn)
+!    deallocate(obsOpOut)
+!    deallocate(rInvHalf)
+!    deallocate(idealPlatform)
+!    deallocate(assimPlatform)
+!    if (associated(ccvPlatform)) then
+!        deallocate(ccvPlatform)
+!    end if
+!    deallocate(obs)
+
+end program

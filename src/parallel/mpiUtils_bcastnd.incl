@@ -1,0 +1,21 @@
+        integer :: ierr
+        integer :: commval
+
+        character(len=MPI_MAX_ERROR_STRING)       :: err_message
+
+        if (present(comm)) then
+            commval = comm
+        else
+            commval = MPI_COMM_WORLD
+        end if
+
+        call mpi_bcast(val,product(dims),type,root,commval,ierr)
+
+		if (ierr /= MPI_SUCCESS) then
+	        write(err_message,'(A,I0,A,I0)') 'Error while broadcasting a ',size(dims),'D ' // &
+	        	& typeName // ' array of total length ',product(dims)
+	
+	        call errmsg_concat(err_message,message)
+		
+	        call mpichk(ierr,err_message)
+        end if

@@ -1,0 +1,29 @@
+        integer :: i, j, nch
+
+        integer, dimension(ndim) :: nr, np
+
+        integer, dimension(:,:), allocatable :: ind        
+
+        do i=1,ndim
+            nr(i) = ranges(i,2)-ranges(i,1)+1
+            ! product of 1:0 is 1, which is nice
+            np(i) = product(nr(1:i-1))
+        end do
+
+        nch = product(nr)
+
+        allocate(ind(ndim,nch))
+
+        do j=1,nch
+            do i=1,ndim
+                ind(i,j) = mod((j-1)/np(i),nr(i))+ranges(i,1)
+            end do
+        end do
+
+        allocate(values(nch))
+        values = value
+
+        call this%addChange(ind,nch,ndim,values)
+
+        deallocate(ind)
+        deallocate(values)

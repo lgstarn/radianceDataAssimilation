@@ -1,0 +1,24 @@
+        integer :: cursor, i, nmsg
+
+        class(MessagePart), pointer :: mpart
+
+        nchanges = this%totalChanges
+        
+        allocate(ind(size(this%lsizes),nchanges))
+        allocate(value(nchanges))
+
+        cursor = 1
+
+        call this%changes%first()
+
+        do i=1,this%changes%getListSize()
+            mpart => this%nextMessage()
+
+            nmsg = size(mpart%ind,2)
+            
+            ind(:,cursor:cursor+nmsg-1) = mpart%ind(:,1:nmsg)
+
+            call mpart%getValuesAtIndices(value,cursor,nmsg)
+
+            cursor = cursor + nmsg
+        end do

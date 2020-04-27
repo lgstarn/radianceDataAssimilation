@@ -1,0 +1,13 @@
+        class(DataShape),       pointer :: dShape
+
+        integer :: nd
+        
+        nd = size(shape(dataptr))
+
+        allocate(dShape)
+        	
+        call dShape%dataShapeConstructor(nd, dim1, dim2, dim3, dim4, dim5, dim6, dim7, &
+        	decomp=pinfo%getParallelDecomposition())
+                
+        var => this%loadDistributedVariable(pinfo,variableName,dataptr,dShape,&
+        	locationInFile,required,squeeze)

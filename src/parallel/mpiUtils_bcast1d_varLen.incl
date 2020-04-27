@@ -1,0 +1,30 @@
+        integer :: rank_comm, size_comm
+
+        integer :: n
+
+        call getRankAndSize(rank_comm,size_comm,comm)
+
+        if (root == rank_comm) then
+            ! we will first broadcast the size of val
+
+            if (.not. associated(val)) then
+                ! error out if not allocated on the root
+                call error('In bcast 1d var len for type ' // typeName // &
+                    &', the array was not allocated on the root.',comm=comm)
+            end if
+
+            n = size(val)
+            call bcast0d(n,root,comm,message)
+            
+            if (n /= 0) then
+	            call bcast1d(val,n,root,comm,message)
+            end if
+        else
+            call bcast0d(n,root,comm,message)
+
+            allocate(val(n))
+
+            if (n /= 0) then
+	            call bcast1d(val,n,root,comm,message)
+	        end if
+        end if

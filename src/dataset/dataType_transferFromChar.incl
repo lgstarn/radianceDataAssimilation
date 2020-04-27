@@ -1,0 +1,17 @@
+        select case (this%dtypeNum)
+            case (BYTE_TYPE_NUM)
+                value = transfer(dval,byteType)
+            case (SHORT_TYPE_NUM)
+                value = transfer(dval,shortType)
+            case (INT_TYPE_NUM)
+                value = transfer(dval,intType)
+            case (LONG_TYPE_NUM)
+                value = transfer(dval,longType)
+            case (REAL_TYPE_NUM)
+                value = transfer(dval,realType)
+            case (DOUBLE_TYPE_NUM)
+                value = transfer(dval,doubleType)
+            case default
+                call error('Unable to transfer to ' // typeName // &
+                	&' from type ' // this%getDataTypeName())
+        end select

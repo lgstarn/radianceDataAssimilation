@@ -1,0 +1,7 @@
+        real(real64), allocatable :: xyiwrap(:,:)
+
+        allocate(xyiwrap(2,ni))
+        
+        xyiwrap(:,:) = xyi(:,:)
+
+		call this%doInterpolate(dble(zd), ni, xyiwrap, zi)

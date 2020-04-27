@@ -1,0 +1,10 @@
+        class(DataArray),  	   pointer :: dArray
+        class(DataShape),      pointer :: dShapeNew
+
+        allocate(dArray)
+        call dArray%dataArrayConstructor(dShape,dataptr,initVal,copyData)        
+        
+       	allocate(var)
+       	call var%dataVariableConstructor(variableName,dArray,.true.,.true.)
+        
+        call this%addVariablePointer(var)

@@ -1,0 +1,27 @@
+        integer :: i, j, indval
+		integer, allocatable :: dims(:)
+
+        call this%getArray(dptr1d)
+        
+        ! note this is slow - performance could be improved by caching this
+        dims = this%dShape%getLocalCounts()
+
+		! double check that the type and dimensions are what we expect
+        call this%checkType(value)
+        call this%checkDimensions(ndim)
+        
+        ! make the change in the local array
+        do j=1,nchanges
+            ! first get the index into the 1D array
+            indval = 0
+            do i=1,ndim
+                if (i == 1) then
+                    indval = ind(i,j)
+                else
+                    indval = indval + (ind(i,j)-1)*product(dims(1:i-1))
+                end if
+            end do
+            
+            ! now make the change
+            dptr1d(indval) = value(j)
+        end do

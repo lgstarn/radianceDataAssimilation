@@ -1,0 +1,255 @@
+module regularTriangulation_mod
+
+    use iso_fortran_env
+
+    use triangulation_mod
+
+    use asciiUtils_mod
+    use mpiUtils_mod
+
+    implicit none
+
+    private
+
+    type, extends(Triangulation), public :: RegularTriangulation
+
+        contains
+            procedure :: regularTriangulationConstructor
+
+            final :: regularTriangulationDestructor ! clean up all allocated variables
+    end type
+
+    contains
+
+    subroutine regularTriangulationConstructor(this,nodeNum,node_ij,node_xy,grid_x,grid_y,&
+        & deallocNode_xy,x0,xhalfwidth,y0,yhalfwidth)
+
+        implicit none
+
+        class(RegularTriangulation) :: this
+
+        integer,                intent(in) :: nodeNum
+        integer,                pointer    :: node_ij(:,:)
+        real(real64),           pointer    :: node_xy(:,:)
+        real(real64),           pointer    :: grid_x(:,:)
+        real(real64),           pointer    :: grid_y(:,:)
+        logical,      optional, intent(in) :: deallocNode_xy
+        real(real64), optional             :: x0
+        real(real64), optional             :: xhalfwidth
+        real(real64), optional             :: y0
+        real(real64), optional             :: yhalfwidth
+
+        integer :: nx, ny
+        integer :: nb, elementNum, triInd, triStep
+        integer :: bottom, top, left, right
+
+        integer      :: inds(2,3)
+        integer      :: neighbor(3)
+
+        integer, pointer :: elementNeighbor(:,:)
+        integer, pointer :: triangle(:,:)
+
+        integer :: i, j
+
+        call this%triangulationConstructor(nodeNum,node_ij,node_xy,deallocNode_xy,x0, &
+            & xhalfwidth,y0,yhalfwidth,triangulate=.false.)
+
+        nx = size(grid_x,1)
+        ny = size(grid_x,2)
+
+        nb = 2*(nx+ny)-4
+        elementNum = 2*nodeNum-nb-2
+
+        call this%setNumTriangles(elementNum)
+
+        triangle => this%getTriangleIndices()
+        elementNeighbor => this%getElementNeighbors()
+
+        triInd = 0
+
+        triStep = 2*(ny-1)
+
+        bottom = 1
+        top    = ny-1
+        left   = 1
+        right  = nx-1
+
+        ! now walk through the triangles
+        do i=left,right
+            do j=bottom,top
+                ! we will now add two triangles for the grid box from (i,j) to (i+1,j+1)
+                triInd = triInd + 1
+
+                inds(:,1) = (/ i,   j+1 /)
+                inds(:,2) = (/ i,   j   /)
+                inds(:,3) = (/ i+1, j   /)
+
+                neighbor = 0
+
+                if (i == left .and. j == bottom) then
+                    ! on the left bottom corner
+                    neighbor(1) = -link(triInd,2)
+                    neighbor(2) = -link(triInd+triStep,2)
+                else if (i == left) then
+                    ! on the left (but not corner)
+                    neighbor(1) = -link(triInd-2,1)
+                else if (i == right .and. j == bottom) then
+                    ! on the right bottom corner
+                    neighbor(2) = -link(triInd+1,1)
+                else if (j == bottom) then
+                    ! on the bottom (but not corner)
+                    neighbor(2) = -link(triInd+triStep,2)
+                end if
+
+                if (neighbor(1) == 0) then
+                    neighbor(1) = triInd - triStep + 1
+                end if
+
+                if (neighbor(2) == 0) then
+                    neighbor(2) = triInd - 1
+                end if
+
+                if (neighbor(3) == 0) then
+                    neighbor(3) = triInd + 1
+                end if
+
+                call addTriangle(triInd,inds,neighbor,grid_x,grid_y,triangle,elementNeighbor,&
+                    & xhalfwidth,yhalfwidth)
+
+                triInd = triInd + 1
+
+                inds(:,1) = (/ i+1, j   /)
+                inds(:,2) = (/ i+1, j+1 /)
+                inds(:,3) = (/ i,   j+1 /)
+
+                neighbor = 0
+
+                if (i == right .and. j == top) then
+                    ! on the right top corner
+                    neighbor(1) = -link(triInd,2)
+                    neighbor(2) = -link(triInd-triStep,2)
+                else if (i == right) then
+                    ! on the right (but not corner)
+                    neighbor(1) = -link(triInd+2,1)
+                else if (i == left .and. j == top) then
+                    ! on the left top corner
+                    neighbor(2) = -link(triInd-1,1)
+                else if (j == top) then
+                    ! on the top (but not corner)
+                    neighbor(2) = -link(triInd-triStep,2)
+                end if
+
+                if (neighbor(1) == 0) then
+                    neighbor(1) = triInd + triStep - 1
+                end if
+
+                if (neighbor(2) == 0) then
+                    neighbor(2) = triInd + 1
+                end if
+
+                if (neighbor(3) == 0) then
+                    neighbor(3) = triInd - 1
+                end if
+
+                call addTriangle(triInd,inds,neighbor,grid_x,grid_y,triangle,&
+                    & elementNeighbor,xhalfwidth,yhalfwidth)
+            end do
+        end do
+    end subroutine
+
+    subroutine regularTriangulationDestructor(this)
+
+        type(RegularTriangulation) :: this
+
+        ! do nothing for now
+    end subroutine
+
+    subroutine addTriangle(triInd,inds,neighbor,grid_x,grid_y,triangle,elementNeighbor,xh,yh)
+
+        implicit none
+
+        integer, intent(in) :: triInd
+        integer, intent(in) :: inds(2,3)
+        integer, intent(in) :: neighbor(3)
+        ! integer, intent(in) :: neighbor(3)
+        real(real64), intent(in) :: grid_x(:,:)
+        real(real64), intent(in) :: grid_y(:,:)
+        integer, intent(out) :: triangle(:,:)
+        integer, intent(out) :: elementNeighbor(:,:)
+        real(real64), intent(in) :: xh
+        real(real64), intent(in) :: yh
+
+        real(real64) :: points(2,3)
+        real(real64) :: area
+        integer      :: nodeInd1, nodeInd2, nodeInd3
+
+        integer :: k, nx, ny
+
+        real(real64) :: pw(2,3)
+
+        nx = size(grid_x,1)
+        ny = size(grid_x,2)
+
+        points(1,1) = grid_x(inds(1,1),inds(2,1))
+        points(2,1) = grid_y(inds(1,1),inds(2,1))
+
+        do k=2,3
+            points(1,k) = wrap(points(1,1),xh,grid_x(inds(1,k),inds(2,k)))
+            points(2,k) = wrap(points(2,1),yh,grid_y(inds(1,k),inds(2,k)))
+        end do
+
+        ! apply the shoelace formula, the actual area should divide by 2, but don't bother here
+        area = points(1,1)*points(2,2) + points(1,2)*points(2,3) + points(1,3)*points(2,1) - &
+             & points(1,2)*points(2,1) - points(1,3)*points(2,2) - points(1,1)*points(2,3)
+
+        nodeInd1 = (inds(2,1)-1)*nx + inds(1,1)
+        nodeInd2 = (inds(2,2)-1)*nx + inds(1,2)
+        nodeInd3 = (inds(2,3)-1)*nx + inds(1,3)
+
+        if (area < 0) then
+            write(msgstr,*) 'the triangle ',triInd,' is CW: ',area,nodeInd1,nodeInd2,nodeInd3,&
+                & points(:,1),points(:,2),points(:,3)
+
+            call error(msgstr)
+        else
+            triangle(1,triInd) = nodeInd1
+            triangle(2,triInd) = nodeInd2
+            triangle(3,triInd) = nodeInd3
+
+            elementNeighbor(1:3,triInd) = neighbor(1:3)
+        end if
+    end subroutine
+
+    function link(triInd,nodeInd) result(ind)
+        implicit none
+
+        integer, intent(in) :: triInd
+        integer, intent(in) :: nodeInd
+
+        integer             :: ind
+
+        ind = 3*triInd + nodeInd - 1
+    end function
+
+    function wrap(val0,valhw,val) result(val2)
+        implicit none
+
+        real(real64), intent(in) :: val0
+        real(real64), intent(in) :: valhw
+        real(real64), intent(in) :: val
+
+        real(real64) :: val2
+
+        val2 = val
+
+        if (abs(valhw) > 0) then
+            if (val2 < val0 - valhw) then
+                val2 = val2 + 2*valhw
+            end if
+
+            if (val2 > val0 + valhw) then
+                val2 = val2 - 2*valhw
+            end if
+        end if
+    end function
+end module

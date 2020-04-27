@@ -1,0 +1,48 @@
+        integer :: rank_comm, size_comm
+
+        integer, allocatable :: dims(:)
+        
+        integer :: ndim
+        
+        character(len=MPI_MAX_ERROR_STRING)       :: err_message
+        
+        call getRankAndSize(rank_comm,size_comm,comm)
+
+        if (root == rank_comm) then
+            if (.not. associated(val)) then
+		        write(err_message,'(A,I0,A,I0,A)') 'Error while broadcasting a ',size(dims),'D ' // &
+		        	& typeName // ' array of total length ',product(dims),&
+		        	'  the array was not allocated on the root.'
+		        	
+	        	call error(err_message,comm=comm)
+            end if
+
+            dims = shape(val)
+            ndim = size(dims)
+            
+            ! broadcast the number of dimensions
+            call bcast0d(ndim,root,comm,message)
+
+            ! broadcast dimensions
+            call bcast1d(dims,ndim,root,comm,message)
+
+            ! broadcast the array
+            call bcastnd(val,dims,root,comm,message)
+        else
+            ! broadcast the number of dimensions
+            call bcast0d(ndim,root,comm,message)
+
+            ! allocate the dimensions array
+            allocate(dims(ndim))
+
+            ! broadcast the dimensions
+            call bcast1d(dims,ndim,root,comm,message)
+
+            ! allocate the variable length array
+            call doAllocateND(val,dims)
+
+            ! broadcast the array
+            call bcastnd(val,dims,root,comm,message)
+
+            deallocate(dims)
+        end if

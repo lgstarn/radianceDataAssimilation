@@ -1,0 +1,27 @@
+        class(DataShape),       pointer :: dShape
+        class(DataArray),  	    pointer :: dArray
+
+        allocate(dShape)
+        	
+        call dShape%dataShapeConstructor(ndim, dim1, dim2, dim3, dim4, dim5, dim6, dim7, &
+        	decomp=pinfo%getParallelDecomposition())
+        
+        allocate(dArray)
+        call dArray%dataArrayConstructor(dTypeNum,dShape,alloc=.true.)
+
+        if (present(locationInFile)) then
+            call this%doLoadArray(pinfo,dArray,locationInFile,required)
+        else
+            call this%doLoadArray(pinfo,dArray,variableName,required)
+        end if
+
+        allocate(var)
+        call var%dataVariableConstructor(variableName,dArray,.true.,.true.)
+
+        call this%addVariablePointer(var)
+        
+        if (present(squeeze)) then
+        	if (squeeze) then
+        		call var%squeeze()
+        	end if
+    	end if        

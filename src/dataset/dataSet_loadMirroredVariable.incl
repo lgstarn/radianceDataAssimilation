@@ -1,0 +1,28 @@
+        class(DataShape), 	    pointer :: dShape
+        class(MirroredArray),   pointer :: mArray        
+        class(DataArray), 	    pointer :: dArray
+
+        allocate(dShape)
+        call dShape%dataShapeConstructor(ndim, dim1, dim2, dim3, dim4, dim5, dim6, dim7)
+        
+        allocate(mArray)
+        call mArray%mirroredArrayConstructor(dTypeNum,dShape,alloc=.true.)
+        
+        dArray => mArray
+
+		if (present(LocationInFile)) then
+	        call this%doLoadArray(pinfo,dArray,locationInFile,required)
+        else
+	        call this%doLoadArray(pinfo,dArray,variableName,required)
+        end if
+
+		allocate(var)
+		call var%dataVariableConstructor(variableName,dArray,.true.,.false.)
+		
+        call this%addVariablePointer(var)   
+        
+        if (present(squeeze)) then
+        	if (squeeze) then
+        		call var%squeeze()
+        	end if
+    	end if   

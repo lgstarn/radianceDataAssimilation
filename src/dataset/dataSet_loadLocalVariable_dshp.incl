@@ -1,0 +1,36 @@
+        class(DataArray), 	    pointer :: dArray
+        class(DataArrayReader), pointer :: dReader
+        class(ParallelInfo),	pointer :: pinfoToUse
+
+        allocate(dArray)
+        call dArray%dataArrayConstructor(dShape,dataptr)
+
+		dReader => this%getDataArrayReader()
+		
+		if (present(pinfo)) then
+			pinfoToUse => pinfo
+		else
+			allocate(pinfoToUse)
+			call pinfoToUse%parallelInfoConstructor(LOCAL_PARALLEL_TYPE)
+		end if
+        
+		if (present(LocationInFile)) then
+	        call this%doLoadArray(pinfoToUse,dArray,locationInFile,required)
+        else
+	        call this%doLoadArray(pinfoToUse,dArray,variableName,required)
+        end if
+        
+        if (.not. present(pinfo)) then
+	        deallocate(pinfoToUse)
+        end if
+        
+       	allocate(var)
+       	call var%dataVariableConstructor(variableName,dArray,.false.,.false.)
+        
+        call this%addVariablePointer(var)
+        
+        if (present(squeeze)) then
+        	if (squeeze) then
+        		call var%squeeze()
+        	end if
+    	end if        

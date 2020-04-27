@@ -1,0 +1,38 @@
+        class(DataShape), pointer :: dShape
+        integer :: nd
+        
+        nd = size(shape(dataptr))
+
+        allocate(dShape)
+        
+        if (nd > 0) then
+        	dim1 => dim1%clone()
+        end if
+
+        if (nd > 1) then
+        	dim2 => dim2%clone()
+        end if
+
+        if (nd > 2) then
+        	dim3 => dim3%clone()
+        end if
+
+        if (nd > 3) then
+        	dim4 => dim4%clone()
+        end if
+
+        if (nd > 4) then
+        	dim5 => dim5%clone()
+        end if
+
+        if (nd > 5) then
+        	dim6 => dim6%clone()
+        end if
+
+        if (nd == 7) then
+        	dim7 => dim7%clone()
+        end if
+        	
+        call dShape%dataShapeConstructor(nd, dim1, dim2, dim3, dim4, dim5, dim6, dim7)
+                
+        var => this%addVariable(pinfo,variableName,dataptr,dShape,initVal,copyData)

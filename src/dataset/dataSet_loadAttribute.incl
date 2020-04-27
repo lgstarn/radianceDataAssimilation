@@ -1,0 +1,40 @@
+        class(DataAttribute),   pointer     :: attr
+        class(DataArrayReader), pointer     :: dReader
+        logical								:: required
+        
+        call print('Now loading the attribute ' // trim(attrName))
+        
+        if (present(defaultValue)) then
+        	required = .false.
+    	else
+    		required = .true.
+    	end if
+
+        allocate(attr)
+        call attr%dataAttributeConstructor(findTypeNum(value),attrName)
+
+        dReader => this%getDataArrayReader()
+
+        if (.not. associated(dReader)) then
+            call error('The reader was not associated for the call to loadAttribute for attr ' // attrName)
+        end if
+
+        if (present(locationInFile)) then
+            call dReader%loadAttribute(pinfo,attr,locationInFile,required=required)
+        else
+            call dReader%loadAttribute(pinfo,attr,attrName,required=required)
+        end if
+
+        if (attr%isLoaded()) then
+            ! load the value from the attr for convenience
+            call attr%getNumericValue(value)
+        else
+            ! couldn't find the value, use the default
+            if (present(defaultValue)) then
+	            value = defaultValue
+	            call attr%setNumericValue(value)
+            else
+            	call error('Could not load the attribute ' // attrName // ' for the file ' &
+            		// trim(dReader%getLocation()))
+            end if
+        end if

@@ -1,0 +1,37 @@
+        class(DataShape), 	    pointer :: dShape
+        class(DataArray), 	    pointer :: dArray
+        class(ParallelInfo),	pointer :: pinfoToUse
+
+        allocate(dShape)
+        call dShape%dataShapeConstructor(ndim, dim1, dim2, dim3, dim4, dim5, dim6, dim7)
+
+        allocate(dArray)
+        call dArray%dataArrayConstructor(dTypeNum,dShape,alloc=.true.)
+        
+        if (present(pinfo)) then
+        	pinfoToUse => pinfo
+        else
+	        allocate(pinfoToUse)
+	        call pinfoToUse%parallelInfoConstructor(LOCAL_PARALLEL_TYPE)
+        end if
+
+		if (present(LocationInFile)) then
+	        call this%doLoadArray(pinfoToUse,dArray,locationInFile,required)
+        else
+	        call this%doLoadArray(pinfoToUse,dArray,variableName,required)
+        end if
+        
+        if (.not. present(pinfo)) then
+	        deallocate(pinfoToUse)
+        end if
+
+		allocate(var)
+		call var%dataVariableConstructor(variableName,dArray,.false.,.false.)
+		
+        call this%addVariablePointer(var)
+        
+        if (present(squeeze)) then
+        	if (squeeze) then
+        		call var%squeeze()
+        	end if
+    	end if        

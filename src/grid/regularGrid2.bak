@@ -1,0 +1,280 @@
+module regularGrid_mod
+
+    use parallelInfo_mod
+
+    use dataGrid_mod
+    use regularTriangulation_mod
+
+    use iso_fortran_env
+
+    use linkedList_mod
+
+    use triangulation_mod
+
+    use dataType_mod
+    use dataArray_mod
+    use dataShape_mod
+    use dataVariable_mod
+    use dataExtent_mod
+
+    use mirroredVariable_mod
+
+    use mpiUtils_mod
+    use asciiUtils_mod
+
+    implicit none
+
+    private
+
+    public :: RegularGrid
+
+    type, extends(DataGrid)   :: RegularGrid
+        private
+
+        contains
+            procedure :: getPointOwners
+            procedure :: doTriangulate
+            procedure :: cloneRegularGrid
+            procedure :: clone
+
+            procedure :: regularGridConstructor
+
+            final     :: regularGridDestructor ! clean up all allocated variables
+    end type
+
+    contains
+
+    subroutine regularGridConstructor(this,pinfo,xcv_local,ycv_local,&
+        & dimsToTriangulate,xhalfwidth,yhalfwidth)
+
+        implicit none
+
+        class(RegularGrid)               :: this
+
+        class(ParallelInfo), pointer  :: pinfo
+        class(DataVariable), pointer  :: xcv_local
+        class(DataVariable), pointer  :: ycv_local
+        integer,             optional :: dimsToTriangulate(2)
+        real(real64),        optional :: xhalfwidth
+        real(real64),        optional :: yhalfwidth
+
+        call this%dataGridConstructor(pinfo,xcv_local,ycv_local,&
+            & dimsToTriangulate,xhalfwidth,yhalfwidth)
+    end subroutine
+
+    subroutine regularGridDestructor(this)
+        implicit none
+
+        type(RegularGrid)  :: this
+
+        call this%dataGridDestructor()
+    end subroutine
+
+    subroutine getPointOwners(this,ndim,nloci,lociVals,owners)
+        implicit none
+
+        class(RegularGrid)      :: this
+
+        integer,      intent(in)  :: ndim
+        integer,      intent(in)  :: nloci
+        real(real64), intent(in)  :: lociVals(ndim,nloci)
+        integer,      intent(out) :: owners(nloci)
+
+        class(DataArray), pointer :: dArray
+
+        class(Triangulation),        pointer :: gridTri
+
+        class(MirroredVariable), pointer :: ownersVar
+
+        integer, pointer :: owners2d(:,:)
+
+        real(real64), pointer :: ownersOut_real(:)
+
+        integer,      pointer :: triangle(:,:)
+        integer,      pointer :: node_ij(:,:)
+        real(real64), pointer :: node_xy(:,:)
+
+        real(real64) :: xyi2(2)
+
+        real(real64) :: alpha
+        real(real64) :: beta
+        real(real64) :: gamma
+        integer :: i, j, edge, step_num
+        integer :: ind
+        integer :: oi, oj
+
+        class(DataVariable), pointer :: xVar
+        class(DataVariable), pointer :: yVar
+
+        real(real32), pointer :: lonVals(:,:)
+        real(real32), pointer :: latVals(:,:)
+
+        if (ndim /= 2) then
+            call error('The data grid class currently only supports 2D.')
+        end if
+
+        gridTri  => this%getTriangulation()
+        triangle => gridTri%getTriangleIndices()
+        node_ij  => gridTri%getNodeLociIndices()
+        node_xy  => gridTri%getNodeLoci()
+
+        ownersVar => this%getGlobalCoordOwnersVar()
+
+        dArray => ownersVar%getDataArray()
+
+        call dArray%getArray(owners2d)
+
+        xVar => this%getLocalCoordinateVar(1)
+        yVar => this%getLocalCoordinateVar(2)
+
+        call xVar%getArray(lonVals)
+        call yVar%getArray(latVals)
+
+        print *,'min/max loci:',minval(lociVals(1,:))+gridTri%x0,&
+            & maxval(lociVals(1,:))+gridTri%x0,&
+            & minval(lociVals(2,:))+gridTri%y0,maxval(lociVals(2,:))+gridTri%y0,&
+            & minval(node_xy(1,:)),&
+            & maxval(node_xy(1,:)),minval(node_xy(2,:)),maxval(node_xy(2,:)), &
+            & minval(lonVals),maxval(lonVals),minval(latVals),maxval(LatVals)
+
+        do i=1,nloci
+            xyi2(1) = gridTri%wrapX(lociVals(1,i))
+            xyi2(2) = gridTri%wrapY(lociVals(2,i))
+
+            call gridTri%search(xyi2,j,alpha,beta,gamma,edge,step_num)
+
+            ! check if the point is outside of the convex hull
+            if (edge < 0) then
+                owners(i) = -1
+                cycle ! the loop
+            end if
+
+            ! take the largest coordinate, as that is the largest area of the triangle
+            ! (see Barycentric coordinates wiki page, e.g.). For a equilateral triangle,
+            ! that is also the closest point. For other "nice" triangles, the largest area is
+            ! close to the closest vertex. Anyways it doesn't really matter, just need to be
+            ! consistent.
+            if (alpha >= beta .and. alpha <= gamma) then
+                ind = triangle(1,j)
+            else if (beta <= alpha .and. beta <= gamma) then
+                ind = triangle(2,j)
+            else
+                ind = triangle(3,j)
+            end if
+
+            oi = node_ij(1,ind)
+            oj = node_ij(2,ind)
+
+            owners(i) = owners2d(oi,oj)
+        end do
+    end subroutine
+
+    function doTriangulate(this,nodeNum,nx,ny,node_ij,node_xy,x0,xhalfwidth,y0,yhalfwidth) &
+        & result(gridTri)
+
+        implicit none
+
+        class(RegularGrid)     :: this
+
+        integer,      intent(in) :: nodeNum
+        integer,      intent(in) :: nx
+        integer,      intent(in) :: ny
+        integer,      pointer    :: node_ij(:,:)
+        real(real64), pointer    :: node_xy(:,:)
+        real(real64), optional   :: x0
+        real(real64), optional   :: xhalfwidth
+        real(real64), optional   :: y0
+        real(real64), optional   :: yhalfwidth
+
+        class(Triangulation), pointer :: gridTri
+
+        class(RegularTriangulation), pointer :: regTri
+
+        real(real64), pointer :: grid_x(:,:)
+        real(real64), pointer :: grid_y(:,:)
+
+        integer :: i, j
+        integer :: ind
+
+        if (nx*ny /= size(node_ij,2)) then
+            call error('The number of node elements does not match in regularGrid.')
+        end if
+
+        allocate(grid_x(nx,ny))
+        allocate(grid_y(nx,ny))
+
+        ind = 0
+
+        do j=1,ny
+            do i=1,nx
+                ind = ind + 1
+                grid_x(i,j) = node_xy(1,ind)
+                grid_y(i,j) = node_xy(2,ind)
+            end do
+        end do
+
+        print *,'in regular grid, min/max x/y:',minval(grid_x),maxval(grid_x),&
+            &minval(grid_y),maxval(grid_y)
+
+        call debug('Now calling regular triangulation')
+
+        allocate(regTri)
+        call regTri%regularTriangulationConstructor(nodeNum,node_ij,node_xy,&
+            &grid_x,grid_y,x0=x0,xhalfwidth=xhalfwidth,y0=y0,yhalfwidth=yhalfwidth)
+
+        gridTri => regTri
+
+        deallocate(grid_x)
+        deallocate(grid_y)
+    end function
+
+    function cloneRegularGrid(this,copyData) result(rgptr)
+        implicit none
+
+        class(RegularGrid)             :: this
+
+        logical,              intent(in) :: copyData
+
+        class(RegularGrid), pointer    :: rgptr
+
+        class(DataVariable), pointer :: xGlobal, yGlobal
+        class(DataVariable), pointer :: xLocal,  yLocal
+        class(MirroredVariable), pointer :: ownerVar
+        class(Triangulation), pointer :: tri
+
+        class(*), pointer :: optr
+
+        integer :: i, ndim
+
+        xGlobal => this%getGlobalCoordinateVar(1)
+        yGlobal => this%getGlobalCoordinateVar(2)
+        xLocal  => this%getLocalCoordinateVar(1)
+        yLocal  => this%getLocalCoordinateVar(2)
+
+        ownerVar => this%getGlobalCoordOwnersVar()
+
+        tri => this%getTriangulation()
+
+        allocate(rgptr)
+        call rgptr%dataGridConstructor(tri%clone(),xLocal%clone(copyData), &
+            & yLocal%clone(copyData),xGlobal%clone(copyData), yGlobal%clone(copyData), &
+            & ownerVar%cloneMirrored(copyData), this%getDimsToTriangulate(), &
+            & this%getXHalfWidth(),this%getYHalfWidth())
+    end function
+
+    function clone(this,copyData) result(dgptr)
+        implicit none
+
+        class(RegularGrid)             :: this
+
+        logical,              intent(in) :: copyData
+
+        class(DataGrid),      pointer    :: dgptr
+
+        class(RegularGrid), pointer    :: rgptr
+
+        rgptr => this%cloneRegularGrid(copyData)
+
+        dgptr => rgptr
+    end function
+end module
