@@ -86,8 +86,6 @@ module observationSplitter_mod
         class(DataVariable),  pointer :: obsLociVar
         class(DataVariable),  pointer :: obsLociGlobalVar
 
-        print *,'obsplit 1'
-
         rank = pinfo%getRank()
 
         obsLociVar => obsIn%getObsLociVar()
@@ -105,15 +103,7 @@ module observationSplitter_mod
             lociVals(i,:) = obsLoci(this%lociDims(i),:)
         end do
 
-        print *,'obsplit 3'
-
-        print *,'min/max loci vals:',pinfo%getRank(),minval(lociVals(1,:)),&
-            & maxval(lociVals(1,:)),&
-            & minval(lociVals(2,:)),maxval(lociVals(2,:))
-
         call this%getPointOwners(pinfo,ndim,nobs,lociVals,owners)
-
-        print *,'obsplit 4'
 
         nobsnew_local  = 0
 
@@ -122,15 +112,6 @@ module observationSplitter_mod
                 nobsnew_local = nobsnew_local + 1
             end if
         end do
-
-        print *,'size of owners is:',shape(owners),nobs,nobsnew_local,rank,&
-            & minval(obsLoci(1,:)),maxval(obsLoci(1,:)),&
-            & minval(obsLoci(2,:)),maxval(obsLoci(2,:)),&
-            & minval(obsLoci(3,:)),maxval(obsLoci(3,:)),&
-            & minval(obsLoci(4,:)),maxval(obsLoci(4,:)),&
-            & minval(owners),maxval(owners)
-
-        print *,'obsplit 5'
 
         allocate(obs_sizes(pinfo%getCommSize()))
 
@@ -142,9 +123,6 @@ module observationSplitter_mod
         end do
 
         nobsnew_global = sum(obs_sizes)
-        print *,'on rank',pinfo%getRank(),'obs_sizes:',obs_sizes,sum(obs_sizes),nobsnew_global
-
-        print *,'obsplit 6'
 
         allocate(obs_offsets(pinfo%getCommSize()))
         do i=1,pinfo%getCommSize()
@@ -168,8 +146,6 @@ module observationSplitter_mod
 
         rp1 = pinfo%getRank() + 1
 
-        print *,'obsplit 7'
-
         allocate(nobsNewDim)
         call nobsNewDim%dataDimensionConstructor(NOBS_DIM_NAME,nobsnew_global)
 
@@ -178,11 +154,8 @@ module observationSplitter_mod
                 & localCount = obs_sizes(rp1),  localStart = obs_offsets(rp1) + 1)
 
         obsOut => obsIn%cloneSubset(pinfo,nobsNewExtent,localInds)
+
         call obsOut%setObsOwnershipRange(1,nobsnew_local,pinfo%getRank())
-
-        print *,'obsplit 8'
-
-        print *,'finished splitting the observations on rank',pinfo%getRank()
 
         deallocate(lociVals)
         deallocate(owners)
@@ -209,11 +182,7 @@ module observationSplitter_mod
         real(real64) :: mindist(2,nloci)
         integer :: i, ierror
 
-        print *,'gpo 1'
-
         call this%inputGrid%getDistanceToCenter(ndim,nloci,lociVals,distances(1,:))
-
-        print *,'gpo 2'
 
         distances(2,:) = pinfo%getRank()
 
@@ -227,23 +196,5 @@ module observationSplitter_mod
                 owners(i) = -1
             end if
         end do
-
-        print *,'sample owners:',owners(1:5)
-
-!        call this%inputGrid%getNearestPoint(ndim,nloci,lociVals,nearestPts)
-!
-!        print *,'gpo 2'
-!
-!        ownersVar => this%inputGrid%getGlobalCoordOwnersVar()
-!        dArray    => ownersVar%getDataArray()
-!        owners1d  => dArray%getDataPointer_int()
-!
-!        do i=1,nloci
-!            if (nearestPts(i) > 0) then
-!                owners(i) = owners1d(nearestPts(i))
-!            else
-!                owners(i) = -1
-!            end if
-!        end do
     end subroutine
 end module

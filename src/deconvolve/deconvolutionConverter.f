@@ -2,6 +2,7 @@ module deconvolutionConverter_mod
     use iso_fortran_env
 
     use datasetVectorConverter_mod
+    use dataType_mod
 
     use abstractVector_mod
     use simple1DVector_mod
@@ -18,7 +19,12 @@ module deconvolutionConverter_mod
     private
 
     type, public, extends(DatasetVectorConverter) :: DeconvolutionConverter
+        character(len=:), allocatable :: stateVarName
+
         contains
+            procedure :: deconvolutionConverterConstructor
+            final     :: deconvolutionConverterDestructor
+
             procedure :: convertToState
             procedure :: convertFromState
             procedure :: getStateVectorSize
@@ -26,15 +32,36 @@ module deconvolutionConverter_mod
 
     contains
 
+    subroutine deconvolutionConverterConstructor(this,stateVarName)
+
+        class(DeconvolutionConverter) :: this
+
+        character(len=*),  intent(in) :: stateVarName
+
+        allocate(character(len=len_trim(stateVarName)) :: this%stateVarName)
+
+        this%stateVarName = trim(stateVarName)
+    end subroutine
+
+    subroutine deconvolutionConverterDestructor(this)
+
+        type(DeconvolutionConverter)  :: this
+
+        if (allocated(this%stateVarName)) then
+            deallocate(this%stateVarName)
+        end if
+
+    end subroutine
+
     subroutine convertToState(this, vector, state)
-        implicit none
 
         class(DeconvolutionConverter)  :: this
         class(AbstractVector), pointer :: vector
         class(DataSet),        pointer :: state
 
-        real(real64), dimension(:),     pointer :: data1d
-        real(real64), dimension(:,:,:), pointer :: tb
+        real(real64), dimension(:),   pointer :: data1d
+        real(real64), dimension(:,:), pointer :: tbDble
+        real(real32), dimension(:,:), pointer :: tbReal
 
         class(DataVariable), pointer :: tbVar
 
@@ -42,58 +69,75 @@ module deconvolutionConverter_mod
 
         data1d => vector%get1DArrayPtr()
 
-        tbVar => state%getVariableByName(TB_VAR_NAME)
-
-        call tbVar%getArray(tb)
+        tbVar => state%getVariableByName(this%stateVarName)
 
         ind = 0
 
-        do k=1,size(tb,3)
-            do j=1,size(tb,2)
-                do i=1,size(tb,1)
+        if (tbVar%getDataTypeNum() == REAL_TYPE_NUM) then
+            call tbVar%getArray(tbReal)
+
+            do j=1,size(tbReal,2)
+                do i=1,size(tbReal,1)
                     ind = ind + 1
-                    tb(i,j,k) = data1d(ind)
+                    tbReal(i,j) = data1d(ind)
                 end do
             end do
-        end do
+        else
+            call tbVar%getArray(tbDble)
+
+            do j=1,size(tbDble,2)
+                do i=1,size(tbDble,1)
+                    ind = ind + 1
+                    tbDble(i,j) = data1d(ind)
+                end do
+            end do
+        end if
     end subroutine
 
     subroutine convertFromState(this, state, vector)
-        implicit none
 
         class(DeconvolutionConverter)  :: this
         class(DataSet),        pointer :: state
         class(AbstractVector), pointer :: vector
 
         real(real64), dimension(:),     pointer :: data1d
-        real(real64), dimension(:,:,:), pointer :: tb
+        real(real64), dimension(:,:), pointer :: tbDble
+        real(real32), dimension(:,:), pointer :: tbReal
 
         class(DataVariable), pointer :: tbVar
 
         integer :: i, j, k, ind
 
         data1d => vector%get1DArrayPtr()
-        tbVar => state%getVariableByName(TB_VAR_NAME)
-
-        call tbVar%getArray(tb)
+        tbVar => state%getVariableByName(this%stateVarName)
 
         ind = 0
 
-        do k=1,size(tb,3)
-            do j=1,size(tb,2)
-                do i=1,size(tb,1)
+        if (tbVar%getDataTypeNum() == REAL_TYPE_NUM) then
+            call tbVar%getArray(tbReal)
+
+            do j=1,size(tbReal,2)
+                do i=1,size(tbReal,1)
                     ind = ind + 1
-                    data1d(ind) = tb(i,j,k)
+                    data1d(ind) = tbReal(i,j)
                 end do
             end do
-        end do
+        else
+            call tbVar%getArray(tbDble)
+
+            do j=1,size(tbDble,2)
+                do i=1,size(tbDble,1)
+                    ind = ind + 1
+                    data1d(ind) = tbDble(i,j)
+                end do
+            end do
+        end if
     end subroutine
 
     function getStateVectorSize(this,state) result(svsize)
-        implicit none
 
         class(DeconvolutionConverter)  :: this
-        class(DataSet),     pointer :: state
+        class(DataSet),        pointer :: state
 
         integer                        :: svsize
 
@@ -101,10 +145,8 @@ module deconvolutionConverter_mod
 
         class(DataVariable), pointer :: tbVar
 
-        tbVar => state%getVariableByName(TB_VAR_NAME)
+        tbVar => state%getVariableByName(this%stateVarName)
 
-        call tbVar%getArray(tb)
-
-        svsize = size(tb,1)*size(tb,2)*size(tb,3)
+        svsize = tbVar%getLocalTotalSize()
     end function
 end module

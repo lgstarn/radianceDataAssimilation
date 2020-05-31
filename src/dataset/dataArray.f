@@ -3755,9 +3755,9 @@ module dataArray_mod
 
         implicit none
 
-        class(DataArray)                      :: this
+        class(DataArray)              :: this
 
-        integer,                   intent(in) :: dimNum
+        integer,           intent(in) :: dimNum
 
         class(DataExtent), pointer    :: ddim
 
@@ -3821,28 +3821,57 @@ module dataArray_mod
 
         class(DataShape), pointer :: dsptr
 
+        logical,        dimension(:), pointer :: new_dptr1d_logical => NULL()
+        integer(int8),  dimension(:), pointer :: new_dptr1d_byte    => NULL()
+        integer(int16), dimension(:), pointer :: new_dptr1d_short   => NULL()
+        integer(int32), dimension(:), pointer :: new_dptr1d_int     => NULL()
+        integer(int64), dimension(:), pointer :: new_dptr1d_long    => NULL()
+        real(real32),   dimension(:), pointer :: new_dptr1d_real    => NULL()
+        real(real64),   dimension(:), pointer :: new_dptr1d_dble    => NULL()
+
         dsptr => this%dShape
 
         allocate(daptr)
 
-        select case(this%dtype%getDataTypeNum())
-            case (LOGICAL_TYPE_NUM)
-                call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_logical,copyData=copyData)
-            case (BYTE_TYPE_NUM)
-                call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_byte,   copyData=copyData)
-            case (SHORT_TYPE_NUM)
-                call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_short,  copyData=copyData)
-            case (INT_TYPE_NUM)
-                call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_int,    copyData=copyData)
-            case (LONG_TYPE_NUM)
-                call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_long,   copyData=copyData)
-            case (REAL_TYPE_NUM)
-                call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_real,   copyData=copyData)
-            case (DOUBLE_TYPE_NUM)
-                call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_dble,   copyData=copyData)
-            case default
-                call error('In clone, unknown data type:' // this%dtype%getDataTypeName())
-        end select
+        if (copyData) then
+            select case(this%dtype%getDataTypeNum())
+                case (LOGICAL_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_logical,copyData=.true.)
+                case (BYTE_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_byte,   copyData=.true.)
+                case (SHORT_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_short,  copyData=.true.)
+                case (INT_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_int,    copyData=.true.)
+                case (LONG_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_long,   copyData=.true.)
+                case (REAL_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_real,   copyData=.true.)
+                case (DOUBLE_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),this%dptr1d_dble,   copyData=.true.)
+                case default
+                    call error('In clone, unknown data type:' // this%dtype%getDataTypeName())
+            end select
+        else
+            select case(this%dtype%getDataTypeNum())
+                case (LOGICAL_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),new_dptr1d_logical,copyData=.false.)
+                case (BYTE_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),new_dptr1d_byte,   copyData=.false.)
+                case (SHORT_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),new_dptr1d_short,  copyData=.false.)
+                case (INT_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),new_dptr1d_int,    copyData=.false.)
+                case (LONG_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),new_dptr1d_long,   copyData=.false.)
+                case (REAL_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),new_dptr1d_real,   copyData=.false.)
+                case (DOUBLE_TYPE_NUM)
+                    call daptr%dataArrayConstructor(dsptr%clone(),new_dptr1d_dble,   copyData=.false.)
+                case default
+                    call error('In clone, unknown data type:' // this%dtype%getDataTypeName())
+            end select
+        end if
     end function
 
     subroutine zeroAll(this)

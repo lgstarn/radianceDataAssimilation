@@ -25,13 +25,14 @@ module platformInfo_mod
 
         class(PlatformInfo) :: this
         integer, intent(in)          :: platformNumber
-        character(len=*), intent(in) :: platformName, sensorName
+        character(len=*), intent(in) :: platformName
+        character(len=*), intent(in) :: sensorName
         integer, intent(in)          :: mobs
 
         this%platformNumber = platformNumber
-        this%platformName = platformName
-        this%sensorName = sensorName
-        this%mobs = mobs
+        this%platformName   = platformName
+        this%sensorName     = sensorName
+        this%mobs           = mobs
     end subroutine
 
     subroutine platformInfoDestructor(this)

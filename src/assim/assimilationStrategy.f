@@ -1,5 +1,6 @@
 module AssimilationStrategy_mod
     use assimilationProblem_mod
+    use parallelInfo_mod
 
     implicit none
 
@@ -14,10 +15,12 @@ module AssimilationStrategy_mod
 
     abstract interface
 
-        subroutine assimilateAbstract(this,problem)
+        subroutine assimilateAbstract(this,pinfo,problem)
             import AssimilationStrategy
+            import ParallelInfo
             import AssimilationProblem
             class(AssimilationStrategy)         :: this
+            class(ParallelInfo),        pointer :: pinfo
             class(AssimilationProblem), pointer :: problem
         end subroutine
     end interface

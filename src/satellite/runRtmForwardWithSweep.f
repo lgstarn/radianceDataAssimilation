@@ -25,6 +25,8 @@ program runRtmForwardWithSweep
     use dataArrayWriter_mod
     use netcdfDataArrayWriter_mod
 
+    use obsQCCodes_mod
+    use observation_mod
     use observationSplitter_mod
     use observationProcessor_mod
 
@@ -48,6 +50,8 @@ program runRtmForwardWithSweep
     integer          :: nchans
     integer, pointer :: channelSubset(:)
 
+    logical          :: newObj
+
     class(ParallelInfo),                 pointer :: pinfo      => null()
     class(ParallelDecomposition),        pointer :: decomp     => null()
 
@@ -66,10 +70,14 @@ program runRtmForwardWithSweep
     class(SatelliteObservation),         pointer :: satObs     => null()
     class(SatelliteObservationOperator), pointer :: obsOpRtm   => null()
 
-    class(DataExtent),    pointer :: xExtent    => null()
-    class(DataExtent),    pointer :: yExtent    => null()
-    class(DataDimension), pointer :: pixDim     => null()
-    class(DataDimension), pointer :: scanDim    => null()
+    class(DataDimension), pointer :: chanDim     => null()
+    class(DataExtent),    pointer :: chanExtent  => null()
+
+    real(real64), pointer :: tb(:,:,:)
+
+    class(DataVariable), pointer :: latVar
+    class(DataVariable), pointer :: lonVar
+    class(DataVariable), pointer :: tbVar
 
     class(RtmOptions),    pointer :: rtmOpts    => null()
 
@@ -77,6 +85,11 @@ program runRtmForwardWithSweep
 
     class(NetcdfDataArrayWriter), pointer :: ncWriter   => null()
     class(DataArrayWriter),       pointer :: writer     => null()
+
+    class(Observation),   pointer :: satObs_o
+    class(Observation),   pointer :: satObs_split
+
+    integer :: nchan
 
     call initParallel()
 
@@ -168,25 +181,32 @@ program runRtmForwardWithSweep
 
     call debug('Created the satellite platform for ' // trim(platform%platformName))
 
-    xExtent => modelState%getWestEastExtent()
-    yExtent => modelState%getSouthNorthExtent()
-
     ! now creating "pixel" and "scan" dimensions from the x and y model dimensions
-    pixDim  => xExtent%getDimension()
-    pixDim  => pixDim%clone()
-    scanDim => yExtent%getDimension()
-    scanDim => scanDim%clone()
-
-    call  pixDim%setName(PIXELS_DIM_NAME)
-    call scanDim%setName(SCANS_DIM_NAME)
-
     allocate(satObs)
     call satObs%satelliteObservationConstructor(platform)
-    call satObs%addDimension(pixDim)
-    call satObs%addDimension(scanDim)
-    call satObs%loadSatelliteObservation(pinfo,pixDim,scanDim, &
-        & modelState%getVariable2D(A3D_LAT_VAR),&
-        & modelState%getVariable2D(A3D_LON_VAR))
+
+    latVar => modelState%getVariable(A3D_LAT_VAR)
+    lonVar => modelState%getVariable(A3D_LON_VAR)
+
+    latVar => latVar%clone(copyData=.true.)
+    lonVar => lonVar%clone(copyData=.true.)
+
+    if (associated(platform%channelSubset)) then
+        nchan = size(platform%channelSubset)
+    else
+        nchan = platform%mobs
+    end if
+
+    chanDim => satObs%addDimensionByName('Channels',nchan)
+    allocate(chanExtent)
+    call chanExtent%dataExtentConstructor(chanDim)
+
+    tbVar => satObs%addVariable(pinfo,'Brightness_Temperatures',tb,&
+        chanExtent,latVar%getExtentNumber(1),latVar%getExtentNumber(2))
+
+    tb = -999.
+
+    call satObs%loadSatelliteObservation_tb3d(pinfo,latVar,lonVar,tbVar)
 
     call debug('Now setting up the RTM options')
 
@@ -207,7 +227,7 @@ program runRtmForwardWithSweep
     allocate(ncWriter)
     call ncWriter%netcdfDataArrayWriterConstructor(trim(outputPrefix) // '_mr.nc')
     writer => ncWriter
-    call satObs%writeSatObsToFile(pinfo,writer,.true.)
+    call satObs%writeSatObsToFile(pinfo,writer)
     deallocate(ncWriter)
 
     satObs_ds => satObs
@@ -215,14 +235,16 @@ program runRtmForwardWithSweep
     ! now sweep the antenna pattern
     call sweepAntennaPattern(pinfo,satObs_ds,scannedObsBundle,scannedObsBundle,outputPrefix)
 
-    call endParallel()
-
     deallocate(decomp)
     deallocate(pinfo)
     deallocate(obsProcessorChain)
-    deallocate(modelState)
+    ! FIXME: deallocating model state is causing a "munmap_chunk(): invalid pointer" error
+    !deallocate(modelState)
     deallocate(rtmOpts)
     deallocate(obsOpRtm)
     deallocate(platform)
     deallocate(satObs)
+
+    call barrier()
+    call endParallel()
 end program

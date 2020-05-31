@@ -152,12 +152,8 @@ module ssmisObservationBundle_mod
         call tmpObs3%ssmisObservationConstructor(pinfo,orbitFile,3,fnumber)
         call tmpObs4%ssmisObservationConstructor(pinfo,orbitFile,4,fnumber)
 
-        print *,'now applying chain'
-
         if (present(obsProcessor)) then
             ! assign observation ownership, apply preliminary QC, etc.
-
-            print *,'now applying chain 1'
 
             obsptr1 => tmpobs1
             call obsProcessor%applyChain(pinfo,obsptr1,obsptr2,PRIOR_STAGE)
@@ -166,8 +162,6 @@ module ssmisObservationBundle_mod
                     this%ssmisObs1 => obsptr2
             end select
 
-            print *,'now applying chain 2'
-
             obsptr1 => tmpobs2
             call obsProcessor%applyChain(pinfo,obsptr1,obsptr2,PRIOR_STAGE)
             select type(obsptr2)
@@ -175,16 +169,12 @@ module ssmisObservationBundle_mod
                     this%ssmisObs2 => obsptr2
             end select
 
-            print *,'now applying chain 3'
-
             obsptr1 => tmpobs3
             call obsProcessor%applyChain(pinfo,obsptr1,obsptr2,PRIOR_STAGE)
             select type(obsptr2)
                 type is (SsmisObservation)
                     this%ssmisObs3 => obsptr2
             end select
-
-            print *,'now applying chain 4'
 
             obsptr1 => tmpobs4
             call obsProcessor%applyChain(pinfo,obsptr1,obsptr2,PRIOR_STAGE)
@@ -198,8 +188,6 @@ module ssmisObservationBundle_mod
             this%ssmisObs3 => tmpobs3
             this%ssmisObs4 => tmpobs4
         end if
-
-        print *,'applied chain'
 
         obs_cs1 => this%ssmisObs1
         obs_cs2 => this%ssmisObs2
@@ -466,7 +454,7 @@ module ssmisObservationBundle_mod
 
         ssmisObs => this%getSsmisObs(bundleNum)
 
-        ddim => ssmisObs%getChannelDim()
+        ddim => ssmisObs%getMObsDim()
 
         nchan = ddim%getGlobalCount()
     end function
@@ -485,7 +473,7 @@ module ssmisObservationBundle_mod
 
         ssmisObs => this%getSsmisObs(bundleNum)
 
-        ddim => ssmisObs%getChannelDim()
+        ddim => ssmisObs%getMObsDim()
 
         nchan = ddim%getGlobalCount() + ssmisObs%getChannelOffset()
     end function

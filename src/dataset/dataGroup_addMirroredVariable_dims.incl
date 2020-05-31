@@ -3,6 +3,11 @@
         integer :: ndim
         class(DataVariable),   pointer :: var
         
+		if (.not. associated(pinfo)) then
+			call error('The pinfo pointer was not associated.')
+		end if        
+
+		! this code will work even for a non-associated pointer
         ndim = size(shape(dataptr))
 
         allocate(dShape) 

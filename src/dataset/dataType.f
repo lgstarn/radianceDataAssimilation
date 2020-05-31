@@ -40,6 +40,7 @@ module dataType_mod
     character(*), public, parameter :: STRINGS_TYPE_NAME = "strings"
 
     public :: findTypeNum
+    public :: lookupDataTypeName
     public :: DataType
 
     type   :: DataType

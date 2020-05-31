@@ -449,7 +449,7 @@ module amsrObservationBundle_mod
 
         amsrObs => this%getAmsrObs(bundleNum)
 
-        ddim => amsrObs%getChannelDim()
+        ddim => amsrObs%getMObsDim()
 
         nchan = ddim%getGlobalCount()
     end function
@@ -467,7 +467,7 @@ module amsrObservationBundle_mod
 
         amsrObs => this%getAmsrObs(bundleNum)
 
-        ddim => amsrObs%getChannelDim()
+        ddim => amsrObs%getMObsDim()
 
         nchan = ddim%getGlobalCount() + amsrObs%getChannelOffset()
     end function

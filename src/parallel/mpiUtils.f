@@ -384,11 +384,7 @@ module mpiUtils_mod
         integer :: myrank, mysize, myunit, istat
         logical :: doForce
 
-        type nothing
-            integer :: i
-        end type
-
-        class(nothing), pointer :: nullPointer => null()
+        real(8), pointer :: intentionalErrorToCauseStackTrace(:) => null()
 
         character(len=128) :: f
 
@@ -408,11 +404,12 @@ module mpiUtils_mod
         call print(trim(f) // ': ' // msg,unit,doForce,comm)
 
         if (printStackTrace) then
+            allocate(intentionalErrorToCauseStackTrace(0))
             ! proposefully cause a null pointer exception to get a stack trace
-            nullPointer%i = nullPointer%i + 1
+            print *,intentionalErrorToCauseStackTrace(1)
+        else
+            call abortParallel(comm)
         end if
-
-        call abortParallel(comm)
     end subroutine
 
     subroutine getArg(argNum,argStr,status)

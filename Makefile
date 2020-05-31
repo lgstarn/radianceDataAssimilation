@@ -4,20 +4,20 @@
 FC        := mpifort
 
 LAPACK_DIR = /home/jsteward/research/libraries/petsc-3.11.1/arch-linux-c-debug/externalpackages/fblaslapack-3.4.2/
-RTTOV_DIR = /home/jsteward/research/satellite/rttov/
+RTTOV_DIR = /home/jsteward/research/satellite/rttov12_2/
 CRTM_DIR  = /home/jsteward/research/satellite/crtm/
 PETSC_FINCLUDE = /home/jsteward/research/libraries/petsc-3.11.1/include
 PETSC_DIR = /home/jsteward/research/libraries/petsc-3.11.1/arch-linux-c-debug
 NETCDF_DIR = /home/jsteward/research/libraries/netcdf
 NETCDF_FORTRAN_DIR = /home/jsteward/research/libraries/netcdf
-HDF5_INCLUDE_DIR = /home/jsteward/research/libraries/hdf5/include
-HDF5_LIB_DIR = /home/jsteward/research/libraries/hdf5/lib
+HDF5_INCLUDE_DIR = /home/jsteward/research/libraries/hdf5-mpi/include
+HDF5_LIB_DIR = /home/jsteward/research/libraries/hdf5-mpi/lib
 PNETCDF_DIR  = /home/jsteward/research/libraries/pnetcdf
 FFTW_DIR = /home/jsteward/research/libraries/fftw
 
 #FFLAGS	  := -g -cpp -fbounds-check -fbacktrace -fstack-protector-all -fimplicit-none -ffree-form -fno-second-underscore -fcheck=all -Wuninitialized
 #FFLAGS	  := -g -O3 -cpp -fbounds-check -fbacktrace -fstack-protector-all -fimplicit-none -ffree-form -fno-second-underscore -march=native
-FFLAGS	  := -g -O3 -cpp -fbounds-check -fbacktrace -fstack-protector-all -fimplicit-none -ffree-form 
+FFLAGS	  := -g -O3 -cpp -fbounds-check -fbacktrace -fstack-protector-all -fimplicit-none -ffree-form
 ##FFLAGS	  := -g -cpp -fbounds-check -fbacktrace -fstack-protector-all -fimplicit-none -ffree-form 
 #FFLAGS	  := -g -cpp -fbounds-check -fbacktrace -fstack-protector-all -fimplicit-none -ffree-form -fno-second-underscore -fcheck=all -ffpe-trap=invalid,zero,overflow
 #FFLAGS	  := -g -cpp -fbounds-check -fbacktrace -fstack-protector-all -fimplicit-none -ffree-form -fno-second-underscore -fcheck=all -Wuninitialized
@@ -45,7 +45,7 @@ LD        := mpifort
 SUBDIRS   := assim atmos3d da dataset datastruct datetime deconvolve fft geodesy grid io math model ndvar obs opt parallel penalty satellite str vec
 #BINARIES  := test.exe runRtmForward.exe runRtmForwardWithSweep.exe deconvolverObsRes.exe
 #BINARIES  := runRtmForward.exe runRtmForwardWithSweep.exe deconvolverObsRes.exe roundTripTest.exe testRoundTripParallelFft.exe matrixFuncSqrtEnKF.exe
-BINARIES  := runRtmForward.exe runRtmForwardWithSweep.exe deconvolverObsRes.exe roundTripTest.exe testRoundTripParallelFft.exe
+BINARIES  := runRtmForward.exe runRtmForwardWithSweep.exe roundTripTest.exe testRoundTripParallelFft.exe testTao.exe
 
 # =================================================================
 

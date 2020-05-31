@@ -1,39 +1,21 @@
 module nDVarAssimilationStrategy_mod
-    use iso_fortran_env
-    use, intrinsic :: iso_c_binding
-
-    use mpiUtils_mod
-    use parallelInfo_mod
-
     use assimilationStrategy_mod
     use assimilationProblem_mod
     use abstractVector_mod
     use abstractVectorOperator_mod
     use dataSet_mod
     use datasetVectorConverter_mod
-!    use optimizer_mod
+    use optimizer_mod
     use observer_mod
     use penalizer_mod
     use numericalUtils_mod
-
-#include "petsc/finclude/petsctao.h"
-    use petscdmda
-    use petsctao
+    use mpiUtils_mod
 
     implicit none
 
-#if defined(PETSC_USING_F90) && !defined(PETSC_USE_FORTRANKIND)
-    external PETSC_NULL_FUNCTION
-#endif
-
     private
         class(AssimilationProblem), pointer :: theProblem => null()
-        real(real64) :: cost0
-
-!        Vec              localX
-!        DM               dm
-!        PetscReal        param
-!        PetscInt         mx, my
+        real(8) :: cost0
 
     type, extends(AssimilationStrategy), public :: NDVarAssimilationStrategy
         private
@@ -50,32 +32,6 @@ module nDVarAssimilationStrategy_mod
 
     contains
 
-    subroutine pqdotdd(pinfo,p1,p2,n,dpx,dpy)
-
-        class(ParallelInfo), pointer     :: pinfo
-        real(real64),        intent(in)  :: p1(n)
-        real(real64),        intent(in)  :: p2(n)
-        integer,             intent(in)  :: n
-        real(real64),        intent(out) :: dpx
-        real(real64),        intent(out) :: dpy
-
-        real(real64) :: allsum(1), dval(1)
-
-        integer :: ierr
-
-        call qdotdd(p1,p2,n,dpx,dpy)
-
-        dval(1) = dpx
-        call MPI_AllReduce(dval,allsum,1,MPI_DOUBLE_PRECISION,MPI_SUM,&
-            pinfo%getCommunicator(),ierr)
-        dpx = allsum(1)
-
-        dval(1) = dpy
-        call MPI_AllReduce(dval,allsum,1,MPI_DOUBLE_PRECISION,MPI_SUM,&
-            pinfo%getCommunicator(),ierr)
-        dpy = allsum(1)
-    end subroutine
-
     subroutine NDVarAssimilationStrategyConstructor(this)
         implicit none
 
@@ -90,22 +46,15 @@ module nDVarAssimilationStrategy_mod
         type(NDVarAssimilationStrategy)  :: this
     end subroutine
 
-    !subroutine funder_ndvar(nctrl,z,costval,grad,iflag)
-
-    subroutine funder_ndvar(tao,z,costval,grad,dummy,ierr)
+    subroutine funder_ndvar(nctrl,z,costval,grad,iflag)
 
         implicit none
 
-!        integer, intent(in)                    :: nctrl
-!        real(real64), intent(in),  dimension(nctrl) :: z
-!        real(real64), intent(out)                   :: costval
-!        real(real64), intent(out), dimension(nctrl) :: grad
-!        integer, intent(out)                   :: iflag
-        Tao              tao
-        Vec              z, grad
-        PetscReal        costval
-        PetscErrorCode   ierr
-        PetscInt         dummy
+        integer, intent(in)                    :: nctrl
+        real(8), intent(in),  dimension(nctrl) :: z
+        real(8), intent(out)                   :: costval
+        real(8), intent(out), dimension(nctrl) :: grad
+        integer, intent(out)                   :: iflag
 
         class(DatasetVectorConverter), pointer :: converter => NULL()
         class(Observer),               pointer :: observer  => NULL()
@@ -118,22 +67,18 @@ module nDVarAssimilationStrategy_mod
         class(DataSet),                pointer :: deltaX    => NULL()
         class(AbstractVectorOperator), pointer :: bHalf     => NULL()
         class(AbstractVectorOperator), pointer :: rInvHalf  => NULL()
-        real(real64), dimension(:),    pointer :: yptr      => NULL()
-        real(real64), dimension(:),    pointer :: zInPtr    => NULL()
-        real(real64), dimension(:),    pointer :: zTmpPtr   => NULL()
-        real(real64), dimension(:),    pointer :: gradPtr   => NULL()
-        class(ParallelInfo),           pointer :: pinfo     => NULL()
+        real(8), dimension(:),         pointer :: yptr      => NULL()
+        real(8), dimension(:),         pointer :: zArray    => NULL()
 
         integer :: i
 
-        real(real64) :: dpx
-        real(real64) :: dpy
-        real(real64) :: dzcost
-        real(real64) :: dycost
-        real(real64) :: pencost
-        real(real64) :: gradnorm
+        real(8) :: dpx
+        real(8) :: dpy
+        real(8) :: dzcost
+        real(8) :: dycost
+        real(8) :: pencost
 
-        real(real64), parameter :: bfactor = 2.0d0
+        real(8), parameter :: bfactor = 1.0d0
 
         ! get the pointers from the options class
         converter => theProblem%getDatasetVectorConverter()
@@ -146,18 +91,11 @@ module nDVarAssimilationStrategy_mod
         yDiff     => theProblem%getObsDiffVector()
         bHalf     => theProblem%getBHalfOperator()
         penmgr    => theProblem%getPenalizer()
-        pinfo     => theProblem%getParallelInfo()
 
         costval = 0.0d0
 
-        call VecGetArrayReadF90(z,zInPtr,ierr)
-        call VecGetArrayF90(grad,gradPtr,ierr)
-
-        ! copy the values (NOT the pointer) of the input z vector to the zVector
-        call zVector%set1DArray(zInPtr)
-
-        ! get the one-dimensional pointer into the z array
-        zTmpPtr => zVector%get1DArrayPtr()
+        ! set the z matrix to the passed in value
+        call zVector%set1DArray(z)
 
         ! apply B^{1/2} as part of the transform B^{1/2}z = x - x_b
         call bHalf%applyOperator(zVector,xVector)
@@ -171,11 +109,11 @@ module nDVarAssimilationStrategy_mod
         ! compute the obs - observation operator, y - H(x)
         call observer%getYDiff(baseState, yDiff)
 
-        ! get the 1D representation of R^{-1/2}(y - H(x)) for the cost function
-        yptr => ydiff%get1DArrayPtr()
-
         ! apply R^{-1/2} once for the cost function
         call observer%applyRInvHalf(ydiff, ydiff)
+
+        ! get the 1D representation of R^{-1/2}(y - H(x)) for the cost function
+        yptr => ydiff%get1DArrayPtr()
 
         !open(unit=993,file='ydiff_rhalf.txt')
 
@@ -192,25 +130,28 @@ module nDVarAssimilationStrategy_mod
         !costval = 0.5d0*(bfactor*dot_product(z,z) + dot_product(yptr,yptr) + penval)/cost0
 
         ! compute the z^T z dot product in high precision
-        call pqdotdd(pinfo,zInPtr,zInPtr,size(zInPtr),dpx,dpy)
+        call qdotdd( z,z,nctrl,dpx,dpy)
 
         dzcost = 0.5d0*bfactor*(dpx+dpy)/cost0
 
         ! compute the \delta y^T \delta y dot product in high precision
-        call pqdotdd(pinfo,yptr,yptr,size(yptr),dpx,dpy)
+        call qdotdd(yptr,yptr,size(yptr),dpx,dpy)
 
         dycost = 0.5d0*(dpx+dpy)/cost0
 
         if (associated(penmgr)) then
-            call penmgr%getPenalty(zVector, xVector, bHalf, pencost, gradPtr)
+            call penmgr%getPenalty(zVector, xVector, bHalf, pencost, grad)
             pencost = 0.5*pencost/cost0
-            gradPtr = 0.5*gradPtr/cost0
+            grad = 0.5*grad/cost0
         else
-            gradPtr = 0.d0
+            grad = 0.d0
             pencost = 0.d0
         end if
 
         costval = dzcost + dycost + pencost
+
+        write(msgstr,*) 'cost val:',costval,dzcost,dycost,pencost
+        call print(msgstr)
 
         ! apply R^{-1/2} again for the adjoint to compute R^{-1} (y - H(x(z)))
         call observer%applyRInvHalf(ydiff,ydiff)
@@ -228,38 +169,21 @@ module nDVarAssimilationStrategy_mod
         ! call modelM%applyTranspose(xVector, ...)
 
         ! get the one-dimensional pointer into the z array
-        zTmpPtr => zVector%get1DArrayPtr()
+        zArray => zVector%get1DArrayPtr()
 
         ! we now have our gradient
         ! \nabla J(z) = z - B^{T/2} \mathbf{H}^T R^{-1} (y - H(x)) + \nabla P
-        gradPtr = (bfactor*zInPtr - zTmpPtr + gradPtr)/cost0
-
-        call pqdotdd(pinfo,gradPtr,gradPtr,size(gradPtr),dpx,dpy)
-
-        gradnorm = dpx+dpy
-
-        write(msgstr,*) 'cost val:',costval,dzcost,dycost,pencost,gradnorm
-        call print(msgstr)
-
-        call VecRestoreArrayReadF90(z,zInPtr,ierr)
-        call VecRestoreArrayF90(grad,gradPtr,ierr)
+        grad = (bfactor*z - zArray + grad)/cost0
     end subroutine
 
     ! another nested subroutine
-    subroutine alphaTest(pinfo,tao,startAlpha,bestxVec,yVec,gradVec,gradPVec)
+    subroutine alphaTest(startAlpha,bestx,nctr)
 
         implicit none
 
-        class(ParallelInfo), pointer :: pinfo
-
-        Tao,          intent(in)    :: tao
-        real(real64), intent(in)    :: startAlpha
-        Vec,          intent(inout) :: bestxVec
-        Vec,          intent(inout) :: yVec
-        Vec,          intent(inout) :: gradVec
-        Vec,          intent(inout) :: gradPVec
-
-        integer :: nctr
+        real(8), intent(in)    :: startAlpha
+        integer, intent(in)    :: nctr
+        real(8), intent(inout) :: bestx(nctr)
 
         class(Penalizer),              pointer :: penmgr
         class(AbstractVectorOperator), pointer :: bHalf
@@ -268,23 +192,14 @@ module nDVarAssimilationStrategy_mod
         integer :: npt
         integer, parameter :: m = 5
 
-        real(real64), pointer, dimension(:) :: x, y, z, hdir, grad, gradp
-        real(real64), pointer, dimension(:,:) :: sk, yk
-        real(real64), pointer, dimension(:) :: alphai
+        real(8), pointer, dimension(:) :: x, y, z, hdir, grad, gradp
+        real(8), pointer, dimension(:,:) :: sk, yk
+        real(8), pointer, dimension(:) :: alphai
 
-        real(real64), pointer :: bestx(:)
-
-        real(real64) :: costval, costvalp, alpha, bestAlpha, testval, prod, bestCostval
-        real(real64) :: calpha, talpha, t, rhok, h0k, betak, gnorm, dpx, dpy
+        real(8) :: costval, costvalp, alpha, bestAlpha, testval, prod, bestCostval
+        real(8) :: calpha, talpha, t, rhok, h0k, betak, gnorm, dpx, dpy
 
         integer :: i, k, kcur, kmax, iflag, ierr, iter, riter, niter, nfe, istart, nrst
-
-        call VecGetArrayF90(bestxVec,bestx,ierr)
-        call VecGetArrayF90(yVec,    y,    ierr)
-        call VecGetArrayF90(gradVec, grad, ierr)
-        call VecGetArrayF90(gradPVec,gradp,ierr)
-
-        nctr = size(bestx)
 
         bHalf     => theProblem%getBHalfOperator()
         penmgr    => theProblem%getPenalizer()
@@ -293,11 +208,20 @@ module nDVarAssimilationStrategy_mod
         allocate (x(nctr), STAT=ierr)
         if(ierr /= 0) write(*,*) "allocation error for x"
 
+        allocate (y(nctr), STAT=ierr)
+        if(ierr /= 0) write(*,*) "allocation error for y"
+
         allocate (z(nctr), STAT=ierr)
         if(ierr /= 0) write(*,*) "allocation error for z"
 
         allocate (hdir(nctr), STAT=ierr)
         if(ierr /= 0) write(*,*) "allocation error for hdir"
+
+        allocate (grad(nctr), STAT=ierr)
+        if(ierr /= 0) write(*,*) "allocation error for grad"
+
+        allocate (gradp(nctr), STAT=ierr)
+        if(ierr /= 0) write(*,*) "allocation error for gradp"
 
         allocate (sk(nctr,m), STAT=ierr)
         if(ierr /= 0) write(*,*) "allocation error for sk"
@@ -340,10 +264,9 @@ module nDVarAssimilationStrategy_mod
                 else
                     nfe = 1
                 end if
-                !call funder_ndvar(nctr,bestx,costval,grad,iflag)
-                call funder_ndvar(tao,bestxVec,costval,gradVec,0,iflag)
+                call funder_ndvar(nctr,bestx,costval,grad,iflag)
 
-                call pqdotdd(pinfo,grad,grad,nctr,dpx,dpy)
+                call qdotdd(grad,grad,nctr,dpx,dpy)
 
                 hdir = -grad / sqrt(dpx+dpy)
 
@@ -355,7 +278,7 @@ module nDVarAssimilationStrategy_mod
                 kcur = 1
                 riter = 1
             else
-                call pqdotdd(pinfo,grad,grad,nctr,dpx,dpy)
+                call qdotdd(grad,grad,nctr,dpx,dpy)
 
 !                    if (gnorm/sqrt(dpx+dpy) > 1.02d0) then
 !                        print *,'GNORM DID NOT DECREASE, RETURNING'
@@ -370,15 +293,15 @@ module nDVarAssimilationStrategy_mod
                 kmax = min(riter-1,m)
                 do i=1,kmax
                     k = modulo(riter-i-1,m)+1
-                    call pqdotdd(pinfo,sk(:,k),yk(:,k),nctr,dpx,dpy)
+                    call qdotdd(sk(:,k),yk(:,k),nctr,dpx,dpy)
 
                     rhok = dpx+dpy
                     if (i == 1) then
-                        call pqdotdd(pinfo,yk(:,k),yk(:,k),nctr,dpx,dpy)
+                        call qdotdd(yk(:,k),yk(:,k),nctr,dpx,dpy)
                         h0k = rhok/(dpx+dpy)
                         kcur = modulo(k,m)+1
                     end if
-                    call pqdotdd(pinfo,sk(:,k),gradp(:),nctr,dpx,dpy)
+                    call qdotdd(sk(:,k),gradp(:),nctr,dpx,dpy)
                     alphai(k) = (dpx+dpy)/rhok
                     gradp = gradp - alphai(k)*y(k)
                 end do
@@ -387,15 +310,15 @@ module nDVarAssimilationStrategy_mod
 
                 do i=kmax,1,-1
                     k = modulo(riter-i-1,m)+1
-                    call pqdotdd(pinfo,yk(:,k),z(:),nctr,dpx,dpy)
+                    call qdotdd(yk(:,k),z(:),nctr,dpx,dpy)
                     betak = dpx + dpy
-                    call pqdotdd(pinfo,sk(:,k),yk(:,k),nctr,dpx,dpy)
+                    call qdotdd(sk(:,k),yk(:,k),nctr,dpx,dpy)
                     betak = betak/(dpx+dpy)
 
                     z = z + (alphai(k)-betak)*sk(:,k)
                 end do
 
-                call pqdotdd(pinfo,z(:),z(:),nctr,dpx,dpy)
+                call qdotdd(z(:),z(:),nctr,dpx,dpy)
 
                 hdir = -z / sqrt(dpx+dpy)
             end if
@@ -407,16 +330,14 @@ module nDVarAssimilationStrategy_mod
             !end if
 
             ! h^T grad
-            call pqdotdd(pinfo,grad,hdir,nctr,dpx,dpy)
+            call qdotdd(grad(:),hdir(:),nctr,dpx,dpy)
             prod = dpx + dpy
 
             do i = 1,npt+1
                 y = x + alpha*hdir
                 gradp = 0.d0
 
-                !call funder_ndvar(nctr,y,costvalp,gradp,iflag)
-                call funder_ndvar(tao,yVec,costvalp,gradpVec,0,iflag)
-
+                call funder_ndvar(nctr,y,costvalp,gradp,iflag)
                 nfe = nfe + 1
 
                 if (costvalp < bestCostval) then
@@ -430,7 +351,7 @@ module nDVarAssimilationStrategy_mod
 
                 calpha  = (alpha*prod  + costval - costvalp)/(alpha*alpha)
 
-                call pqdotdd(pinfo,gradp,gradp,nctr,dpx,dpy)
+                call qdotdd(gradp(:),gradp(:),nctr,dpx,dpy)
 
                 gnorm = sqrt(dpx+dpy)
 
@@ -444,8 +365,7 @@ module nDVarAssimilationStrategy_mod
 
                 t = prod/(2.d0*calpha)
 
-                write(msgstr,*) 'Optimal alpha:',t,'predicted value:',costval + t*prod - t*t*calpha
-                call print(msgstr)
+                ! print *,'Optimal alpha:',t,'predicted value:',costval + t*prod - t*t*calpha
 
 !                    if (i .eq. 1. .and. riter > 1 .and. costvalp .lt. costval &
 !                            &.and. costvalp - (costval - costvalp) .lt. costval + t*prod - t*t*calpha) then
@@ -465,129 +385,81 @@ module nDVarAssimilationStrategy_mod
 
         ! deallocate local variables
         deallocate (x)
-        deallocate (z)
-        deallocate (sk)
-        deallocate (yk)
-        deallocate (alphai)
+        deallocate (y)
         deallocate (hdir)
+        deallocate (grad)
+        deallocate (gradp)
 
-        call VecRestoreArrayF90(bestxVec,bestx,ierr)
-        call VecRestoreArrayF90(yVec,    y,    ierr)
-        call VecRestoreArrayF90(gradVec, grad, ierr)
-        call VecRestoreArrayF90(gradpVec,gradp,ierr)
+        return
     end subroutine
 
-    subroutine assimilateNDVar(this,pinfo,problem)
+    subroutine assimilateNDVar(this,problem)
         implicit none
 
         class(NDVarAssimilationStrategy)    :: this
-        class(ParallelInfo),        pointer :: pinfo
         class(AssimilationProblem), pointer :: problem
-!        class(Optimizer), pointer           :: optimizer
+        class(Optimizer), pointer           :: optimizer
 
-        real(real64), pointer :: z0(:)
-        real(real64), pointer :: gradFinal(:)
-        real(real64) :: cost
+        real(8), pointer :: z0(:)
+        real(8), pointer :: gradFinal(:)
+        real(8) :: cost
         integer :: nctrl
         integer :: iflag
-        real(real64) :: dpx
-        real(real64) :: dpy
+        real(8) :: dpx
+        real(8) :: dpy
 
-        Vec :: z0Vec
-        Vec :: yVec
-        Vec :: gradVec
-        Vec :: gradpVec
+        integer :: i
 
-        integer :: i, ierr
-
-        Tao        tao            ! Tao solver context
-
-        logical :: flg
-
-        !procedure (funder_func), pointer :: funder_ptr
-
-        !external funder_ndvar
-
-        call PetscInitialize(PETSC_NULL_CHARACTER,ierr)
-
-        if (ierr .ne. 0) then
-            print*,'Unable to initialize PETSc'
-            stop
-        endif
+        procedure (funder_func), pointer :: funder_ptr
 
         theProblem => problem
 
-        !funder_ptr => null()
+        funder_ptr => null()
 
         nctrl = theProblem%getNControl()
 
         z0 => theProblem%getInitialGuess()
-        gradFinal => theProblem%getFinalGrad()
-
-        ! Create TAO solver
-        call TaoCreate(PETSC_COMM_WORLD,tao,ierr)
-        call TaoSetType(tao,TAOLMVM,ierr)
-
-        call TaoSetObjectiveAndGradientRoutine(tao,funder_ndvar,0,ierr)
-
-        call VecCreateMPIWithArray(PETSC_COMM_WORLD,1,size(z0),PETSC_DECIDE,z0,z0Vec,ierr)
-        call VecCreateMPIWithArray(PETSC_COMM_WORLD,1,size(gradFinal),PETSC_DECIDE,gradFinal,gradVec,ierr)
 
         cost0 = 1.d0
 
         if (theProblem%shouldDoAlphaTest()) then
-            call VecCreateMPI(PETSC_COMM_WORLD,size(z0),PETSC_DECIDE,gradpVec,ierr)
-            call VecCreateMPI(PETSC_COMM_WORLD,size(z0),PETSC_DECIDE,yVec,    ierr)
-            call alphaTest(pinfo,tao,1000.d0,z0Vec,yVec,gradVec,gradpVec)
-
-            write(msgstr,*) 'Finished alpha test'
-            call print(msgstr)
-
-            call VecDestroy(gradPVec,ierr)
-            call VecDestroy(yVec,ierr)
+            call alphaTest(10.0d0,z0,nctrl)
         end if
 
-        !call funder_ndvar(nctrl,z0,cost,gradFinal,iflag)
-        call funder_ndvar(tao,z0Vec,cost,gradVec,0,iflag)
+        write(msgstr,*) 'Finished alpha test'
+        call print(msgstr)
+
+        optimizer => theProblem%getOptimizer()
+
+        if (.not. associated(optimizer)) then
+            call error('Error: NDVar requires an optimizer')
+        end if
+
+        funder_ptr => funder_ndvar
+
+        call theProblem%allocFinalGrad()
+
+        gradFinal => theProblem%getFinalGrad()
+        ! set the problem at the module level so it can be read by the funder_ndvar method.
+        ! it would be preferable to have this be a contained subroutine in this subroutine,
+        ! but gfortran seems to crash when using a contained subroutine function pointer
+        ! (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=87838)
+
+        call funder_ptr(nctrl,z0,cost,gradFinal,iflag)
 
         cost0 = cost
 
-        call TaoSetInitialVector(tao,z0Vec,ierr)
+        call optimizer%optimize(funder_ptr,nctrl,z0,cost,gradFinal,iflag)
 
-        !call PetscOptionsHasName(PETSC_NULL_OPTIONS,PETSC_NULL_CHARACTER,   &
-        !                       & '-testmonitor',flg,ierr)
-        !if (flg) then
-            ! call TaoSetMonitor(tao,Monitor,dummy,PETSC_NULL_FUNCTION,ierr)
-        ! endif
+        call funder_ptr(nctrl,z0,cost,gradFinal,iflag)
 
-        !call PetscOptionsHasName(PETSC_NULL_OPTIONS,PETSC_NULL_CHARACTER,  &
-        !                        & '-testconvergence',flg, ierr)
-        ! if (flg) then
-            ! call TaoSetConvergenceTest(tao,ConvergenceTest,dummy, ierr)
-        ! endif
-
-        ! Check for any TAO command line options
-        call TaoSetFromOptions(tao,ierr)
-
-        ! SOLVE THE APPLICATION
-        call TaoSolve(tao,ierr)
-
-        ! call TaoView(tao,PETSC_COMM_WORLD,ierr)
-
-        call funder_ndvar(tao,z0Vec,cost,gradVec,0,iflag)
-
-        call VecGetArrayF90(gradVec,gradFinal,ierr)
-        call pqdotdd(pinfo,gradFinal,gradFinal,nctrl,dpx,dpy)
-        call VecRestoreArrayF90(gradVec,gradFinal,ierr)
+        call qdotdd( gradFinal,gradFinal,nctrl,dpx,dpy)
 
         write(msgstr,*) 'Final cost is: ',cost*cost0,'Final gnorm is:',cost0*sqrt(dpx+dpy)
         call print(msgstr)
 
-        theProblem => null()
+        deallocate(gradFinal)
 
-        ! Free TAO data structures
-        call TaoDestroy(tao,ierr)
-        call VecDestroy(z0Vec,ierr)
-        call VecDestroy(gradVec,ierr)
+        theProblem => null()
     end subroutine
 end module

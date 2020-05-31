@@ -25,6 +25,10 @@ module conicalScanningObservation_mod
 
     private
 
+    character(*), public, parameter :: TB_VAR_NAME      = 'Brightness_Temperatures'
+    character(*), public, parameter :: LAT_VAR_NAME     = 'Latitude'
+    character(*), public, parameter :: LON_VAR_NAME     = 'Longitude'
+
     type, extends(ScannedObservation), public :: ConicalScanningObservation
         !private
             ! Spin-frequency in RPM
@@ -94,7 +98,7 @@ module conicalScanningObservation_mod
 
     subroutine loadConicalScanningObservation(this,pinfo,tbVar,latVar,lonVar,&
         & scLatVar,scLonVar,yearVar,monthVar,dayVar,hourVar,minuteVar,       &
-        & secondVar,mobsExtent,nobsExtent,nlociExtent)
+        & secondVar)
 
         implicit none
 
@@ -124,13 +128,9 @@ module conicalScanningObservation_mod
         class(DataVariable),  optional, pointer    :: minuteVar
         ! integer(1) nscan
         class(DataVariable),  optional, pointer    :: secondVar
-        class(DataExtent),    optional, pointer    :: mobsExtent
-        class(DataExtent),    optional, pointer    :: nobsExtent
-        class(DataExtent),    optional, pointer    :: nlociExtent
 
         call this%loadScannedObservation(pinfo,tbVar,latVar,lonVar,scLatVar,scLonVar,&
-            & yearVar,monthVar,dayVar,hourVar,minuteVar,secondVar,mobsExtent,&
-            & nobsExtent,nlociExtent)
+            & yearVar,monthVar,dayVar,hourVar,minuteVar,secondVar)
     end subroutine
 
     function cloneConicalScanningObs(this,shallow,copyData) result(csoptr)

@@ -1,5 +1,7 @@
 module asciiUtils_mod
 
+    use iso_fortran_env
+
     implicit none
 
     private
@@ -12,10 +14,10 @@ module asciiUtils_mod
     subroutine load2DRealFile(filename,nx,ny,data2d)
         implicit none
 
-        character(len=*), intent(in)     :: filename
-        integer, intent(out)             :: nx
-        integer, intent(out)             :: ny
-        real(8), dimension(:,:), pointer :: data2d
+        character(len=*), intent(in)  :: filename
+        integer,          intent(out) :: nx
+        integer,          intent(out) :: ny
+        real(real64),     pointer     :: data2d(:,:)
 
         character(1024) :: line
         integer         :: io

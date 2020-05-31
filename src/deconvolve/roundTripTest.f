@@ -15,7 +15,10 @@ program roundTripTest
 
     use datasetVectorConverter_mod
 
+    ! from package io
+    use dataArrayReader_mod
     use dataArrayWriter_mod
+    use netcdfDataArrayReader_mod
     use netcdfDataArrayWriter_mod
 
     ! from package vec
@@ -48,10 +51,11 @@ program roundTripTest
     ! from package atmos3d
     use atmos3dDataSet_mod
     use atmos3dDataSetFactory_mod
-        
+
     ! from package deconvolve
     use firstGuesser_mod
-    use boundedVarBHalfOp_mod
+    use vertEofOperator_mod
+    !use boundedVarBHalfOp_mod
     use deconvolutionFactory_mod
     use deconvolutionConstants_mod
     use deconvolutionConverter_mod
@@ -81,6 +85,7 @@ program roundTripTest
     class(ParallelDecomposition),        pointer :: decomp     => null()
 
     class(SatellitePlatformInfo),        pointer :: platform
+    class(SatellitePlatformInfo),        pointer :: platformWithChanSubset
 
     integer :: time = 1
     class(Atmos3dDataSet),               pointer :: trueAtmosState
@@ -88,14 +93,19 @@ program roundTripTest
     class(RtmOptions),                   pointer :: rtmOpts
     class(SatelliteObservationOperator), pointer :: obsOpRtm
     class(SatelliteObservation),         pointer :: obs_modelRes
+    class(DataSet),                      pointer :: obs_dataSet
 
     class(Atmos3dDataSet),               pointer :: trueState => null()
 
     class(DataVariable),                 pointer :: columnNormsVar
     class(DataSet),                      pointer :: columnNorms
-    class(DataSet),                      pointer :: firstGuess
+    class(SatelliteObservation),         pointer :: firstGuess
+    class(DataSet),                      pointer :: firstGuess_ds
 
-    real(8), dimension(:,:),             pointer :: veofs
+    class(DataVariable),                 pointer :: latVar
+    class(DataVariable),                 pointer :: lonVar
+
+    real(real64), dimension(:,:),        pointer :: veofs
 
     class(ObservationBundle),            pointer :: obsBundle        => NULL()
     class(ScannedObservationBundle),     pointer :: scannedObsBundle => NULL()
@@ -104,19 +114,13 @@ program roundTripTest
     class(ScannedObservation),           pointer :: obs_so           => NULL()
     class(ScannedObservationOperator),   pointer :: obsOpConv        => NULL()
 
-    real(8), dimension(:,:),             pointer :: output           => NULL()
-
     class(FirstGuesser),                 pointer :: fg
 
-    real(8), dimension(:,:),             pointer :: node_xy      => NULL()
-    real(8), dimension(:),               pointer :: node_tb_fg   => NULL()
-    real(8), dimension(:),               pointer :: node_tb_dc   => NULL()
-    real(8), dimension(:),               pointer :: node_tb_true => NULL()
-    real(8), dimension(:,:),             pointer :: latptr       => NULL()
-    real(8), dimension(:,:),             pointer :: lonptr       => NULL()
-
-    real(4), dimension(:,:,:),           pointer :: obsTb        => NULL()
-    real(8), dimension(:),               pointer :: obsErr       => NULL()
+    class(DataVariable),                 pointer :: obsDataVar       => NULL()
+    real(real64), dimension(:,:),        pointer :: obsData          => NULL()
+    class(DataVariable),                 pointer :: tbVar            => NULL()
+    real(real64), dimension(:,:,:),      pointer :: tb               => NULL()
+    real(real64), dimension(:),          pointer :: obsErr           => NULL()
 
     class(NDVarAssimilationStrategy),    pointer :: deconvstrategy
     class(AssimilationStrategy),         pointer :: strategy
@@ -124,17 +128,20 @@ program roundTripTest
 
     class(AssimilationProblem),          pointer :: problem
 
-    class(BoundedVarBHalfOp),            pointer :: fftOp
+    !class(BoundedVarBHalfOp),            pointer :: fftOp
+    class(VertEofOperator),              pointer :: veofOp
 
     class(DatasetVectorConverter),       pointer :: converter
     class(DeconvolutionConverter),       pointer :: converter_dcnv
     class(AbstractVectorOperator),       pointer :: BHalf
     class(Observer),                     pointer :: obsvr
+
     class(DataSet),                      pointer :: finalState
+    class(SatelliteObservation),         pointer :: finalState_so
 
     class(DataGrid),                     pointer :: inputGrid  => null()
 
-    real(8),               dimension(:), pointer :: initGuess
+    real(real64),                        pointer :: initGuess(:)
 
     class(SatelliteObservation),         pointer :: fgObsInterp
     class(SatelliteObservation),         pointer :: dcObsInterp
@@ -144,24 +151,26 @@ program roundTripTest
     class(ObservationProcessor),         pointer :: obsProcessor
     class(ObservationProcessingChain),   pointer :: obsProcessingChain
 
-    class(DataExtent),    pointer :: xExtent    => null()
-    class(DataExtent),    pointer :: yExtent    => null()
-    class(DataDimension), pointer :: pixDim     => null()
-    class(DataDimension), pointer :: scanDim    => null()
+    class(DataExtent),    pointer :: mobsExtent  => null()
+    class(DataExtent),    pointer :: nobsExtent  => null()
+    class(DataExtent),    pointer :: nLociExtent => null()
+    class(DataDimension), pointer :: mobsDim     => null()
+    class(DataDimension), pointer :: nobsDim     => null()
+    class(DataDimension), pointer :: nLociDim    => null()
 
-    class(SatelliteObservation), pointer :: satObs     => null()
-    class(DataSet),              pointer :: satObs_ds  => null()
+    class(DataDimension), pointer :: chanDim     => null()
+    class(DataExtent),    pointer :: chanExtent  => null()
+
+    class(NetcdfDataArrayReader), pointer :: ncReader   => null()
+    class(DataArrayReader),       pointer :: reader     => null()
 
     class(NetcdfDataArrayWriter), pointer :: ncWriter   => null()
     class(DataArrayWriter),       pointer :: writer     => null()
 
     integer, pointer :: channelSubset(:)
 
-    integer :: chnum, chseq, ind, nprofile, nodenum, obsi, obsj, x, y
+    integer :: chnum, chseq, ind, nprofile, nodenum, obsi, obsj, pixnum, x, y
     integer :: i, narg, nchans, nctrl, npc, ntokens, platformNumber
-
-    real(8), dimension(1)   :: tbi_fg, tbi_dc, tbi_true
-    real(8), dimension(2,1) :: loctb
 
     character(len=4096) :: cmdlineArg
     character(len=1024) :: modelInputFile
@@ -203,7 +212,7 @@ program roundTripTest
         call print('    [model input file] is the model file to read (must be of type [model string])')
         call print('    [model string] is the code for the state, e.g. "' // trim(WRF_ARW_MODEL) // &
             '" for the WRF ARW model (see radianceAssimilationFactory.f)')
-        write(msgstr,'(A,I4,A)') '     [platform #] is the number of the platform, e.g. "',PLATFORM_TRMM_TMI,&
+        write(msgstr,'(A,I4,A)') '    [platform #] is the number of the platform, e.g. "',PLATFORM_TRMM_TMI,&
             '" for TRMM/TMI'
         call print(msgstr)
         call print('    [obs op string] is the code for the observation operator, e.g. "' // &
@@ -215,8 +224,8 @@ program roundTripTest
         call print('    [noisy obs output prefix] is the location to output the post-noise convolved TBs')
         call print('    [fg output prefix] is the location to output the first guess')
         call print('    [deconvolved output file] is the location to output the final deconvolved solution')
-        call error('')
-        call abortParallel()
+        call endParallel()
+        stop
     end if
 
     call get_command_argument(1,  modelInputFile)
@@ -236,10 +245,10 @@ program roundTripTest
     allocate(decomp)
     call decomp%parallelDecompositionConstructor(WEST_EAST_DIM_NAME,SOUTH_NORTH_DIM_NAME)
 
-    call debug('Now setting the parallel info')
-
     allocate(pinfo)
     call pinfo%parallelInfoConstructor(DISTRIBUTED_PARALLEL_TYPE,decomp=decomp)
+
+    platform => getSatellitePlatform(platformNumber,obsOpName)
 
     call newline()
     call newline()
@@ -271,31 +280,7 @@ program roundTripTest
     call newline()
     call newline()
     call print('----------------------------------------------------')
-    call print('Now running the ' // trim(obsOpName) // ' forward radiative transfer.')
-    call newline()
-
-    inquire(file = rtmOutputFile, exist=rtmOutExists)
-!    if (rtmOutExists) then
-!        call obs_modelRes%satelliteObservationConstructor_load(platform,null(),null(),&
-!            trueAtmosState%getNX()*trueAtmosState%getNY(),rtmOutputFile)
-!        write(msgstr,*) '   Loaded the existing RTM file from ',trim(rtmOutputFile)
-!        call print(msgstr)
-!    else
-!        call obs_modelRes%satelliteObservationConstructor_empty(platform,null(),null(),&
-!            trueAtmosState%getNX()*trueAtmosState%getNY())
-!        call doRtmForward(platform,trueAtmosState,obsOp,obs_modelRes,rtmOutputFile)
-!        write(msgstr,*) '   Ran the RTM and saved the output to ',trim(rtmOutputFile)
-!        call print(msgstr)
-!    end if
-
-    call print('----------------------------------------------------')
-    call newline()
-    call newline()
-    call newline()
-    call print('----------------------------------------------------')
     call print('Now loading the platform specific parameters.')
-
-    platform => getSatellitePlatform(platformNumber,obsOpName)
 
     call load2DRealFile(BHalfFile,npc,nchans,veofs)
     write(msgstr,*) 'Read ',nchans,'chans /',npc,'PCs from the BHalf file ',trim(BHalfFile)
@@ -306,6 +291,9 @@ program roundTripTest
     end if
 
     call print('Now loading the scannedObsBundle from ' // trim(orbitFile))
+
+    inputGrid => trueAtmosState%getGrid()
+    call inputGrid%tile(pinfo)
 
     allocate(obsProcessingChain)
     call obsProcessingChain%observationProcessingChainConstructor()
@@ -336,52 +324,78 @@ program roundTripTest
 
     call debug('Created the satellite platform for ' // trim(platform%platformName))
 
-    xExtent => trueAtmosState%getWestEastExtent()
-    yExtent => trueAtmosState%getSouthNorthExtent()
-
-    ! now creating "pixel" and "scan" dimensions from the x and y model dimensions
-    pixDim  => xExtent%getDimension()
-    pixDim  => pixDim%clone()
-    scanDim => yExtent%getDimension()
-    scanDim => scanDim%clone()
-
-    call  pixDim%setName(PIXELS_DIM_NAME)
-    call scanDim%setName(SCANS_DIM_NAME)
-
     allocate(obs_modelRes)
-    call obs_modelRes%satelliteObservationConstructor(platform)
-    call obs_modelRes%addDimension(pixDim)
-    call obs_modelRes%addDimension(scanDim)
-    call obs_modelRes%loadSatelliteObservation(pinfo,pixDim,scanDim, &
-        & trueAtmosState%getVariable2D(A3D_LAT_VAR),&
-        & trueAtmosState%getVariable2D(A3D_LON_VAR))
 
-    call debug('Now setting up the RTM options')
+    inquire(file = rtmOutputFile, exist=rtmOutExists)
+    if (rtmOutExists) then
+        call debug('RTM output file ' // trim(rtmOutputFile) // &
+            & ' already exists - reusing it.')
 
-    rtmOpts    => getRtmOptions()
-    obsOpRtm   => getSatelliteObservationOperator(obsOpName,rtmOpts,platform)
+        allocate(ncReader)
+        call ncReader%netcdfDataArrayReaderConstructor(rtmOutputFile)
 
-    call debug('Now running the RTM forward calculations...')
+        reader => ncReader
 
-    call doRtmForward(pinfo,platform,trueAtmosState,obsOpRtm,satObs)
+        call obs_modelRes%satelliteObservationConstructor(platform,reader)
 
-    call barrier(pinfo%getCommunicator())
+        call obs_modelRes%loadSatObsFromFile(pinfo)
 
-    call debug('Successfully completed the RTM forward calculations.')
+        write(msgstr,*) '   Loaded the existing RTM file from ',trim(rtmOutputFile)
+        call print(msgstr)
+    else
+        call debug('The RTM output file does not exist - regenerating.')
 
-    call debug('Now writing the model resolution output to ' // &
-        & trim(rtmOutputFile))
+        call obs_modelRes%satelliteObservationConstructor(platform)
 
-    allocate(ncWriter)
-    call ncWriter%netcdfDataArrayWriterConstructor(rtmOutputFile)
-    writer => ncWriter
-    call satObs%writeSatObsToFile(pinfo,writer,.true.)
-    deallocate(ncWriter)
+        latVar => trueAtmosState%getVariable(A3D_LAT_VAR)
+        lonVar => trueAtmosState%getVariable(A3D_LON_VAR)
 
-    satObs_ds => satObs
+        latVar => latVar%clone(copyData=.true.)
+        lonVar => lonVar%clone(copyData=.true.)
+
+        if (associated(platform%channelSubset)) then
+            chanDim => obs_modelRes%addDimensionByName('Channels',&
+                size(platform%channelSubset))
+        else
+            chanDim => obs_modelRes%addDimensionByName('Channels',platform%mobs)
+        end if
+
+        allocate(chanExtent)
+        call chanExtent%dataExtentConstructor(chanDim)
+
+        tbVar => obs_modelRes%addVariable(pinfo,'Brightness_Temperatures',tb,&
+            chanExtent,latVar%getExtentNumber(1),latVar%getExtentNumber(2))
+
+        tb = -999.
+
+        call obs_modelRes%loadSatelliteObservation_tb3d(pinfo,latVar,lonVar,tbVar)
+
+        call debug('Now setting up the RTM options')
+
+        rtmOpts    => getRtmOptions()
+        obsOpRtm   => getSatelliteObservationOperator(obsOpName,rtmOpts,platform)
+
+        call debug('Now running the RTM forward calculations...')
+
+        call doRtmForward(pinfo,platform,trueAtmosState,obsOpRtm,obs_modelRes)
+
+        write(msgstr,*) 'Ran the RTM and saved the output to ',trim(rtmOutputFile)
+        call print(msgstr)
+
+        call debug('Now writing the model resolution output to ' // &
+            & trim(rtmOutputFile))
+
+        allocate(ncWriter)
+        call ncWriter%netcdfDataArrayWriterConstructor(rtmOutputFile)
+        writer => ncWriter
+        call obs_modelRes%writeSatObsToFile(pinfo,writer)
+        deallocate(ncWriter)
+    end if
+
+    obs_dataSet => obs_modelRes
 
     ! now sweep the antenna pattern
-    call sweepAntennaPattern(pinfo,satObs_ds,scannedObsBundle,scannedObsBundle,&
+    call sweepAntennaPattern(pinfo,obs_dataSet,scannedObsBundle,scannedObsBundle,&
         noNoiseScannedOutputPrefix)
 
 !    allocate(columnNorms)
@@ -408,142 +422,129 @@ program roundTripTest
 !    write(msgstr,*) 'Wrote the column norms file to',trim(columnNormOutputFile)
 !    call print(msgstr)
 
-!    ! copy the data from the model-res obs to the model state as part of the round-trip
-!    nprofile = 0
-!    do x=1,trueState_mres%getNX()
-!        do y=1,trueState_mres%getNY()
-!            nprofile = nprofile + 1
-!            do chnum=1,nchans
-!                chseq = scannedObsBundle%getFullSetChanNum(chnum)
-!                trueState_mres%data3d(x,y,chnum) = obs_modelRes%obsData(chseq,nprofile)
-!            end do
-!        end do
-!    end do
-
     call random_seed()
 
-    ! now run the antenna convolution to get the obs-res synthetic obs
-!    do i=1,scannedObsBundle%getBundleSize()
-!        obs_so    => scannedObsBundle%getScannedObservation(i)
-!        obs       => obs_so
-!        obsOpConv => scannedObsBundle%getAntennaPatternObsOp(i)
-!
-!        allocate(output(obs%getMObs(),obs%getNObs()))
-!        call obsOpConv%forward(trueState, obs, output)
-!
-!        obsErr => obs_so%getObservationError()
-!
-!        ! add noise to the observation
-!        do chnum=1,obs%getMObs()
-!            call addGaussianNoise(obs%getNObs(),obs_so%obsData(chnum,:),obsErr(chnum),0.d0)
-!        end do
-!
-!        write(filenum,'(I4)') i+1000
-!        fileName = trim(noNoiseScannedOutputPrefix) //filenum(2:4)
-!
-!        call obs_so%writeToFile(fileName)
-!
-!        obsTb => obs_so%getTB()
-!
-!        ! copy the data back into the observation
-!        do ind=1,obs%getNObs()
-!            obsi = aint(obs%obsLoci(SO_PIX_DIM,ind))
-!            obsj = aint(obs%obsLoci(SO_SCAN_DIM,ind))
-!            obsTb(:,obsi,obsj) = output(:,ind)
-!            obs_so%obsData(:,ind)  = output(:,ind)
-!        end do
-!
-!        filename = trim(noisyScannedOutputPrefix) //filenum(2:4)
-!
-!        call obs_so%writeToFile(fileName)
-!
-!        deallocate(output)
-!        nullify(output)
-!    end do
+    ! now add the observation error for noisy observations
+    do i=1,scannedObsBundle%getBundleSize()
+        obs_so => scannedObsBundle%getScannedObservation(i)
 
-!    write(msgstr,*) 'Wrote the ',scannedObsBundle%getBundleSize(),' noise-free observation bundles to',&
-!        &trim(noNoiseScannedOutputPrefix)
-!    call print(msgstr)
-!    write(msgstr,*) 'Wrote the ',scannedObsBundle%getBundleSize(),' noisy observation bundles to',&
-!        &trim(noNoiseScannedOutputPrefix)
-!    call print(msgstr)
+        obsErr     => obs_so%getObservationError()
 
-! the rest is real
+        obsDataVar => obs_so%getObsDataVar()
+
+        call obsDataVar%getArray(obsData)
+
+        ! add noise to the observation
+        do chnum=1,size(obsData,1)
+            call addStandardGaussianNoise(size(obsData,2),obsData(chnum,:),&
+                obsErr(chnum),0.d0)
+        end do
+
+        if (size(obsData,1) /= 0) then
+            write(filenum,'(I4)') i+1000
+            filename = trim(noisyScannedOutputPrefix) // filenum(2:4) // '.nc'
+
+            allocate(ncWriter)
+            call ncWriter%netcdfDataArrayWriterConstructor(filename)
+            writer => ncWriter
+
+            call obs_so%writeSatObsToFile(pinfo,writer)
+            deallocate(ncWriter)
+
+            write(msgstr,'(A,I0,A,A)') 'Wrote noisy observation bundle number ',i,&
+                & ' to ', filename
+            call print(msgstr)
+        end if
+    end do
 
 !    ! now get the first guess
-!    allocate(firstGuess_mres)
-!    call firstGuess_mres%modelResGriddedTbDataSetConstructor(trueAtmosState,nchans,&
-!        null(),null())
-!
-!    fg => getFirstGuesser(ADJOINT_AVE_FG)
-!    firstGuess_gtb => firstGuess_mres
-!
-!    call fg%populateFirstGuess(scannedObsBundle,firstGuess_gtb)
-!
-!    fgOutputFile = trim(fgOutputPrefix) // '_fg.nc'
-!
-!    call firstGuess_gtb%writeToFile(fgOutputFile,'TB_FirstGuess')
-!
-!    write(msgstr,*) 'Wrote the first guess to',trim(fgOutputFile)
-!    call print(msgstr)
-!
-!    latptr => firstGuess_gtb%getLatPtr()
-!    lonptr => firstGuess_gtb%getLonPtr()
-!
-!    allocate(problem)
-!
-!    allocate(fftOp)
-!
-!    call fftOp%boundedVarBHalfOpConstructor(firstGuess_gtb%getNX(),firstGuess_gtb%getNY(),&
-!        nchans,npc,veofs)
-!
-!    nctrl = fftOp%getNumControl()
-!    opt => getOptimizer(LBFGS_OPTIMIZER,nctrl,MAX_ITER)
-!
-!    allocate(initGuess(nctrl))
-!    initGuess = 0.
-!
-!    allocate(converter_dcnv)
-!
-!    converter => converter_dcnv
-!
-!    allocate(obsvr)
-!    call obsvr%observerConstructor()
-!
-!    obsBundle => scannedObsBundle
-!    call obsvr%addObservationBundle(obsBundle)
-!
-!    bHalf => fftOp
-!
-!    firstGuess => firstGuess_gtb
-!
-!    call problem%assimilationProblemConstructor(nctrl,initGuess,opt,converter,obsvr,&
-!        &firstGuess,bHalf)
-!
-!    allocate(deconvstrategy)
-!    call deconvstrategy%nDVarAssimilationStrategyConstructor()
-!
-!    write(msgstr,*) 'Now beginning deconvolution minimization...'
-!    call print(msgstr)
-!
-!    call deconvstrategy%assimilate(problem)
-!
-!    finalState => problem%getBaseDataSet()
-!
-!    select type(finalState)
-!        class is (GriddedTbDataSet)
-!            finalState_gtb => finalState
-!        class default
-!            write(msgstr,*) 'Unknown model state in roundTripTest base state.'
-!            call error(msgstr)
-!    end select
-!
-!    deconvolvedOutputFile = trim(deconvolvedOutputPrefix) // '_dc.nc'
-!
-!    call finalState_gtb%writeToFile(deconvolvedOutputFile,'TB_Deconv')
-!
-!    write(msgstr,*) 'Finalized deconvolution and wrote output to ',trim(deconvolvedOutputFile)
-!    call print(msgstr)
+    firstGuess_ds => obs_modelRes%clone(shallow=.false.,copyData=.true.)
+
+    fg => getFirstGuesser(ADJOINT_AVE_FG)
+
+    select type (firstGuess_ds)
+        class is (SatelliteObservation)
+            firstGuess => firstGuess_ds
+        class default
+            call error('Unknown first guess type')
+    end select
+
+    call fg%populateFirstGuess(scannedObsBundle,firstGuess_ds)
+
+    fgOutputFile = trim(fgOutputPrefix) // '_fg.nc'
+
+    allocate(ncWriter)
+    call ncWriter%netcdfDataArrayWriterConstructor(fgOutputFile)
+    writer => ncWriter
+
+    call firstGuess%writeSatObsToFile(pinfo,writer)
+    deallocate(ncWriter)
+
+    write(msgstr,*) 'Wrote the first guess to',trim(fgOutputFile)
+    call print(msgstr)
+
+    obsDataVar => firstGuess%getObsDataVar()
+
+    call obsDataVar%getArray(obsData)
+
+    allocate(veofOp)
+    call veofOp%vertEofOperatorConstructor(1,nchans,npc,veofs)
+
+    allocate(converter_dcnv)
+    call converter_dcnv%deconvolutionConverterConstructor(OBS_DATA_VAR_NAME)
+
+    nctrl = npc*size(obsData,2)
+
+    !opt => getOptimizer(LBFGS_OPTIMIZER,nctrl,MAX_ITER)
+
+    allocate(initGuess(nctrl))
+    initGuess = 0.
+
+    converter => converter_dcnv
+
+    allocate(obsvr)
+    call obsvr%observerConstructor()
+
+    obsBundle => scannedObsBundle
+    call obsvr%addObservationBundle(obsBundle)
+
+    bHalf => veofOp
+
+    allocate(problem)
+    ! FIXME: remove pinfo from here, only pass in during assimilate. Stale pointers are bad.
+    call problem%assimilationProblemConstructor(pinfo,nctrl,initGuess,opt,converter,obsvr,&
+        &firstGuess_ds,bHalf)
+
+    allocate(deconvstrategy)
+    call deconvstrategy%nDVarAssimilationStrategyConstructor()
+
+    write(msgstr,*) 'Now beginning deconvolution minimization...'
+    call print(msgstr)
+
+    call deconvstrategy%assimilate(pinfo,problem)
+
+    finalState => problem%getBaseDataSet()
+
+    select type (finalState)
+        class is (SatelliteObservation)
+            finalState_so => finalState
+        class default
+            call error('Unknown dataset type')
+    end select
+
+    deconvolvedOutputFile = trim(deconvolvedOutputPrefix) // '_dc.nc'
+
+    allocate(ncWriter)
+    call ncWriter%netcdfDataArrayWriterConstructor(deconvolvedOutputFile)
+    writer => ncWriter
+
+    ! FIXME: should have tb point to obsData
+    call finalState_so%writeSatObsToFile(pinfo,writer)
+
+    deallocate(ncWriter)
+
+    write(msgstr,*) 'Finalized deconvolution and wrote output to ',trim(deconvolvedOutputFile)
+    call print(msgstr)
 !
 !    ! now interpolate the first guess, deconv, and true state to the observations
 !    do i=1,scannedObsBundle%getBundleSize()

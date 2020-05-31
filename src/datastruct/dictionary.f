@@ -69,6 +69,7 @@ module dictionary_mod
         class(DictionaryItem), pointer :: ditem
 
         allocate(ditem)
+        allocate(character(len=len_trim(adjustl(key))) :: ditem%key)
         ditem%key = adjustl(trim(key))
         ditem%value => value
 
@@ -312,9 +313,15 @@ module dictionary_mod
         class(*), pointer             :: upointer
         type(DictionaryItem), pointer :: item
 
+        character(len=:), allocatable :: shortKey
+
         getItem => null()
 
-        hash = this%hashkey(key)
+        allocate(character(len=len_trim(adjustl(key))) :: shortKey)
+
+        shortKey = adjustl(trim(key))
+
+        hash = this%hashkey(shortKey)
 
         if (associated(this%table(hash)%list)) then
             list => this%table(hash)%list
@@ -329,7 +336,7 @@ module dictionary_mod
                       item => upointer
                 end select
 
-                if (adjustl(trim(item%key)) == adjustl(trim(key))) then
+                if (trim(item%key) == shortKey) then
                     getItem => item
                     exit
                 endif

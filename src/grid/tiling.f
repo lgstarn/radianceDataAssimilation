@@ -14,8 +14,6 @@ module tiling_mod
     type, abstract, public :: Tiling
         !private
             integer               :: nodeNum               = -1
-            integer               :: ngx                   = -1
-            integer,      pointer :: node_owner(:)         => NULL()
             integer,      pointer :: node_ij(:,:)          => NULL()
             real(real64), pointer :: node_xy(:,:)          => NULL()
             integer,      pointer :: elements(:,:)         => NULL()
@@ -32,12 +30,10 @@ module tiling_mod
 !            procedure :: setNumElements
 
             procedure :: getNumNodes
-            procedure :: getNodeOwner
             procedure :: getNodeLoci
             procedure :: getNodeLociIndices
             procedure :: getElementIndices
             procedure :: getElementNeighbors
-            procedure :: getNFirstIndex
             generic   :: interpolate => &
                 & interpolate_byte,  &
                 & interpolate_short, &
@@ -111,26 +107,22 @@ module tiling_mod
 
     contains
 
-    subroutine tilingConstructor(this,nodenum,ngx,node_ij,node_xy,elements,&
-        & elementNeighbor,ndim,nelements,node_owner,deallocNode_ij,deallocNode_xy)
+    subroutine tilingConstructor(this,nodenum,node_ij,node_xy,elements,&
+        & elementNeighbor,ndim,nelements,deallocNode_ij,deallocNode_xy)
 
         implicit none
 
         class(Tiling)                 :: this
 
         integer,           intent(in) :: nodenum
-        integer,           intent(in) :: ngx
         integer,           intent(in) :: ndim
         integer,           intent(in) :: nelements
         integer,           pointer    :: node_ij(:,:)         ! (2,nodenum)
         real(real64),      pointer    :: node_xy(:,:)         ! (2,nodenum)
         integer,           pointer    :: elements(:,:)        ! (ndim,nelements)
         integer,           pointer    :: elementNeighbor(:,:) ! (ndim,nelements)
-        integer, optional, pointer    :: node_owner(:)        ! (nodenum)
         logical, optional, intent(in) :: deallocNode_ij
         logical, optional, intent(in) :: deallocNode_xy
-
-        print *,'size of node_xy 3:',shape(node_xy)
 
         if (present(deallocNode_ij)) then
             this%deallocNode_ij = deallocNode_ij
@@ -144,12 +136,7 @@ module tiling_mod
             this%deallocNode_xy = .true.
         end if
 
-        if (present(node_owner)) then
-            this%node_owner => node_owner
-        end if
-
         this%nodeNum         =  nodenum
-        this%ngx             =  ngx
         this%ndim            =  ndim
         this%numElements     =  nelements
         this%node_ij         => node_ij
@@ -204,16 +191,6 @@ module tiling_mod
         numElements = this%numElements
     end function
 
-    function getNodeOwner(this) result(node_owner)
-        implicit none
-
-        class(Tiling)         :: this
-
-        integer, pointer :: node_owner(:)
-
-        node_owner => this%node_owner
-    end function
-
     function getNodeLoci(this) result(node_xy)
         implicit none
 
@@ -242,16 +219,6 @@ module tiling_mod
         integer, pointer :: elements(:,:)
 
         elements => this%elements
-    end function
-
-    function getNFirstIndex(this) result(ngx)
-        implicit none
-
-        class(Tiling)    :: this
-
-        integer :: ngx
-
-        ngx = this%ngx
     end function
 
     function getElementNeighbors(this) result(neighbors)

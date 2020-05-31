@@ -113,7 +113,7 @@ module bHalf3dFftOperator_mod
     subroutine copyToFreqSpace(this, in, out, c)
         implicit none
 
-        class(BHalf3dFftOperator)         :: this
+        class(BHalf3dFftOperator)             :: this
         class(VecFourierMultVector),  pointer :: in
         class(AbstractVector),        pointer :: out
         real(8), optional,         intent(in) :: c
@@ -159,7 +159,7 @@ module bHalf3dFftOperator_mod
     subroutine copyFromDomain(this, in, out)
         implicit none
 
-        class(BHalf3dFftOperator)       :: this
+        class(BHalf3dFftOperator)             :: this
         class(AbstractVector),        pointer :: in
         class(VecFourierMultVector),  pointer :: out
 

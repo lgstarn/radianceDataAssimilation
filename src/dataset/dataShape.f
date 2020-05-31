@@ -175,7 +175,8 @@ module dataShape_mod
         allocate(staggers(ndim))
 
         if (.not. associated(dim1)) then
-            call error('Dimension 1 is not associated with a pointer in dataShape constructor')
+            call error('Dimension 1 was not associated in the data shape constructor ' // &
+                & ' - ndim: ' // int2str(ndim))
         end if
 
         globalCounts(1) = dim1%getGlobalCount()
@@ -184,7 +185,8 @@ module dataShape_mod
 
         if (ndim >= 2) then
             if (.not. associated(dim2)) then
-                call error('Dimension 2 was not associated in the data shape constructor')
+                call error('Dimension 2 was not associated in the data shape constructor ' // &
+                    & ' - ndim: ' // int2str(ndim))
             end if
             globalCounts(2) = dim2%getGlobalCount()
             staggers(2)     = dim2%getStagger()
@@ -193,7 +195,8 @@ module dataShape_mod
 
         if (ndim >= 3) then
             if (.not. associated(dim3)) then
-                call error('Dimension 3 was not associated in the data shape constructor')
+                call error('Dimension 3 was not associated in the data shape constructor ' // &
+                    & ' - ndim: ' // int2str(ndim))
             end if
             globalCounts(3) = dim3%getGlobalCount()
             staggers(3)     = dim3%getStagger()
@@ -202,7 +205,8 @@ module dataShape_mod
 
         if (ndim >= 4) then
             if (.not. associated(dim4)) then
-                call error('Dimension 4 was not associated in the data shape constructor')
+                call error('Dimension 4 was not associated in the data shape constructor ' // &
+                    & ' - ndim: ' // int2str(ndim))
             end if
             globalCounts(4) = dim4%getGlobalCount()
             staggers(4)     = dim4%getStagger()
@@ -211,7 +215,8 @@ module dataShape_mod
 
         if (ndim >= 5) then
             if (.not. associated(dim5)) then
-                call error('Dimension 5 was not associated in the data shape constructor')
+                call error('Dimension 5 was not associated in the data shape constructor ' // &
+                    & ' - ndim: ' // int2str(ndim))
             end if
             globalCounts(5) = dim5%getGlobalCount()
             staggers(5)     = dim5%getStagger()
@@ -220,7 +225,8 @@ module dataShape_mod
 
         if (ndim >= 6) then
             if (.not. associated(dim6)) then
-                call error('Dimension 6 was not associated in the data shape constructor')
+                call error('Dimension 6 was not associated in the data shape constructor ' // &
+                    & ' - ndim: ' // int2str(ndim))
             end if
             globalCounts(6) = dim6%getGlobalCount()
             staggers(6)     = dim6%getStagger()
@@ -229,7 +235,8 @@ module dataShape_mod
 
         if (ndim == 7) then
             if (.not. associated(dim7)) then
-                call error('Dimension 7 was not associated in the data shape constructor')
+                call error('Dimension 7 was not associated in the data shape constructor ' // &
+                    & ' - ndim: ' // int2str(ndim))
             end if
             globalCounts(7) = dim7%getGlobalCount()
             staggers(7)     = dim7%getStagger()

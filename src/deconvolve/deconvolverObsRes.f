@@ -120,12 +120,10 @@ program deconvolverObsRes
     class(BoundedVarBHalfOp),         pointer :: fftOpNoVeofs
 
     class(DataDimension), pointer :: pcDim
-    class(DataDimension), pointer :: scanDim
-    class(DataDimension), pointer :: pixDim
+    class(DataDimension), pointer :: nobsDim
     class(DataDimension), pointer :: chanDim
 
-    class(DataExtent), pointer :: pixExtent
-    class(DataExtent), pointer :: scanExtent
+    class(DataExtent), pointer :: nobsExtent
     class(DataExtent), pointer :: pcExtent
 
     class(DataVariable), pointer :: backgroundVar
@@ -177,8 +175,7 @@ program deconvolverObsRes
 
     integer :: nchans
     integer :: npc
-    integer :: nscan
-    integer :: npix
+    integer :: nobs
 
     logical :: fileExists
 
@@ -328,10 +325,8 @@ program deconvolverObsRes
 
     call print('Finished reading orbit file ' // trim(orbitFile))
 
-    pixExtent  => scannedObs%getPixelExtent()
-    scanExtent => scannedObs%getScanExtent()
-    pixDim     => pixExtent%getDimension()
-    scanDim    => scanExtent%getDimension()
+    nobsExtent => scannedObs%getNobsExtent()
+    nobsDim    => nobsExtent%getDimension()
 
     allocate(scanRanges(pinfo_state%getCommSize()))
     scanRanges(pinfo_state%getRank()+1) = scanExtent%getLocalEnd()
@@ -518,14 +513,14 @@ program deconvolverObsRes
 
     bHalf => fftOp
 
-    call problem%assimilationProblemConstructor(nctrl,initGuess,opt,converter,obsvr,&
+    call problem%assimilationProblemConstructor(pinfo_state,nctrl,initGuess,opt,converter,obsvr,&
         &background,bHalf,penmgr,alphaTest)
 
     allocate(deconvstrategy)
     call deconvstrategy%nDVarAssimilationStrategyConstructor()
 
     call print('Now beginning deconvolution minimization.')
-    call deconvstrategy%assimilate(problem)
+    call deconvstrategy%assimilate(pinfo_state,problem)
 
     finalState => problem%getBaseDataSet()
 

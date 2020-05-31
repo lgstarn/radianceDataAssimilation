@@ -9,7 +9,7 @@
         else
             call this%doLoadArray(pinfo,dArray,variableName,required)
         end if
-
+        
         allocate(var)
         call var%dataVariableConstructor(variableName,dArray,.true.,.true.)
 

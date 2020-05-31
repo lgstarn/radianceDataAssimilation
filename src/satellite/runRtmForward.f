@@ -23,6 +23,8 @@ program runRtmForward
     use dataDimension_mod
     use dataVariable_mod
 
+    use observation_mod
+
     use parallelConstants_mod
     use parallelInfo_mod
     use parallelDecomposition_mod
@@ -48,25 +50,26 @@ program runRtmForward
     class(NetcdfDataArrayWriter),        pointer :: ncWriter   => null()
     class(DataArrayWriter),              pointer :: writer     => null()
 
-    class(DataExtent),    pointer :: xExtent    => null()
-    class(DataExtent),    pointer :: yExtent    => null()
-    class(DataDimension), pointer :: pixDim     => null()
-    class(DataDimension), pointer :: scanDim    => null()
-    class(DataDimension), pointer :: chanDim    => null()
+    class(DataDimension), pointer :: chanDim     => null()
+    class(DataExtent),    pointer :: chanExtent  => null()
 
-    class(DataVariable),  pointer :: tbVar      => null()
-    class(DataVariable),  pointer :: latVar     => null()
-    class(DataVariable),  pointer :: lonVar     => null()
+    real(real64), pointer :: tb(:,:,:)
+
+    integer :: nchan
 
     integer :: time = 1
     integer :: platformNumber
 
     class(RtmOptions), pointer :: rtmOpts => null()
 
+    class(DataVariable), pointer :: latVar
+    class(DataVariable), pointer :: lonVar
+    class(DataVariable), pointer :: tbVar
+
     integer :: narg
     character(len=1024) :: cmdlineArg
 
-    integer :: nprofile, x, y
+    integer :: i, ierr, iobs, j, nprofile, nobs_s, x, y, nx_g, ny_g, nx_l, ny_l, nx_s, ny_s
 
     class(SatellitePlatformInfo), pointer :: platform => null()
 
@@ -123,9 +126,6 @@ program runRtmForward
 
     call debug('Now setting up the RTM options and platform')
 
-    xExtent => modelState%getWestEastExtent()
-    yExtent => modelState%getSouthNorthExtent()
-
     rtmOpts  => getRtmOptions()
     platform => getSatellitePlatform(platformNumber,obsOpName)
     obsOp    => getSatelliteObservationOperator(obsOpName,rtmOpts,platform)
@@ -135,21 +135,31 @@ program runRtmForward
     call debug('Now setting the observation parallel info')
 
     ! now creating "pixel" and "scan" dimensions from the x and y model dimensions
-    pixDim  => xExtent%getDimension()
-    pixDim  => pixDim%clone()
-
-    scanDim => yExtent%getDimension()
-    scanDim => scanDim%clone()
-    call pixDim%setName(PIXELS_DIM_NAME)
-    call scanDim%setName(SCANS_DIM_NAME)
-
     allocate(satObs)
     call satObs%satelliteObservationConstructor(platform)
-    call satObs%addDimension(pixDim)
-    call satObs%addDimension(scanDim)
-    call satObs%loadSatelliteObservation(pinfo,pixDim,scanDim, &
-        & modelState%getVariable2D(A3D_LAT_VAR),&
-        & modelState%getVariable2D(A3D_LON_VAR))
+
+    latVar => modelState%getVariable(A3D_LAT_VAR)
+    lonVar => modelState%getVariable(A3D_LON_VAR)
+
+    latVar => latVar%clone(copyData=.true.)
+    lonVar => lonVar%clone(copyData=.true.)
+
+    if (associated(platform%channelSubset)) then
+        nchan = size(platform%channelSubset)
+    else
+        nchan = platform%mobs
+    end if
+
+    chanDim    => satObs%addDimensionByName('Channels',nchan)
+    allocate(chanExtent)
+    call chanExtent%dataExtentConstructor(chanDim)
+
+    tbVar => satObs%addVariable(pinfo,'Brightness_Temperatures',tb,&
+        chanExtent,latVar%getExtentNumber(1),latVar%getExtentNumber(2))
+
+    tb = -999.
+
+    call satObs%loadSatelliteObservation_tb3d(pinfo,latVar,lonVar,tbVar)
 
     call debug('Now running the RTM forward calculations...')
 
@@ -163,7 +173,7 @@ program runRtmForward
     allocate(ncWriter)
     call ncWriter%netcdfDataArrayWriterConstructor(outputFile)
     writer => ncWriter
-    call satObs%writeSatObsToFile(pinfo,writer,.true.)
+    call satObs%writeSatObsToFile(pinfo,writer)
     deallocate(ncWriter)
     deallocate(modelState)
     deallocate(rtmOpts)

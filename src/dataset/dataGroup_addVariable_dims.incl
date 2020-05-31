@@ -1,15 +1,20 @@
         class(DataShape), pointer :: dShape
         integer :: nd
-        
+
+		if (.not. associated(pinfo)) then
+			call error('The pinfo pointer was not associated.')
+		end if        
+
+		! this code will work even for a non-associated pointer
         nd = size(shape(dataptr))
 
         allocate(dShape)
-        	
+
         if (pinfo%getParallelType() == DISTRIBUTED_PARALLEL_TYPE) then
 	        call dShape%dataShapeConstructor(nd, dim1, dim2, dim3, dim4, dim5, dim6, dim7, &
 	        	decomp=pinfo%getParallelDecomposition())
     	else
 	        call dShape%dataShapeConstructor(nd, dim1, dim2, dim3, dim4, dim5, dim6, dim7)    	
     	end if
-                
+
         var => this%addVariable(pinfo,variableName,dataptr,dShape,initVal,copyData)

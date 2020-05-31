@@ -253,7 +253,7 @@ module gmiObservationBundle_mod
 
         gmiObs => this%getGmiObs(bundleNum)
 
-        ddim => gmiObs%getChannelDim()
+        ddim => gmiObs%getMObsDim()
 
         nchan = ddim%getGlobalCount()
     end function
@@ -301,7 +301,7 @@ module gmiObservationBundle_mod
 
         gmiObs => this%getGmiObs(bundleNum)
 
-        ddim => gmiObs%getChannelDim()
+        ddim => gmiObs%getMObsDim()
 
         nchan = ddim%getGlobalCount() + gmiObs%getChannelOffset()
     end function

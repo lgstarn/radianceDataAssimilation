@@ -1,4 +1,6 @@
 module assimilationProblem_mod
+    use parallelInfo_mod
+
     use observation_mod
     use observationOperator_mod
     use observer_mod
@@ -21,12 +23,13 @@ module assimilationProblem_mod
             integer                                :: nctrl       ! number of control variables
             logical                                :: alphaTest   ! do alpha test?
 
+            class(ParallelInfo),           pointer :: pinfo            => NULL() ! Passed in
             real(8), dimension(:),         pointer :: initGuess        => NULL() ! dimension: nctrl x 1. Passed in
-            class(DatasetVectorConverter),   pointer :: converter        => NULL() ! Passed in
+            class(DatasetVectorConverter), pointer :: converter        => NULL() ! Passed in
             class(Observer),               pointer :: obsvr            => NULL() ! Passed in
-            class(DataSet),             pointer :: background       => NULL() ! Passed in
-            class(DataSet),             pointer :: baseState        => NULL() ! Passed in
-            class(DataSet),             pointer :: deltaX           => NULL() ! Passed in
+            class(DataSet),                pointer :: background       => NULL() ! Passed in
+            class(DataSet),                pointer :: baseState        => NULL() ! Passed in
+            class(DataSet),                pointer :: deltaX           => NULL() ! Passed in
             class(AbstractVectorOperator), pointer :: bHalf            => NULL() ! Passed in
             class(Optimizer),              pointer :: opt              => NULL() ! Passed in; optional
             class(Penalizer),              pointer :: penmgr           => NULL() ! Passed in; optional
@@ -40,6 +43,7 @@ module assimilationProblem_mod
 
             procedure :: assimilationProblemConstructor
 
+            procedure :: getParallelInfo
             procedure :: getNControl
             procedure :: getInitialGuess
             procedure :: getOptimizer
@@ -53,7 +57,6 @@ module assimilationProblem_mod
             procedure :: getStateVector
             procedure :: getObsDiffVector
             procedure :: getBHalfOperator
-            procedure :: allocFinalGrad
             procedure :: getFinalGrad
             procedure :: shouldDoAlphaTest
 
@@ -64,18 +67,19 @@ module assimilationProblem_mod
 
     contains
 
-    subroutine assimilationProblemConstructor(this,nctrl,initGuess,opt,converter,obsvr,&
+    subroutine assimilationProblemConstructor(this,pinfo,nctrl,initGuess,opt,converter,obsvr,&
         &background,bHalf,penmgr,alphaTest)
 
         implicit none
 
         class(AssimilationProblem)              :: this
+        class(ParallelInfo),           pointer  :: pinfo
         integer, intent(in)                     :: nctrl
         real(8), dimension(:),         pointer  :: initGuess
         class(Optimizer),              pointer  :: opt
-        class(DatasetVectorConverter),   pointer  :: converter
+        class(DatasetVectorConverter), pointer  :: converter
         class(Observer),               pointer  :: obsvr
-        class(DataSet),             pointer  :: background
+        class(DataSet),                pointer  :: background
         class(AbstractVectorOperator), pointer  :: bHalf
         class(Penalizer),    optional, pointer  :: penmgr
         logical, intent(in), optional           :: alphaTest
@@ -89,6 +93,7 @@ module assimilationProblem_mod
         nstate = converter%getStateVectorSize(background)
         nobs   = obsvr%getTotalObs()
 
+        this%pinfo      => pinfo
         this%initGuess  => initGuess
         this%opt        => opt
         this%converter  => converter
@@ -96,12 +101,9 @@ module assimilationProblem_mod
         this%background => background
         this%bHalf      => bHalf
 
-        ! assume if the optimizer is set we'll want to the variational-type variables
-        if (associated(opt)) then
-            ! clone the background into a baseState and deltaX
-            this%baseState  => background%clone(.false.)
-            this%deltaX     => background%clone(.false.)
-        end if
+        ! clone the background into a baseState and deltaX
+        this%baseState  => background%clone(shallow=.false.,copyData=.true.)
+        this%deltaX     => background%clone(shallow=.false.,copyData=.false.)
 
         allocate(bvec)
         allocate(cvec)
@@ -166,6 +168,15 @@ module assimilationProblem_mod
             deallocate(this%finalGrad)
         end if
     end subroutine
+
+    function getParallelInfo(this) result(pinfo)
+        implicit none
+
+        class(AssimilationProblem)    :: this
+        class(ParallelInfo), pointer  :: pinfo
+
+        pinfo => this%pinfo
+    end function
 
     function getNControl(this) result(nctrl)
         implicit none
@@ -283,18 +294,6 @@ module assimilationProblem_mod
 
         bHalf => this%bHalf
     end function
-
-    subroutine allocFinalGrad(this)
-        implicit none
-
-        class(AssimilationProblem)     :: this
-
-        if (associated(this%finalGrad)) then
-            deallocate(this%finalGrad)
-        end if
-
-        allocate(this%finalGrad(this%nctrl))
-    end subroutine
 
     function getFinalGrad(this) result(finalGrad)
         implicit none

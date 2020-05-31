@@ -380,7 +380,7 @@ module radianceAssimilationFactory_mod
 
             scannedObs => amsrObs
         else
-            write(msgstr,*) 'Unknown platformNumber for getScannedObservationBundle', platformNumber
+            write(msgstr,*) 'Unknown platformNumber for getScannedObservation ', platformNumber
             call error(msgstr)
         end if
     end function
@@ -410,7 +410,6 @@ module radianceAssimilationFactory_mod
             call ssmisObsBundle%ssmisObservationBundleConstructor(pinfo,orbitFile,      &
                 & inputGrid,platformNumber+7,obsProcessor,minGoodRatio,obsErrInflation, &
                 & columnNormsVar)
-
             scannedObsBundle => ssmisObsBundle
         else if (platformNumber >= PLATFORM_AMSR_E .and. platformNumber <= PLATFORM_AMSR_2) then
             allocate(amsrObsBundle)

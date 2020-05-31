@@ -1182,7 +1182,7 @@ module dataSet_mod
     end function
 
     function loadDimensionFromVariable(this,pinfo,dimName,dimNum,locationInFile,&
-        globalCount,globalStart,localCount,localStart,stagger,compareToDim) result(ddim)
+        globalCount,globalStart,stagger,compareToDim,required) result(ddim)
 
         implicit none
 
@@ -1194,10 +1194,9 @@ module dataSet_mod
         character(len=*), optional, intent(in)  :: locationInFile
         integer,          optional, intent(in)  :: globalCount
         integer,          optional, intent(in)  :: globalStart
-        integer,          optional, intent(in)  :: localCount
-        integer,          optional, intent(in)  :: localStart
         integer,          optional, intent(in)  :: stagger
         character(len=*), optional, intent(in)  :: compareToDim
+        logical,          optional, intent(in)  :: required
 
         class(DataDimension),       pointer :: ddim
         class(DataArrayReader),     pointer :: dReader
@@ -1212,13 +1211,17 @@ module dataSet_mod
 
         allocate(ddim)
         if (present(locationInFile)) then
-            dimn = dReader%loadDimSizeFromVariable(pinfo,locationInFile,dimNum)
+            dimn = dReader%loadDimSizeFromVariable(pinfo,locationInFile,dimNum,required)
         else
-            dimn = dReader%loadDimSizeFromVariable(pinfo,dimName,dimNum)
+            dimn = dReader%loadDimSizeFromVariable(pinfo,dimName,dimNum,required)
         end if
 
-        ddim => this%addDimensionByName(dimName,dimn,globalCount,globalStart,&
-            & localCount,localStart,stagger,compareToDim)
+        if (dimn >= 0) then
+            ddim => this%addDimensionByName(dimName,dimn,globalCount,globalStart,&
+                & stagger,compareToDim)
+        else
+            ddim => null()
+        end if
     end function
 
     function loadVariable_dim1(this,pinfo,dTypeNum,variableName,dim1,locationInFile,&
@@ -1230,13 +1233,22 @@ module dataSet_mod
 
         character(len=*),                       intent(in) :: variableName
         integer,                                intent(in) :: dTypeNum
-        class(DataDimension),                   pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),                   pointer    :: dim1
         class(ParallelInfo),                    pointer    :: pinfo
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
 
         class(DataVariable),                    pointer    :: var
+
+        class(Datadimension),                   pointer    :: dim2 => null()
+        class(Datadimension),                   pointer    :: dim3 => null()
+        class(Datadimension),                   pointer    :: dim4 => null()
+        class(Datadimension),                   pointer    :: dim5 => null()
+        class(Datadimension),                   pointer    :: dim6 => null()
+        class(Datadimension),                   pointer    :: dim7 => null()
+
+        integer, parameter :: ndim = 1
 
         include 'dataSet_loadVariable.incl'
     end function
@@ -1250,13 +1262,21 @@ module dataSet_mod
 
         character(len=*),                       intent(in) :: variableName
         integer,                                intent(in) :: dTypeNum
-        class(DataDimension),                   pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),                   pointer    :: dim1, dim2
         class(ParallelInfo),                    pointer    :: pinfo
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
 
         class(DataVariable),                    pointer    :: var
+
+        class(Datadimension),                   pointer    :: dim3 => null()
+        class(Datadimension),                   pointer    :: dim4 => null()
+        class(Datadimension),                   pointer    :: dim5 => null()
+        class(Datadimension),                   pointer    :: dim6 => null()
+        class(Datadimension),                   pointer    :: dim7 => null()
+
+        integer, parameter :: ndim = 2
 
         include 'dataSet_loadVariable.incl'
     end function
@@ -1270,13 +1290,20 @@ module dataSet_mod
 
         character(len=*),                       intent(in) :: variableName
         integer,                                intent(in) :: dTypeNum
-        class(DataDimension),                   pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),                   pointer    :: dim1, dim2, dim3
         class(ParallelInfo),                    pointer    :: pinfo
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
 
         class(DataVariable),                    pointer    :: var
+
+        class(Datadimension),                   pointer    :: dim4 => null()
+        class(Datadimension),                   pointer    :: dim5 => null()
+        class(Datadimension),                   pointer    :: dim6 => null()
+        class(Datadimension),                   pointer    :: dim7 => null()
+
+        integer, parameter :: ndim = 3
 
         include 'dataSet_loadVariable.incl'
     end function
@@ -1290,13 +1317,19 @@ module dataSet_mod
 
         character(len=*),                       intent(in) :: variableName
         integer,                                intent(in) :: dTypeNum
-        class(DataDimension),                   pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),                   pointer    :: dim1, dim2, dim3, dim4
         class(ParallelInfo),                    pointer    :: pinfo
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
 
         class(DataVariable),                    pointer    :: var
+
+        class(Datadimension),                   pointer    :: dim5 => null()
+        class(Datadimension),                   pointer    :: dim6 => null()
+        class(Datadimension),                   pointer    :: dim7 => null()
+
+        integer, parameter :: ndim = 4
 
         include 'dataSet_loadVariable.incl'
     end function
@@ -1310,13 +1343,18 @@ module dataSet_mod
 
         character(len=*),                       intent(in) :: variableName
         integer,                                intent(in) :: dTypeNum
-        class(DataDimension),                   pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),                   pointer    :: dim1, dim2, dim3, dim4, dim5
         class(ParallelInfo),                    pointer    :: pinfo
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
 
         class(DataVariable),                    pointer    :: var
+
+        class(Datadimension),                   pointer    :: dim6 => null()
+        class(Datadimension),                   pointer    :: dim7 => null()
+
+        integer, parameter :: ndim = 5
 
         include 'dataSet_loadVariable.incl'
     end function
@@ -1330,13 +1368,17 @@ module dataSet_mod
 
         character(len=*),                       intent(in) :: variableName
         integer,                                intent(in) :: dTypeNum
-        class(DataDimension),                   pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),                   pointer    :: dim1, dim2, dim3, dim4, dim5, dim6
         class(ParallelInfo),                    pointer    :: pinfo
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
 
         class(DataVariable),                    pointer    :: var
+
+        class(Datadimension),                   pointer    :: dim7 => null()
+
+        integer, parameter :: ndim = 6
 
         include 'dataSet_loadVariable.incl'
     end function
@@ -1357,6 +1399,8 @@ module dataSet_mod
         logical,                      optional, intent(in) :: squeeze
 
         class(DataVariable),                    pointer    :: var
+
+        integer, parameter :: ndim = 7
 
         include 'dataSet_loadVariable.incl'
     end function
@@ -7383,11 +7427,18 @@ module dataSet_mod
 
         character(len=*),             intent(in) :: variableName
         integer,                      intent(in) :: dTypeNum
-        class(DataDimension),         pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),         pointer    :: dim1
         class(ParallelInfo),          pointer    :: pinfo
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
+
+        class(DataDimension),         pointer    :: dim2 => null()
+        class(DataDimension),         pointer    :: dim3 => null()
+        class(DataDimension),         pointer    :: dim4 => null()
+        class(DataDimension),         pointer    :: dim5 => null()
+        class(DataDimension),         pointer    :: dim6 => null()
+        class(DataDimension),         pointer    :: dim7 => null()
 
         class(DataVariable),          pointer    :: var
 
@@ -7405,13 +7456,19 @@ module dataSet_mod
 
         character(len=*),             intent(in) :: variableName
         integer,                      intent(in) :: dTypeNum
-        class(DataDimension),         pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),         pointer    :: dim1, dim2
         class(ParallelInfo),          pointer    :: pinfo
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
 
         class(DataVariable),          pointer    :: var
+
+        class(DataDimension),         pointer    :: dim3 => null()
+        class(DataDimension),         pointer    :: dim4 => null()
+        class(DataDimension),         pointer    :: dim5 => null()
+        class(DataDimension),         pointer    :: dim6 => null()
+        class(DataDimension),         pointer    :: dim7 => null()
 
         integer, parameter :: ndim = 2
 
@@ -7427,13 +7484,18 @@ module dataSet_mod
 
         character(len=*),             intent(in) :: variableName
         integer,                      intent(in) :: dTypeNum
-        class(DataDimension),         pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),         pointer    :: dim1, dim2, dim3
         class(ParallelInfo),          pointer    :: pinfo
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
 
         class(DataVariable),          pointer    :: var
+
+        class(DataDimension),         pointer    :: dim4 => null()
+        class(DataDimension),         pointer    :: dim5 => null()
+        class(DataDimension),         pointer    :: dim6 => null()
+        class(DataDimension),         pointer    :: dim7 => null()
 
         integer, parameter :: ndim = 3
 
@@ -7449,13 +7511,17 @@ module dataSet_mod
 
         character(len=*),             intent(in) :: variableName
         integer,                      intent(in) :: dTypeNum
-        class(DataDimension),         pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),         pointer    :: dim1, dim2, dim3, dim4
         class(ParallelInfo),          pointer    :: pinfo
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
 
         class(DataVariable),          pointer    :: var
+
+        class(DataDimension),         pointer    :: dim5 => null()
+        class(DataDimension),         pointer    :: dim6 => null()
+        class(DataDimension),         pointer    :: dim7 => null()
 
         integer, parameter :: ndim = 4
 
@@ -7471,13 +7537,16 @@ module dataSet_mod
 
         character(len=*),             intent(in) :: variableName
         integer,                      intent(in) :: dTypeNum
-        class(DataDimension),         pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),         pointer    :: dim1, dim2, dim3, dim4, dim5
         class(ParallelInfo),          pointer    :: pinfo
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
 
         class(DataVariable),          pointer    :: var
+
+        class(DataDimension),         pointer    :: dim6 => null()
+        class(DataDimension),         pointer    :: dim7 => null()
 
         integer, parameter :: ndim = 5
 
@@ -7493,7 +7562,7 @@ module dataSet_mod
 
         character(len=*),             intent(in) :: variableName
         integer,                      intent(in) :: dTypeNum
-        class(DataDimension),         pointer    :: dim1, dim2, dim3, dim4, dim5, dim6, dim7
+        class(DataDimension),         pointer    :: dim1, dim2, dim3, dim4, dim5, dim6
         class(ParallelInfo),          pointer    :: pinfo
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
@@ -7502,6 +7571,8 @@ module dataSet_mod
         class(DataVariable),          pointer    :: var
 
         integer, parameter :: ndim = 6
+
+        class(DataDimension),         pointer    :: dim7 => null()
 
         include 'dataSet_loadDistributedVariable.incl'
     end function

@@ -5504,6 +5504,7 @@ contains
     !  triangle if I2->I1 is a boundary arc.
     !
             if ( abs ( list(lp) ) /= i2 ) then
+              print *,'the error is:',list(lp),i2,lp,i,kt,n1st,nm2,i1,i2
               go to 13
             end if
 

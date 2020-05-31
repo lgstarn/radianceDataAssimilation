@@ -1,6 +1,14 @@
         class(MirroredArray),  pointer :: mArray
         class(DataVariable),   pointer :: var
         
+		if (.not. associated(pinfo)) then
+			call error('The pinfo pointer was not associated.')
+		end if        
+
+		if (.not. associated(dShape)) then
+			call error('The data shape pointer was not associated.')
+		end if
+                
         allocate(mArray)
         call mArray%mirroredArrayConstructor(dShape,dataptr,initVal,copyData)
        	allocate(mvar)

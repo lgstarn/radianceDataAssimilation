@@ -8,17 +8,20 @@
 
 		! here, we want to allocate if we are copying, so doCopy = doAlloc
         call this%dataArrayConstructor(typeNum,dShape,alloc=doCopy)
-        
+
         if (doCopy) then
+        	if (.not. associated(dptr1d)) then
+        		call error('The data pointer was not associated for a copy')
+        	end if
             call this%dShape%checkLocalTotalSize(size(dptr1d))
             call this%copyData(dptr1d)
         else
         	allocate(dptr1d(dShape%getLocalTotalSize()))
         	call this%setDataPointer(dptr1d)
-        end if
 
-        if (present(initVal)) then
-        	dptr1d = initVal
-    	else
-    		dptr1d = defaultInitVal
-    	end if
+		    if (present(initVal)) then
+		    	dptr1d(:) = initVal
+			else
+				dptr1d(:) = defaultInitVal
+			end if
+        end if

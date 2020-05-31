@@ -10,7 +10,7 @@ module HwrfDataSet_mod
     use atmos3dDataSet_mod
 
     use dataGrid_mod
-    use triangularLatLonGrid_mod
+    use regularTriangularLatLonGrid_mod
 
     use dataGroup_mod
     use dataVariable_mod
@@ -205,8 +205,8 @@ module HwrfDataSet_mod
 
         character(:), allocatable :: loadFrom
 
-        class(DataGrid),             pointer :: grid         => null()
-        class(TriangularLatLonGrid), pointer :: triGrid      => null()
+        class(DataGrid),                    pointer :: grid         => null()
+        class(RegularTriangularLatLonGrid), pointer :: triGrid      => null()
 
         class(DataVariable),  pointer :: latVar_global => null()
         class(DataVariable),  pointer :: lonVar_global => null()
@@ -372,7 +372,7 @@ module HwrfDataSet_mod
         q2(:,:,1) = q(:,:,1,1)
 
         allocate(triGrid)
-        call triGrid%triangularLatLonGridConstructor(latVar,lonVar)
+        call triGrid%regularTriangularLatLonGridConstructor(latVar,lonVar)
 
         grid => triGrid
 

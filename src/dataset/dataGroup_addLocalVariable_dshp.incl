@@ -1,5 +1,13 @@
         class(DataArray),  	   pointer :: dArray
         
+		if (.not. associated(pinfo)) then
+			call error('The pinfo pointer was not associated.')
+		end if        
+		
+		if (.not. associated(dShape)) then
+			call error('The data shape pointer was not associated.')
+		end if
+        
         allocate(dArray)
         call dArray%dataArrayConstructor(dShape,dataptr,initVal,copyData)
         	

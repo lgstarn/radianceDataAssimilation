@@ -1,4 +1,12 @@
 		class(MirroredVariable), pointer :: mvar
+
+		if (.not. associated(pinfo)) then
+			call error('The pinfo pointer was not associated.')
+		end if
+		
+		if (.not. associated(dShape)) then
+			call error('The data shape was not associated.')
+		end if
 		
 		if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
             var    => this%addLocalVariable(variableName,dataptr,dShape,initVal,copyData,pinfo)

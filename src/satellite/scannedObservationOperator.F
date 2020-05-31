@@ -64,6 +64,7 @@ module scannedObservationOperator_mod
 
     type, extends(ObservationOperator), abstract :: ScannedObservationOperator
         !private
+            character(len=:), allocatable :: xVarName
             integer :: chstart
             integer :: chend
             integer :: nposting_channels
@@ -172,7 +173,7 @@ module scannedObservationOperator_mod
     contains
 
     subroutine scannedObservationOperatorConstructor(this, pinfo, obs, inputGrid, &
-        & minGoodRatio, columnNormsVar)
+        & minGoodRatio, columnNormsVar, xVarName)
 
         implicit none
 
@@ -183,6 +184,7 @@ module scannedObservationOperator_mod
         class(DataGrid),                   pointer    :: inputGrid
         real(real64),            optional, intent(in) :: minGoodRatio
         class(DataVariable),     optional, pointer    :: columnNormsVar
+        character(len=*),        optional, intent(in) :: xVarName
 
         integer :: totalNz
 
@@ -250,9 +252,15 @@ module scannedObservationOperator_mod
             min_good_ratio = DEFAULT_MIN_GOOD_RATIO
         end if
 
-        tbVar => obs%getTbVar()
+        if (present(xVarName)) then
+            allocate(character(len=len_trim(xVarName)) :: this%xVarName)
+            this%xVarName = trim(xVarName)
+        else
+            allocate(character(len=len_trim(OBS_DATA_VAR_NAME)) :: this%xVarName)
+            this%xVarName = trim(OBS_DATA_VAR_NAME)
+        end if
 
-        chanExtent => tbVar%getExtentNumber(1)
+        chanExtent => obs%getMObsExtent()
 
         call chanExtent%getLocalRange(this%chstart,this%chend,this%nposting_channels)
 
@@ -420,13 +428,20 @@ module scannedObservationOperator_mod
                 !print *,'tin:',iz,chind,tin,tin < MIN_GOOD_RATIO,scLat,scLon,lat,lon
 
                 if (tin < MIN_GOOD_RATIO) then
+                    !write(msgstr,*) 'The computed row sum was too small:', tin,&
+                    !    pinfo%getRank(),il,chind,d_nnz(il,chind),o_nnz(il,chind),lat,lon
+                    !call print(msgstr,forceOutput=.true.)
+
                     rowComputed = .false.
                     call obs%setQCCode(chind, i, QC_UPDT_FWDOP)
                     cycle
-                else if (tin > 1.5) then
+                else if (tin > 1.2) then
                     write(msgstr,*) 'The computed row sum was too large:', tin,&
-                        pinfo%getRank(),il,chind,d_nnz(il,chind),o_nnz(il,chind)
-                    call error(msgstr)
+                        pinfo%getRank(),il,chind,d_nnz(il,chind),o_nnz(il,chind),lat,lon
+                    call print(msgstr,forceOutput=.true.)
+                    rowComputed = .false.
+                    call obs%setQCCode(chind, i, QC_UPDT_FWDOP)
+                    cycle
                 end if
 
                 izs(1) = il-1 + this%obs_offsets(pinfo%getRank()+1)
@@ -506,9 +521,12 @@ module scannedObservationOperator_mod
             end if
         end do
 
-        call VecCreateMPIWithArray(pinfo%getCommunicator(),1,&
-            nx_local*ny_local,nx_global*ny_global,PETSC_NULL_SCALAR,this%sooData%xvec,ierr)
-        call VecCreateMPI(pinfo%getCommunicator(),nobs_local,nobs_global,this%sooData%yvec,ierr)
+!        call VecCreateMPIWithArray(pinfo%getCommunicator(),1,&
+!            nx_local*ny_local,nx_global*ny_global,PETSC_NULL_SCALAR,this%sooData%xvec,ierr)
+        call VecCreateMPI(pinfo%getCommunicator(),nx_local*ny_local,nx_global*ny_global,&
+            this%sooData%xvec,ierr)
+        call VecCreateMPI(pinfo%getCommunicator(),nobs_local,       nobs_global,&
+            this%sooData%yvec,ierr)
 
         deallocate(maxLat)
         deallocate(minLat)
@@ -696,38 +714,48 @@ module scannedObservationOperator_mod
 
         Mat,                          pointer :: hmat
 
-        real(real32), dimension(:,:,:), pointer :: tbData
+        real(real64), dimension(:,:), pointer :: inputData
 
-        class(DataVariable),  pointer :: inputTbVar
+        class(DataVariable),  pointer :: inputDataVar
         class(DataVariable),  pointer :: obsDataVar
 
         class(DataExtent), pointer :: chanExtent
         class(DataExtent), pointer :: nobsExtent
 
-        real(real64), dimension(:,:), contiguous, pointer :: dptr2d
         real(real64), dimension(:),               pointer :: dptr1d
 
-        integer :: chind, nx, ny, n1, n2, ierr
-        integer :: i, j, ind, lsize
+        class(ScannedObservation), pointer :: obs_so
+
+        integer :: chind, ierr
+        integer :: i, j, ind
 
         integer :: nobs_local
         integer :: nobs_global
 
+        integer :: choffset
+
         real(real64) :: mval
 
-        inputTbVar => input%getVariableByName(TB_VAR_NAME)
-        obsDataVar => obs%getObsDataVar()
-        chanExtent => obsDataVar%getExtentNumber(1)
+        select type(obs)
+            class is (ScannedObservation)
+                obs_so => obs
+            class default
+                call error('The observation type was not ScannedObservation')
+        end select
+
+        inputDataVar => input%getVariableByName(this%xVarName)
+        obsDataVar   => obs_so%getObsDataVar()
+        chanExtent   => obsDataVar%getExtentNumber(1)
 
         if (.not. associated(chanExtent)) then
             call error('Could not find the dimension ' // CHANS_DIM_NAME)
         end if
 
-        if (chanExtent%getLocalCount() /= this%nposting_channels) then
-            write(msgstr,*) 'Error: nchannels does not match in scannedObservationOperator',&
-                &chanExtent%getLocalCount(),this%nposting_channels
-            call error(msgstr)
-        end if
+!        if (chanExtent%getLocalCount() /= this%nposting_channels) then
+!            write(msgstr,*) 'nchannels does not match in scannedObservationOperator',&
+!                &chanExtent%getLocalCount(),this%nposting_channels
+!            call error(msgstr)
+!        end if
 
         nobsExtent  => obsDataVar%getExtentNumber(2)
         nobs_local  =  nobsExtent%getLocalCount()
@@ -740,34 +768,22 @@ module scannedObservationOperator_mod
 
         call this%firstMatrix()
 
-        nx = inputTbVar%getLocalExtentCount(2)
-        ny = inputTbVar%getLocalExtentCount(3)
-
-        call inputTbVar%getArray(tbData)
-
-        allocate(dptr2d(size(tbData,2),size(tbData,3)))
+        call inputDataVar%getArray(inputData)
 
         do chind=1,this%nposting_channels
             hmat => this%nextMatrix()
 
-            dptr2d(:,:) = tbData(chind,:,:)
-
-            dptr1d(1:nx*ny) => dptr2d(:,:)
+            dptr1d => inputData(chind+obs_so%getChannelOffset(),:)
 
             ! TODO: need to include QC here
             call VecPlaceArray(this%sooData%xvec, dptr1d, ierr)
-
             call MatMult(hMat, this%sooData%xvec, this%sooData%yvec, ierr)
-
             call VecResetArray(this%sooData%xvec,ierr)
 
             call VecGetArrayReadF90(this%sooData%yvec,dptr1d,ierr)
             output(chind,1:nobs_local) = dptr1d(1:nobs_local)
-
             call VecRestoreArrayReadF90(this%sooData%yvec,dptr1d,ierr)
         end do
-
-        deallocate(dptr2d)
     end subroutine
 
     subroutine tangentLinear(this, baseState, obs, deltaX, deltaY)
@@ -799,77 +815,86 @@ module scannedObservationOperator_mod
 
         Mat,                          pointer :: hmat
 
-        real(real32), dimension(:,:,:), pointer :: tbData
+        real(real64), dimension(:,:), pointer :: obsOutData
 
-        real(real64), dimension(:,:), contiguous, pointer :: dptr2d
-        real(real64), dimension(:),               pointer :: dptr1d
+        real(real64), dimension(:),   pointer :: xptr
+        real(real64), dimension(:),   pointer :: yptr
 
-        integer :: chind, nx, ny, ierr
+        integer :: chind, ierr, msize, nsize
         integer :: i, j, ind, nobs_local
 
-        class(DataVariable), pointer :: tbVar
-        class(DataVariable), pointer :: obsData
+        class(ScannedObservation), pointer :: obs_so
+
+        class(DataVariable), pointer :: obsDataVar
+        class(DataVariable), pointer :: outDataVar
 
         class(DataExtent), pointer :: chanExtent
         class(DataExtent), pointer :: nobsExtent
 
-!        select type(deltaX)
-!            class is (GriddedTbDataSet)
-!                state_gtb => deltaX
-!            class default
-!                call error('Unknown model state in scannedObservationOperator.')
-!        end select
-!
-!        select type(obs)
-!            class is (SatelliteObservation)
-!                satObs => obs
-!            class default
-!                call error('Unknown observation in scannedObservationOperator.')
-!        end select
+        integer :: vsize
 
-        tbVar => baseState%getVariableByName(TB_VAR_NAME)
-        chanExtent => tbVar%getExtentNumber(1)
+        select type(obs)
+            class is (ScannedObservation)
+                obs_so => obs
+            class default
+                call error('The observation type was not ScannedObservation')
+        end select
 
-        if (chanExtent%getLocalCount() /= this%nposting_channels) then
-            call error('Error: nchannels does not match in scannedObservationOperator')
-        end if
+        chanExtent => obs%getMObsExtent()
 
-        obsData => obs%getObsDataVar()
+        outDataVar => deltaX%getVariableByName(this%xVarName)
 
-        nobsExtent  => obsData%getExtentNumber(2)
+!        if (chanExtent%getLocalCount() /= this%nposting_channels) then
+!            write(msgstr,*) 'Error: nchannels does not match in scannedObservationOperator: ', &
+!                & chanExtent%getLocalCount(), ' vs. ',this%nposting_channels
+!            call error(msgstr)
+!        end if
 
+        obsDataVar  => obs%getObsDataVar()
+        nobsExtent  => obsDataVar%getExtentNumber(2)
         nobs_local  =  nobsExtent%getLocalCount()
 
         if (nobs_local /= size(deltaY,2)) then
             call error('nobs does not match in scannedObservationOperator')
         end if
 
-        nx = tbVar%getLocalExtentCount(2)
-        ny = tbVar%getLocalExtentCount(3)
-
-        call tbVar%getArray(tbData)
-
-        allocate(dptr2d(nx,ny))
+        call outDataVar%getArray(obsOutData)
 
         call this%firstMatrix()
+
+        call VecGetArrayF90(this%sooData%yvec,yptr,ierr)
 
         do chind=1,this%nposting_channels
             hmat => this%nextMatrix()
 
-            call VecGetArrayF90(this%sooData%yvec,dptr1d,ierr)
-            dptr1d(1:nobs_local) = deltaY(chind,1:nobs_local)
-            call VecRestoreArrayF90(this%sooData%yvec,dptr1d,ierr)
+            call VecGetLocalSize(this%sooData%yvec,vsize,ierr)
 
-            dptr2d(:,:)     =  tbData(chind,:,:)
-            dptr1d(1:nx*ny) => dptr2d(:,:)
+            call MatGetLocalSize(hMat,msize,nsize,ierr)
 
-            call VecPlaceArray(this%sooData%xvec, dptr1d, ierr)
+            yptr(1:nobs_local) = deltaY(chind,1:nobs_local)
 
+            !xptr => obsOutData(chind+obs_so%getChannelOffset(),:)
+
+            call VecGetLocalSize(this%sooData%xvec,vsize,ierr)
+
+            if (vsize /= size(obsOutData,2)) then
+                write (msgstr,*) 'Incompatible sizes',vsize,'vs.',size(obsOutData,2)
+
+                call error(msgstr)
+            end if
+
+            ! FIXME: it would be better to use the second formulation
+            call VecGetArrayF90(this%sooData%xvec,xptr,ierr)
+            xptr(1:vsize) = obsOutData(chind+obs_so%getChannelOffset(),1:vsize)
             call MatMultTransposeAdd(hMat, this%sooData%yvec, this%sooData%xvec, this%sooData%xvec, ierr)
+            obsOutData(chind+obs_so%getChannelOffset(),1:vsize) = xptr(1:vsize)
+            call VecRestoreArrayF90(this%sooData%xvec,xptr,ierr)
 
-            call VecResetArray(this%sooData%xvec, ierr)
+!            call VecPlaceArray(this%sooData%xvec, xptr, ierr)
+!            call MatMultTransposeAdd(hMat, this%sooData%yvec, this%sooData%xvec, this%sooData%xvec, ierr)
+!            call VecResetArray(this%sooData%xvec, ierr)
         end do
 
-        deallocate(dptr2d)
+        call VecRestoreArrayF90(this%sooData%yvec,yptr,ierr)
     end subroutine
 end module

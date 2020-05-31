@@ -52,15 +52,12 @@ module adjointAveFirstGuesser_mod
 
         class(AdjointAveFirstGuesser) :: this
 
-        class(ScannedObservationBundle), pointer :: obsBundle
-        class(DataSet),      pointer :: firstGuess
+        class(ScannedObservationBundle),   pointer :: obsBundle
+        class(DataSet),                    pointer :: firstGuess
 
-        real(real64), dimension(:,:),         pointer :: lat, lon
+        real(real64), dimension(:,:),      pointer :: lat, lon
 
         real(real64) :: xv,yv
-
-        integer                            :: nloc
-        real(real64)                            :: mslon
 
         class(ScannedObservation),         pointer :: obs_so
 
@@ -72,20 +69,45 @@ module adjointAveFirstGuesser_mod
         class(DataExtent),                 pointer :: nobsExtent
         class(DataVariable),               pointer :: tbVar1
         class(DataVariable),               pointer :: tbVar2
+        class(DataExtent),                 pointer :: chanExtent
+        class(DataExtent),                 pointer :: pixExtent
+        class(DataExtent),                 pointer :: scanExtent
 
-        integer :: i, ind1, ind2, nx, ny
+        integer :: i, ind1, ind2, nchan, npts
+
+        integer      :: nloc
+        real(real64) :: mslon
+
 
         real(real64), pointer :: output(:,:)
 
         real(real64), pointer :: obsData(:,:)
 
-        real(real64), pointer :: tb1(:,:,:)
-        real(real64), pointer :: tb2(:,:,:)
+        real(real64), pointer :: tb1(:,:)
+        real(real64), pointer :: tb2(:,:)
 
-        tmpState => firstGuess%clone(.true.)
+        class(SatelliteObservation), pointer :: firstGuess_so
+        class(SatelliteObservation), pointer :: tmpState_so
 
-        call firstGuess%zeroAll()
-        call tmpState%zeroAll()
+        select type (firstGuess)
+            class is (SatelliteObservation)
+                firstGuess_so => firstGuess
+            class default
+                call error('Unknown satellite observation type')
+        end select
+
+        tmpState_so => firstGuess_so%cloneSatObs(shallow=.false.,copyData=.true.)
+
+        tmpState => tmpState_so
+
+        tbVar1 => firstGuess_so%getObsDataVar()
+        tbVar2 =>   tmpState_so%getObsDataVar()
+
+        call tbVar1%getArray(tb1)
+        call tbVar2%getArray(tb2)
+
+        tb1 = 0.0d0
+        tb2 = 0.0d0
 
         do i=1,obsBundle%getBundleSize()
             obs_so => obsBundle%getScannedObservation(i)
@@ -97,20 +119,24 @@ module adjointAveFirstGuesser_mod
             mobsExtent => obs%getMObsExtent()
             nobsExtent => obs%getNObsExtent()
 
-            nx = mobsExtent%getLocalCount()
-            ny = nobsExtent%getLocalCount()
+            nchan = mobsExtent%getLocalCount()
+            npts  = nobsExtent%getLocalCount()
+
+            if (nchan == 0) then
+                cycle
+            end if
 
             write(msgstr,*) 'in bundle ',i,'passes qc:',obs%getNPassesQC(),&
-                nx*ny
+                nchan*npts
             call print(msgstr)
 
-            allocate(output(nx,ny))
+            allocate(output(nchan,npts))
 
             obsData => obs%getObsData()
 
-            do ind2=1,ny
-                do ind1=1,nx
-                    if (obs%passesQC(ind1, ind2)) then
+            do ind2=1,npts
+                do ind1=1,nchan
+                    if (obsData(ind1,ind2) > 0) then !obs_so%passesQC(ind1,ind2)) then
                         output(ind1,ind2) = obsData(ind1,ind2)
                     else
                         output(ind1,ind2) = 0.d0
@@ -118,33 +144,40 @@ module adjointAveFirstGuesser_mod
                 end do
             end do
 
+            do ind1=1,nchan
+                write(msgstr,*) 'min/max value for channel ',ind1+obs_so%getChannelOffset(),&
+                    ':',minval(output(ind1,:)),maxval(output(ind1,:))
+                call print(msgstr)
+            end do
+
             call obsOp_conv%adjoint(firstGuess, obs, output, firstGuess)
 
-            do ind2=1,ny
-                do ind1=1,nx
-                    if (obs_so%passesQC(ind1, ind2)) then
+            do ind2=1,npts
+                do ind1=1,nchan
+                    if (obsData(ind1,ind2) > 0) then !obs_so%passesQC(ind1, ind2)) then
                         output(ind1,ind2) = 1.d0
                     else
                         output(ind1,ind2) = 0.d0
                     end if
                 end do
             end do
-            call obsOp_conv%adjoint(firstGuess, obs, output, tmpState)
+
+            call obsOp_conv%adjoint(tmpState, obs, output, tmpState)
 
             deallocate(output)
         end do
 
-        tbVar1 => firstGuess%getVariableByName(TB_VAR_NAME)
-        tbVar2 => tmpState%getVariableByName(TB_VAR_NAME)
-
-        call tbVar1%getArray(tb1)
-        call tbVar2%getArray(tb2)
+        do i=1,size(tb1,1)
+            write(msgstr,*) 'min/max value for channel ',i,':',minval(tb1(i,:)),&
+                maxval(tb1(i,:)),minval(tb2(i,:)),maxval(tb2(i,:))
+            call print(msgstr)
+        end do
 
         where (tb2 > 0.d0) tb1 = tb1/tb2
 
         do i=1,size(tb1,1)
-            write(msgstr,*) 'min/max value for channel ',i,':',minval(tb1(i,:,:)),&
-                maxval(tb1(i,:,:))
+            write(msgstr,*) 'min/max value for channel ',i,':',minval(tb1(i,:)),&
+                maxval(tb1(i,:))
             call print(msgstr)
         end do
 

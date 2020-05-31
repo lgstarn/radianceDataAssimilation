@@ -77,7 +77,7 @@ module hdfDataArrayReader_mod
         littleEndian = this%littleEndian
     end function
 
-    function loadDimSizeFromVariable_hdf(this,pinfo,locationInFile,dimNum) result(dimn)
+    function loadDimSizeFromVariable_hdf(this,pinfo,locationInFile,dimNum,required) result(dimn)
 
         use hdf5
 
@@ -88,6 +88,7 @@ module hdfDataArrayReader_mod
         class(ParallelInfo),        pointer     :: pinfo
         character(len=*),           intent(in)  :: locationInFile
         integer,                    intent(in)  :: dimNum
+        logical,         optional,  intent(in)  :: required
 
         integer                                 :: dimn
 
@@ -101,7 +102,15 @@ module hdfDataArrayReader_mod
         integer(HID_T) :: dspace_id
         integer(HID_T) :: dset_id
 
+        logical :: isRequired
+
         integer :: commToUse
+
+        if (present(required)) then
+            isRequired = required
+        else
+            isRequired = .true.
+        end if
 
         commToUse = pinfo%getCommunicator()
 
@@ -123,22 +132,52 @@ module hdfDataArrayReader_mod
             call h5dopen_f(file_id, locationInFile, dset_id, hdferr); call h5check(hdferr,'h5dopen')
 
             ! open the dataspace for the data set
-            call h5dget_space_f(dset_id,dspace_id,hdferr); call h5check(hdferr,'h5dget_space')
+            call h5dget_space_f(dset_id,dspace_id,hdferr)
+
+            if (hdferr /= 0) then
+                if (isRequired) then
+                    call h5check(hdferr,'h5dget_space')
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             ! get the number of dimensions for the data space
             call h5sget_simple_extent_ndims_f(dspace_id, ndims, hdferr)
-            call h5check(hdferr,'h5sget_simple_extent_ndims')
+
+            if (hdferr /= 0) then
+                if (isRequired) then
+                    call h5check(hdferr,'h5sget_simple_extent_ndims')
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             ! allocate a place to store the dimensions
             allocate(dims(ndims),maxdims(ndims))
 
             ! get the actual dimensions
             call h5sget_simple_extent_dims_f(dspace_id, dims, maxdims, hdferr)
-            call h5check(hdferr,'h5sget_simple_extent_dims_f')
+
+            if (hdferr /= 0) then
+                if (isRequired) then
+                    call h5check(hdferr,'h5sget_simple_extent_dims_f')
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             if (dimNum < 1 .or. dimNum > ndims) then
-                call error('Illegal dimension number: ' // int2str(dimNum) // '(ndims: ' // &
-                    int2str(ndims) // ')')
+                if (isRequired) then
+                    call error('Illegal dimension number: ' // int2str(dimNum) // '(ndims: ' // &
+                        int2str(ndims) // ')')
+                else
+                    dimn = -1
+                    return
+                end if
             end if
 
             dimn = dims(dimNum)

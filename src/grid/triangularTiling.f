@@ -44,18 +44,16 @@ module triangularTiling_mod
 
     contains
 
-    subroutine triangularTilingConstructor_tile(this,nodeNum,ngx,node_ij,node_xy,&
-        node_owner,deallocNode_ij,deallocNode_xy,regularGrid,nx)
+    subroutine triangularTilingConstructor_tile(this,nodeNum,node_ij,node_xy,&
+        deallocNode_ij,deallocNode_xy,regularGrid,nx)
 
         implicit none
 
         class(TriangularTiling) :: this
 
         integer,             intent(in) :: nodeNum
-        integer,             intent(in) :: ngx
         integer,             pointer    :: node_ij(:,:)
         real(real64),        pointer    :: node_xy(:,:)
-        integer,   optional, pointer    :: node_owner(:)
         logical,   optional, intent(in) :: deallocNode_ij
         logical,   optional, intent(in) :: deallocNode_xy
         logical,   optional, intent(in) :: regularGrid
@@ -131,16 +129,16 @@ module triangularTiling_mod
         this%elements(:,:)        = ltri(1:3,1:nt)
         this%elementNeighbor(:,:) = ltri(4:6,1:nt)
 
-        call this%tilingConstructor(nodeNum,ngx,node_ij,node_xy,this%elements,&
-            & this%elementNeighbor,2,nt,node_owner,deallocNode_ij,deallocNode_xy)
+        call this%tilingConstructor(nodeNum,node_ij,node_xy,this%elements,&
+            & this%elementNeighbor,2,nt,deallocNode_ij,deallocNode_xy)
 
         deallocate(lcc)
         deallocate(lct)
         deallocate(ltri)
     end subroutine
 
-    subroutine triangularTilingConstructor_set(this,nodeNum,ngx,node_ij,node_xy,&
-        & elements,elementNeighbor,numElements,list,lptr,lend,lnew,node_owner,&
+    subroutine triangularTilingConstructor_set(this,nodeNum,node_ij,node_xy,&
+        & elements,elementNeighbor,numElements,list,lptr,lend,lnew,&
         & deallocNode_ij,deallocNode_xy)
 
         implicit none
@@ -148,7 +146,6 @@ module triangularTiling_mod
         class(TriangularTiling) :: this
 
         integer,                intent(in) :: nodeNum
-        integer,                intent(in) :: ngx
         integer,                pointer    :: node_ij(:,:)
         real(real64),           pointer    :: node_xy(:,:)
         integer,                pointer    :: elements(:,:)
@@ -158,12 +155,11 @@ module triangularTiling_mod
         integer,                pointer    :: lptr(:)
         integer,                pointer    :: lend(:)
         integer,                intent(in) :: lnew
-        integer,      optional, pointer    :: node_owner(:)
         logical,      optional, intent(in) :: deallocNode_ij
         logical,      optional, intent(in) :: deallocNode_xy
 
-        call this%tilingConstructor(nodeNum,ngx,node_ij,node_xy,elements, &
-            & elementNeighbor,2,numElements,node_owner,deallocNode_ij,&
+        call this%tilingConstructor(nodeNum,node_ij,node_xy,elements, &
+            & elementNeighbor,2,numElements,deallocNode_ij,&
             & deallocNode_xy)
 
         this%list     => list
@@ -382,7 +378,6 @@ module triangularTiling_mod
         integer,      pointer    :: lend(:)
         integer,      pointer    :: elements(:,:)
         integer,      pointer    :: elementNeighbor(:,:)
-        integer,      pointer    :: node_owner(:)
 
         allocate(node_ij(size(this%node_ij,1),size(this%node_ij,2)))
         allocate(node_xy(size(this%node_xy,1),size(this%node_xy,2)))
@@ -392,10 +387,6 @@ module triangularTiling_mod
         allocate(elements(size(this%elements,1),size(this%elements,2)))
         allocate(elementNeighbor(size(this%elementNeighbor,1),size(this%elementNeighbor,2)))
 
-        if (associated(this%node_owner)) then
-            allocate(node_owner(size(this%node_owner,1)))
-        end if
-
         if (copyData) then
             node_ij(:,:) = this%node_ij(:,:)
             node_xy(:,:) = this%node_xy(:,:)
@@ -403,16 +394,12 @@ module triangularTiling_mod
             lend(:) = this%lend(:)
             elements(:,:) = this%elements(:,:)
             elementNeighbor(:,:) = this%elementNeighbor(:,:)
-
-            if (associated(this%node_owner)) then
-                node_owner(:) = this%node_owner(:)
-            end if
         end if
 
         allocate(other)
-        call other%triangularTilingConstructor(this%nodeNum,this%ngx,node_ij,node_xy,     &
+        call other%triangularTilingConstructor(this%nodeNum,node_ij,node_xy,     &
             & elements,elementNeighbor,this%numElements,list,lptr,lend,this%lnew,&
-            & node_owner,deallocNode_ij=.true.,deallocNode_xy=.true.)
+            & deallocNode_ij=.true.,deallocNode_xy=.true.)
     end function
 
     function clone(this,copyData) result(other)

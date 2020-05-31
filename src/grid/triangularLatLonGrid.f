@@ -157,7 +157,7 @@ module triangularLatLonGrid_mod
         real(real64) :: latcr
         real(real64) :: loncr
 
-        integer :: oi, oj, ngx, nproc
+        integer :: oi, oj, nproc
 
         class(*), pointer :: optr
 
@@ -172,11 +172,6 @@ module triangularLatLonGrid_mod
         latcr = this%latc*d2r
         loncr = this%lonc*d2r
 
-        print *,'will test ',this%myproc-1,minval(lociVals(1,:)),maxval(lociVals(1,:)), &
-            minval(lociVals(2,:)),maxval(lociVals(2,:)),this%xyBounds(MIN_LAT,this%myproc),&
-            this%xyBounds(MAX_LAT,this%myproc),this%xyBounds(MIN_LON,this%myproc),&
-            this%xyBounds(MAX_LON,this%myproc)
-
         do i=1,nloci
 
             if (lociVals(1,i) < this%xyBounds(MIN_LAT,this%myproc) .or. &
@@ -190,8 +185,6 @@ module triangularLatLonGrid_mod
                     distances(i), azi1, azi2, 1)
             end if
         end do
-
-        print *,'tllg:',lociVals(1,1:5),lociVals(2,1:5),this%latc,this%lonc,distances(1:5)
 
 !        localTilings => this%getLocalTilings()
 !
@@ -323,8 +316,8 @@ module triangularLatLonGrid_mod
         integer :: yis, yie, niy
 
         integer :: nodeNum
-        integer, parameter :: buffer  = 20
-        integer, parameter :: buffer2 = 5
+        integer, parameter :: buffer  = 5
+        integer, parameter :: buffer2 = 2
         integer :: numtot
         integer :: ierr
 
@@ -479,8 +472,6 @@ module triangularLatLonGrid_mod
             lonc = d2r*lonptr_dble(xgc,ygc)
         end if
 
-        print *,'Question mark:',pinfo%getRank(),xgc,ygc,latc,lonc
-
         ind = 0
 
         minLond =  1d99
@@ -550,22 +541,22 @@ module triangularLatLonGrid_mod
         allocate(lptr(nlist))
         allocate(lend(nodenum))
 
-        call trmshr ( nbx*nby, nbx, node_xpyp(1,:), node_xpyp(2,:), nit, &
-            & list, lptr, lend, lnew, ier )
+        !call trmshr ( nbx*nby, nbx, node_xpyp(1,:), node_xpyp(2,:), nit, &
+        !    & list, lptr, lend, lnew, ier )
         allocate(near(nodenum))
         allocate(next(nodenum))
         allocate(dist(nodenum))
 
-        !call trmesh( nodenum, node_xpyp(1,:), node_xpyp(2,:), list, lptr, lend, lnew, &
-        !    & near, next, dist, ier )
+        call trmesh( nodenum, node_xpyp(1,:), node_xpyp(2,:), list, lptr, lend, lnew, &
+            & near, next, dist, ier )
 
         deallocate(near)
         deallocate(next)
         deallocate(dist)
 
         if (ier /= 0) then
-            call error('trmshr returned a non-zero error: ' // int2str(ier) // ', nit: ' // int2str(nit))
-            !call error('trmesh returned a non-zero error: ' // int2str(ier))
+            !call error('trmshr returned a non-zero error: ' // int2str(ier) // ', nit: ' // int2str(nit))
+            call error('trmesh returned a non-zero error: ' // int2str(ier))
         end if
 
         allocate(lcc(1))
@@ -574,7 +565,9 @@ module triangularLatLonGrid_mod
 
         call trlist ( 0, lcc, nbx*nby, list, lptr, lend, 6, nt, ltri, lct, ier )
 
-        print *,'ier is:',ier
+        if (ier /= 0) then
+            call error('trlist returned a non-zero error: ' // int2str(ier))
+        end if
 
         allocate(triangles(3,nt))
         allocate(neighbors(3,nt))
@@ -668,7 +661,7 @@ module triangularLatLonGrid_mod
             lnewv = this%localBounds(LSIZE,proc+1)
 
             allocate(localTriTil)
-            call localTriTil%triangularTilingConstructor(size(nodeijv,2),ngx,nodeijv,nodexpypv, &
+            call localTriTil%triangularTilingConstructor(size(nodeijv,2),nodeijv,nodexpypv, &
                 & elementsv,neighborsv,size(elementsv,2),listv,lptrv,lendv,lnewv,             &
                 & deallocNode_ij=.true.,deallocNode_xy=.true.)
 
@@ -726,20 +719,20 @@ module triangularLatLonGrid_mod
                     ! when trying to connect two boundary points - only do so if
                     ! both the x and y values are 0 or 1 apart; otherwise it's an
                     ! exterior connection of an exterior triangle (bad)
-                    if (nodeb .and. nbrb .and. ((abs(nodeijv(2,n1) - nodeijv(2,node)) > 1) .or. &
-                        (abs(nodeijv(1,n1) - nodeijv(1,node)) > 1))) then
-
-                        !fprintf('Skipping proc %d node %d (%d/%d) and (%d/%d)\n',proc,node,&
-                        !    nodeijv(1,node),nodeijv(2,node),nodeijv(1,n1),nodeijv(2,n1))
-                        if (lp == lpl) then
-                            allLend(indAll) = lnewAll-1
-                            allLptr(lnewAll-1) = loldAll
-                            allList(lnewAll-1) = listFac*allList(lnewAll-1)
-                            !fprintf('Stopping proc %d node %d (%d/%d) at #%d\n',proc,node,&
-                            !    nodeijv(1,node),nodeijv(2,node),j)
-                            exit
-                        end if
-                    else
+!                    if (nodeb .and. nbrb .and. ((abs(nodeijv(2,n1) - nodeijv(2,node)) > 1) .or. &
+!                        (abs(nodeijv(1,n1) - nodeijv(1,node)) > 1))) then
+!
+!                        !fprintf('Skipping proc %d node %d (%d/%d) and (%d/%d)\n',proc,node,&
+!                        !    nodeijv(1,node),nodeijv(2,node),nodeijv(1,n1),nodeijv(2,n1))
+!                        if (lp == lpl) then
+!                            allLend(indAll) = lnewAll-1
+!                            allLptr(lnewAll-1) = loldAll
+!                            allList(lnewAll-1) = listFac*allList(lnewAll-1)
+!                            !fprintf('Stopping proc %d node %d (%d/%d) at #%d\n',proc,node,&
+!                            !    nodeijv(1,node),nodeijv(2,node),j)
+!                            exit
+!                        end if
+!                    else
                         if (nbrb  .and. nodeb) then
                             listFac = -1
                         else
@@ -761,7 +754,7 @@ module triangularLatLonGrid_mod
                             !fprintf('The proc %d #%d neighbor of node (%d/%d) is: (%d/%d)\n',proc,j,&
                             !    nodeijv(1,node),nodeijv(2,node),nodeijv(1,n1),nodeijv(2,n1))
                         end if
-                    end if
+!                    end if
                 end do
             end do
 
@@ -856,16 +849,16 @@ module triangularLatLonGrid_mod
                         end if
                     end do
 
-                    if (.not. allIn) then
-                        ! not all of the indexes are in the buffer region so the triangle is suspect
-                        cycle ! the j loop
-                    end if
+                    !if (.not. allIn) then
+                    !    ! not all of the indexes are in the buffer region so the triangle is suspect
+                    !    cycle ! the j loop
+                    !end if
 
                     ! also exclude any purely boundary triangles that fill in the convex hull
-                    if(all(iv == xgs) .or. all(iv == xge) .or. &
-                       all(jv == ygs) .or. all(jv == yge)) then
-                        cycle ! the j loop
-                    end if
+                    !if(all(iv == xgs) .or. all(iv == xge) .or. &
+                    !   all(jv == ygs) .or. all(jv == yge)) then
+                    !    cycle ! the j loop
+                    !end if
 
                     ! get the comma-separated key of all of the nodes
                     triKey = getTriangleKey(j,triv,tri_i_node_ij,ngx)
@@ -1011,8 +1004,39 @@ module triangularLatLonGrid_mod
             end do ! the "i = 0,comm_size-1" loop
         end do ! the "loop = 1,2" loop
 
+        if (pinfo%getRank() == 0) then
+            open(unit=42,file="node_xy.txt",status="replace")
+
+            write(42,*) ngx
+            write(42,*) ngy
+
+            ind = 0
+
+            do j=1,ngy
+                do i=1,ngx
+                    ind = ind + 1
+                    write(42,*) allNodeij(1,ind),allNodeij(2,ind),&
+                        allNodexy(1,ind),allNodexy(2,ind)
+                end do
+            end do
+            close(unit=42)
+
+            open(unit=42,file="allTriangles.txt",status="replace")
+
+            write(42,*) numtot
+
+            do j=1,numtot
+                do i=1,3
+                    write(42,*) i,j,allTriangles(i,j)
+                end do
+            end do
+            close(unit=42)
+
+            call abortParallel()
+        end if
+
         allocate(globalTriTile)
-        call globalTriTile%triangularTilingConstructor(size(allNodeij,2),ngx,allNodeij,allNodexy, &
+        call globalTriTile%triangularTilingConstructor(size(allNodeij,2),allNodeij,allNodexy, &
             & allTriangles,allNeighbors,allTriInd,allList,allLptr,allLend,lnewAll,     &
             & deallocNode_ij=.true.,deallocNode_xy=.true.)
 

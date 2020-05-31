@@ -3,6 +3,7 @@ module dataArrayReader_mod
     use parallelInfo_mod
 
     use dataArray_mod
+    use dataVariable_mod
     use dataAttribute_mod
 
     implicit none
@@ -29,7 +30,7 @@ module dataArrayReader_mod
     end type
 
     abstract interface
-        function loadDimSizeFromVariableAbstract(this,pinfo,locationInFile,dimNum) &
+        function loadDimSizeFromVariableAbstract(this,pinfo,locationInFile,dimNum,required) &
             result(dimn)
 
             import DataArrayReader
@@ -40,6 +41,7 @@ module dataArrayReader_mod
             class(ParallelInfo), pointer     :: pinfo
             character(len=*),    intent(in)  :: locationInFile
             integer,             intent(in)  :: dimNum
+            logical,   optional, intent(in)  :: required
 
             integer :: dimn
         end function

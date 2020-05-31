@@ -1,54 +1,47 @@
 module noiseUtils_mod
 
+    use iso_fortran_env
+
     implicit none
 
-    real(8), parameter :: TAU = 8*atan(1.0d0)
+    real(real64), parameter :: TAU = 8*atan(1.0d0)
+
+    interface addStandardGaussianNoise
+        module procedure addStandardGaussianNoise_dble, &
+                         addStandardGaussianNoise_real
+    end interface
 
     contains
 
-    subroutine addGaussianNoise(n,x,sd,mean)
+    subroutine addStandardGaussianNoise_dble(n,x,sd,mean)
         implicit none
 
-        integer, intent(in)                :: n
-        real(8), intent(out), dimension(n) :: x
-        real(8), intent(in), optional      :: sd
-        real(8), intent(in), optional      :: mean
+        integer,      intent(in)                   :: n
+        real(real64), intent(inout), dimension(n)  :: x
+        real(real64), intent(in),    optional      :: sd
+        real(real64), intent(in),    optional      :: mean
 
-        real(8) :: sd1, mean1
-        real(8), dimension(2,1) :: r
+        real(real64) :: sd1, mean1
+        real(real64), dimension(2,1) :: r
         integer :: ij, ind2
-        real(8) :: u, v, f1, f2, x1, x2
+        real(real64) :: u, v, f1, f2, x1, x2
 
-        integer :: neven
+        include 'noiseUtils_addStandardGaussianNoise.incl'
+    end subroutine
 
-        if (present(sd)) then
-            sd1 = sd
-        else
-            sd1 = 1.d0
-        end if
+    subroutine addStandardGaussianNoise_real(n,x,sd,mean)
+        implicit none
 
-        if (present(mean)) then
-            mean1 = mean
-        else
-            mean1 = 0.d0
-        end if
+        integer,      intent(in)                   :: n
+        real(real32), intent(inout), dimension(n)  :: x
+        real(real32), intent(in),    optional      :: sd
+        real(real32), intent(in),    optional      :: mean
 
-        do ij = 1,size(x),2
-            call random_number(r)
+        real(real32) :: sd1, mean1
+        real(real32), dimension(2,1) :: r
+        integer :: ij, ind2
+        real(real32) :: u, v, f1, f2, x1, x2
 
-            u = r(1,1)   !! uniform random number in [0,1)
-            v = r(2,1)   !! same as above (another sample)
-
-            f1 = sqrt(-2.0*log(max(u,1d-16)))
-            f2 = TAU*v
-
-            ind2 = min(ij+1,size(x))
-
-            x1 = x(ij)
-            x2 = x(ind2)
-
-            x(ij)   = x1 + sd1*f1*cos(f2) + mean1
-            x(ind2) = x2 + sd1*f1*sin(f2) + mean1
-        end do
+        include 'noiseUtils_addStandardGaussianNoise.incl'
     end subroutine
 end module

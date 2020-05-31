@@ -56,7 +56,6 @@ module conicalScanningObsOperator_mod
     real(real64), parameter :: earthRadius = 6370d0
     real(real64), parameter :: kmToDegrees = 360.d0/2.0d0/3.141593d0/earthRadius
 
-
     public :: ConicalScanningObsOperator
 
     type, extends(ScannedObservationOperator) :: ConicalScanningObsOperator
@@ -322,11 +321,6 @@ module conicalScanningObsOperator_mod
         ! considering the largest maxdistsqr of any channel, then multiplying by some factor
         ! to account for the antenna pattern scan.
 
-        print *,'now checking min max inside: ',pinfo%getRank(),size(obsLoci,2)-1,&
-            & minval(owners),maxval(owners),shape(obsLoci),size(node_xy,2),minval(node_xy(1,:)),&
-            & maxval(node_xy(1,:)),minval(node_xy(2,:)),maxval(node_xy(2,:)),this%nposting_channels,&
-            & size(obsLoci,2)*this%nposting_channels*NT_POINTS*size(node_xy,2)
-
         ! do a quick run through the obs to approximate the min/max lat/lon
         do i=1,size(obsLoci,2)
             if (owners(i) /= pinfo%getRank()) then
@@ -408,8 +402,6 @@ module conicalScanningObsOperator_mod
                 !end do
             end do
         end do
-
-        print *,'finished min max inside: ',pinfo%getRank()
     end subroutine
 
     subroutine getRowData(this,pinfo,doCount,obs_so,inputGrid,obsnum,il,chind,scLat,scLon,&
@@ -455,6 +447,8 @@ module conicalScanningObsOperator_mod
         real(real64) :: fval, distsqr, latdist, londist, coslat, earthradius, kmtodegrees
 
         integer :: i, ind1, ind2, ind3, iz, itime, k, ki, kj, l, numtri, triInd
+        integer :: i1, i2, i3
+        integer :: j1, j2, j3
 
         real(real64) :: acostheta
 
@@ -473,6 +467,8 @@ module conicalScanningObsOperator_mod
         integer, pointer :: triangle(:,:)
         integer, pointer :: node_ij(:,:)
         real(real64), pointer :: node_xy(:,:)
+
+        integer :: rejected
 
         minAngle = 5.0d0*DTOR
         maxAngle = 175.d0*DTOR
@@ -540,6 +536,8 @@ module conicalScanningObsOperator_mod
 
         ! reset the used indexes to 0
         this%usedInd = 0
+
+        rejected = 0
 
         ! go through the points within the time integral
         do itime = 1,NT_POINTS
@@ -618,24 +616,33 @@ module conicalScanningObsOperator_mod
                     bn = dsqrt(bx*bx + by*by)
 
                     if (abs(an*bn) < 1d-16) then
+                        rejected = rejected + 1
                         cycle
                     end if
 
                     costheta = (ax*bx + ay*by)/(an*bn)
 
-                    if (costheta >= 1.d0 .or. costheta <= -1.d0) then
-                        cycle
-                    end if
+                    !if (costheta >= 1.d0 .or. costheta <= -1.d0) then
+                    !    rejected = rejected + 1
+                    !    cycle
+                    !end if
 
                     ! also check if the angle is unreasonably large or small
                     acostheta = dacos(costheta)
 
-                    if (acostheta < minAngle .or. acostheta > maxAngle) then
-                        ! this is a degenerate triangle, ignore it
-                        cycle
-                    end if
+                    !if (acostheta < minAngle .or. acostheta > maxAngle) then
+                    !    ! this is a degenerate triangle, ignore it
+                    !    rejected = rejected + 1
+                    !    cycle
+                    !end if
 
-                    areak = 0.5*an*bn*dsqrt(1.d0-costheta*costheta)
+                    areak = 0.5d0*an*bn*dsqrt(1.d0-costheta*costheta)
+
+                    !if (areak > 0.6d0) then
+                    !    print *,'areak:',areak
+                    !    rejected = rejected + 1
+                    !    cycle
+                    !end if
 
                     ! and complete the summed portion of the integral
                     zf = this%wt(itime)*areak/(6.0d0*PI)
@@ -685,6 +692,10 @@ module conicalScanningObsOperator_mod
                     end if
                 end if
             end do
+        end if
+
+        if (rejected > 0) then
+            print *,'avg rejected:',rejected/dble(NT_POINTS)
         end if
     end subroutine
 
@@ -787,9 +798,6 @@ module conicalScanningObsOperator_mod
         call this%getMinMaxLatLons(pinfo, obs_cs, inputGrid, minLat, maxLat, minLon, maxLon)
 
         ! here we should prune the input grid to stay within min/max lat/lon
-        print *,'the min/max val of min/max lat/lon is:',minval(minLat),maxval(maxLat), &
-            & minval(minLon),maxval(maxLon)
-
         obsLoci => obs_cs%getObsLoci()
 
         scLatPtr => obs_cs%getCraftLatitudes()
@@ -886,8 +894,7 @@ module conicalScanningObsOperator_mod
             end do
         end do
 
-        print *,'found nnz:',pinfo%getRank(),minval(d_nnz),maxval(d_nnz),minval(o_nnz),maxval(o_nnz)
-
+        !print *,'found nnz:',pinfo%getRank(),minval(d_nnz),maxval(d_nnz),minval(o_nnz),maxval(o_nnz)
 
         ! switch back the minLat/minLon to be consistent with maxLat/maxLon
         where(minLat == 999) minLat = -999

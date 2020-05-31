@@ -59,7 +59,8 @@ module netcdfDataArrayReader_mod
         call this%dataArrayReaderDestructor()
     end subroutine
 
-    function loadDimSizeFromVariable_netcdf(this,pinfo,locationInFile,dimNum) result(dimn)
+    function loadDimSizeFromVariable_netcdf(this,pinfo,locationInFile,dimNum,required) &
+        result(dimn)
 
         use mpi
         use netcdf
@@ -72,6 +73,7 @@ module netcdfDataArrayReader_mod
         class(ParallelInfo),        pointer     :: pinfo
         character(len=*),           intent(in)  :: locationInFile
         integer,                    intent(in)  :: dimNum
+        logical,          optional, intent(in)  :: required
 
         integer                                 :: dimn
         integer(kind=kindnum)                   :: dimn_kind
@@ -82,39 +84,75 @@ module netcdfDataArrayReader_mod
         integer :: ncerr
         integer :: vid, did, rcode
 
+        logical :: isRequired
+
+        if (present(required)) then
+            isRequired = required
+        else
+            isRequired = .true.
+        end if
+
         ! assume initParallel() has already been called
         if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
             rcode = nf90_open(this%getLocation(), nf_nowrite, fid)
             call ncCheck(rcode,'Opening the file ' // trim(this%getLocation()))
 
             rcode = nf90_inq_varid(fid, locationInFile, vid)
-            call ncCheck(rcode,'Reading the variable id for ' // trim(locationInFile) // &
-                & ' in the file ' // trim(this%getLocation()))
+            if (rcode /= 0) then
+                if (isRequired) then
+                    call ncCheck(rcode,'Reading the variable id for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()))
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             rcode = nf90_inquire_variable(fid, vid, ndims=ndims)
-            call ncCheck(rcode,'Reading the number of dims for ' // trim(locationInFile) // &
-                & ' in the file ' // trim(this%getLocation()))
+            if (rcode /= 0) then
+                if (isRequired) then
+                    call ncCheck(rcode,'Reading the number of dims for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()))
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             allocate(dids(ndims))
 
             rcode = nf90_inquire_variable(fid, vid, dimids=dids)
-            call ncCheck(rcode,'Reading the dimension IDs for ' // trim(locationInFile) // &
-                & ' in the file ' // trim(this%getLocation()))
+            if (rcode /= 0) then
+                if (isRequired) then
+                    call ncCheck(rcode,'Reading the dimension IDs for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()))
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             if (dimNum < 1 .or. dimNum > ndims) then
-                call error('Invalid dimension number for ' // trim(locationInFile) // &
-                    & ' in the file ' // trim(this%getLocation()) // ' - dim #' // &
-                    & int2str(dimNum) // '/' // int2str(ndims))
+                if (isRequired) then
+                    call error('Invalid dimension number for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()) // ' - dim #' // &
+                        & int2str(dimNum) // '/' // int2str(ndims))
+                else
+                    dimn = -1
+                    return
+                end if
             end if
 
             rcode = nf90_inquire_dimension(fid, dids(dimNum), len=dimn)
-            call ncCheck(rcode,'Reading the dimension length for ' // trim(locationInFile) // &
-                & ' in the file ' // trim(this%getLocation()))
-            ! dimn = int(dimn_kind)
-
-            if (rcode /= nf_noerr) then
-                dimn = -1
-            endif
+            if (rcode /= 0) then
+                if (isRequired) then
+                    call ncCheck(rcode,'Reading the dimension length for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()))
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             rcode = nf90_close(fid)
             call ncCheck(rcode,'Closing the file ' // trim(this%getLocation()))
@@ -124,33 +162,63 @@ module netcdfDataArrayReader_mod
             call ncCheck(rcode,'Opening the file ' // trim(this%getLocation()))
 
             rcode = nfmpi_inq_varid(fid, locationInFile, vid)
-            call ncCheck(rcode,'Reading the variable id for ' // trim(locationInFile) // &
-                & ' in the file ' // trim(this%getLocation()))
+            if (rcode /= 0) then
+                if (isRequired) then
+                    call ncCheck(rcode,'Reading the variable id for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()))
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             rcode = nfmpi_inq_varndims(fid, vid, ndims)
-            call ncCheck(rcode,'Reading the number of dims for ' // trim(locationInFile) // &
-                & ' in the file ' // trim(this%getLocation()))
+            if (rcode /= 0) then
+                if (isRequired) then
+                    call ncCheck(rcode,'Reading the number of dims for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()))
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             allocate(dids(ndims))
 
             rcode = nfmpi_inq_vardimid(fid, vid, dids)
-            call ncCheck(rcode,'Reading the dimension IDs for ' // trim(locationInFile) // &
-                & ' in the file ' // trim(this%getLocation()))
+            if (rcode /= 0) then
+                if (isRequired) then
+                    call ncCheck(rcode,'Reading the dimension IDs for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()))
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
             if (dimNum < 1 .or. dimNum > ndims) then
-                call error('Invalid dimension number for ' // trim(locationInFile) // &
-                    & ' in the file ' // trim(this%getLocation()) // ' - dim #' // &
-                    & int2str(dimNum) // '/' // int2str(ndims))
+                if (isRequired) then
+                    call error('Invalid dimension number for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()) // ' - dim #' // &
+                        & int2str(dimNum) // '/' // int2str(ndims))
+                else
+                    dimn = -1
+                    return
+                end if
             end if
 
             rcode = nfmpi_inq_dimlen(fid, dids(dimNum), dimn_kind)
-            call ncCheck(rcode,'Reading the dimension length for ' // trim(locationInFile) // &
-                & ' in the file ' // trim(this%getLocation()))
-            dimn = int(dimn_kind)
+            if (rcode /= 0) then
+                if (isRequired) then
+                    call ncCheck(rcode,'Reading the dimension length for ' // trim(locationInFile) // &
+                        & ' in the file ' // trim(this%getLocation()))
+                else
+                    dimn = -1
+                    return
+                end if
+            end if
 
-            if (rcode /= nf_noerr) then
-                dimn = -1
-            endif
+            dimn = int(dimn_kind)
 
             rcode = nfmpi_close(fid)
             call ncCheck(rcode,'Closing the file ' // trim(this%getLocation()))

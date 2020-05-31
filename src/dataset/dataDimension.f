@@ -22,6 +22,7 @@ module dataDimension_mod
             procedure           :: getName
             procedure           :: setName
             procedure           :: getComparisonDimName
+            procedure           :: setComparisonDimName
             procedure           :: getGlobalSize
             procedure           :: getGlobalCount
             procedure           :: getGlobalStart
@@ -156,6 +157,25 @@ module dataDimension_mod
 
         compareToDim => this%compareToDim
     end function
+
+    subroutine setComparisonDimName(this,compareToDim)
+        implicit none
+
+        class(DataDimension)  :: this
+        character(:), pointer :: compareToDim
+
+        if (this%isReadOnly()) then
+            call error('Cannot set the comparison name on a read-only data dimension')
+        end if
+
+        if (associated(this%compareToDim)) then
+            deallocate(this%compareToDim)
+        end if
+
+        allocate(character(len=len(compareToDim)) :: this%compareToDim)
+
+        this%compareToDim = compareToDim
+    end subroutine
 
     function getGlobalSize(this) result(globalSize)
         implicit none

@@ -4,6 +4,7 @@ module ccvObservationOperator_mod
     use rtmOptions_mod
     use satellitePlatformInfo_mod
     use satelliteObservation_mod
+    use dataVariable_mod
 
     use radianceCcv_mod
 
@@ -90,6 +91,7 @@ module ccvObservationOperator_mod
 
         real(8), dimension(:),   pointer :: obsx, obsy
 
+        real(8), dimension(:,:), pointer :: obsData
         real(8), dimension(:,:), pointer :: obsLoci
         real(8), dimension(:,:), pointer :: auxData
 
@@ -105,6 +107,8 @@ module ccvObservationOperator_mod
 
         real(8), dimension(:), pointer :: obsptr, auxptr
         integer, dimension(:), allocatable :: ccvNums
+
+        class(DataVariable), pointer :: obsDataVar
 
         real :: start, finish
 
@@ -128,14 +132,17 @@ module ccvObservationOperator_mod
             ccvNums(z) = z
         end do
 
+        obsDataVar => obs%getObsDataVar()
+
+        call obsDataVar%getArray(obsData)
+
         do obsnum=1,nprofiles
             x = obsx(obsnum)
             y = obsy(obsnum)
 
             call input%getColumnFields(x,y,.false.,this%dptr,this%modelVarNames)
 
-            obsptr => obs%getObservation(obsnum)
-            obsptr => output(:,obsnum)
+            obsptr => obsData(:,obsnum)
             auxptr => auxData(:,obsnum)
 
             call radCcvManager%forward(nint(auxptr(1)),nint(auxptr(2)),ccvNums,this%dptr,nint(auxptr(3)),obsptr)
@@ -164,6 +171,7 @@ module ccvObservationOperator_mod
         real(8), pointer :: obsx(:), obsy(:)
         real(8), pointer, dimension(:) :: obsptr, obsptr_tl, auxptr
 
+        real(8), dimension(:,:), pointer :: obsData
         real(8), dimension(:,:), pointer :: obsLoci
         real(8), dimension(:,:), pointer :: auxData
 
@@ -189,6 +197,7 @@ module ccvObservationOperator_mod
 
         obsLoci => obs%getObsLoci()
         auxData => obs%getAuxData()
+        obsData => obs%getObsData()
 
         obsx => obsLoci(SO_PIX_DIM,:)
         obsy => obsLoci(SO_SCAN_DIM,:)
@@ -201,7 +210,7 @@ module ccvObservationOperator_mod
             call baseState%getColumnFields(x,y,.false.,this%dptr,this%modelVarNames)
             call deltaX%getColumnFields(x,y,.false.,this%dptr2,this%modelVarNames)
 
-            obsptr    => obs%getObservation(obsnum)
+            obsptr    => obsData(:,obsnum)
             obsptr_tl => deltaY(:,obsnum)
             auxptr    => auxData(:,obsnum)
 
@@ -228,6 +237,7 @@ module ccvObservationOperator_mod
         real(8), dimension(:,:),     pointer :: deltaY
         class(Atmos3DDataSet),    pointer :: deltaX
 
+        real(8), dimension(:,:), pointer :: obsData
         real(8), dimension(:,:), pointer :: obsLoci
         real(8), dimension(:,:), pointer :: auxData
 
@@ -254,6 +264,7 @@ module ccvObservationOperator_mod
 
         obsLoci => obs%getObsLoci()
         auxData => obs%getAuxData()
+        obsData => obs%getObsData()
 
         obsx => obsLoci(SO_PIX_DIM,:)
         obsy => obsLoci(SO_SCAN_DIM,:)
@@ -266,7 +277,7 @@ module ccvObservationOperator_mod
             call baseState%getColumnFields(x,y,.false.,this%dptr,this%modelVarNames)
             call baseState%getColumnFields(x,y,.false.,this%dptr2,this%modelVarNames)
 
-            obsptr     => obs%getObservation(obsnum)
+            obsptr     => obsData(:,obsnum)
             obsptr_adj => deltaY(:,obsnum)
             auxptr     => auxData(:,obsnum)
 

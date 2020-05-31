@@ -238,14 +238,9 @@ module ssmisObservation_mod
         call hdfReader%hdfDataArrayReaderConstructor(filename,littleEndian=.true.)
         reader => hdfReader
 
-        print *,'Now calling SSMIS constructor'
-        call barrier()
-
         call this%conicalScanningObservationConstructor(satellitePlatform,&
             & reader,fovAlong=fovAlong,fovCross=fovCross,intTime=intTime, &
             & choffset=choffset,spinFrequency=spinFrequency,obsErr=obsErr)
-
-        print *,'Finished calling SSMIS constructor'
 
         write(grp,'(A,I1)') '/S',groupNum
 

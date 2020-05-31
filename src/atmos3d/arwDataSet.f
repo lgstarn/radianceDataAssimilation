@@ -10,7 +10,7 @@ module ArwDataSet_mod
     use atmos3dDataSet_mod
 
     use dataGrid_mod
-    use triangularLatLonGrid_mod
+    use regularTriangularLatLonGrid_mod
 
     use dataGroup_mod
     use dataAttribute_mod
@@ -171,8 +171,8 @@ module ArwDataSet_mod
         class(DataVariable),  pointer :: tLandVar    => null()
         class(DataVariable),  pointer :: tWaterVar   => null()
 
-        class(DataGrid),             pointer :: grid        => null()
-        class(TriangularLatLonGrid), pointer :: triGrid    => null()
+        class(DataGrid),                   pointer :: grid        => null()
+        class(RegularTriangularLatLonGrid), pointer :: triGrid    => null()
 
         class(DataVariable),  pointer :: latVar_global => null()
         class(DataVariable),  pointer :: lonVar_global => null()
@@ -495,7 +495,7 @@ module ArwDataSet_mod
         call debug('Now creating the input grid')
 
         allocate(triGrid)
-        call triGrid%triangularLatLonGridConstructor(latVar,lonVar)
+        call triGrid%regularTriangularLatLonGridConstructor(latVar,lonVar)
         grid => triGrid
 
         call debug('Now finalizing the WRF data set')

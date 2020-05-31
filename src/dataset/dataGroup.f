@@ -48,8 +48,15 @@ module dataGroup_mod
             procedure :: getName
             procedure :: setName
 
+            procedure :: getDimension
+            procedure :: getDimensionByName
+            procedure :: getDimensionNames
+            procedure :: getEnum
+            procedure :: getEnumByName
+            procedure :: getEnumNames
             procedure :: getGroup
             procedure :: getGroupByName
+            procedure :: getGroupNames
             procedure :: getVariable
             procedure :: getVariableByName
             procedure :: getVariableNames
@@ -59,13 +66,15 @@ module dataGroup_mod
             procedure :: getMirroredArrayByName
             procedure :: getAttribute
             procedure :: getAttributeByName
-            procedure :: getDimension
-            procedure :: getDimensionByName
-            procedure :: getDimensionNames
+
             procedure :: getGlobalDimCount
-            procedure :: getEnum
 
             procedure :: getNDimensions
+
+            procedure :: hasDimension
+            procedure :: hasEnum
+            procedure :: hasGroup
+            procedure :: hasVariable
 
             procedure :: addGroup
             procedure :: addGroupByName
@@ -1129,9 +1138,9 @@ module dataGroup_mod
 
         integer :: i
 
-        trimmedStr = trim(str)
+        trimmedStr = trim(adjustl(str))
 
-        nstr = len(trim(trimmedStr))
+        nstr = len_trim(trimmedStr)
 
         ! remove all initial '/' characters
         do while (trimmedStr(1:1) == '/')
@@ -1152,22 +1161,21 @@ module dataGroup_mod
             trimmedStr = trimmedStr(1:nstr-i)
         end if
 
-        nstr = len(trim(trimmedStr))
+        nstr = len_trim(trimmedStr)
     end function
 
-    recursive function getGroup(this,locationString,ierr) result(group)
+    recursive function getGroup(this,locationString) result(group)
         implicit none
 
         class(DataGroup), target          :: this
 
         character(len=*),    intent(in)   :: locationString
-        integer,             intent(out)  :: ierr
 
         class(DataGroup), pointer :: group
 
         character(:), allocatable :: substr1, substr2, substr3
 
-        integer :: nstr, i
+        integer :: nstr, i, ierr
 
         class(*), pointer :: optr
 
@@ -1178,7 +1186,6 @@ module dataGroup_mod
         if (nstr == 0) then
             ! found the requested group! it's us.
             group => this
-            ierr = 0
         else
             ! now let's see if we have the group being requested
 
@@ -1196,50 +1203,52 @@ module dataGroup_mod
                 end if
             end do
 
-            ierr = 2 ! group is not found (by default, changed below in getGroup)
-
-            if (this%subgroups%hasKey(substr2)) then
-                optr => this%subgroups%get(substr2)
-
-                select type(optr)
-                    class is (DataGroup)
-                        ! cast down
-                        tmpgroup => optr
-                    class default
-                        call error('Unknown class in subgroups dictionary')
-                end select
+            if (this%hasGroup(substr2)) then
+                tmpgroup => this%getGroupByName(substr2)
 
                 ! go further down the rabbit hole. We'll be fine (probably).
-                group => tmpgroup%getGroup(substr3,ierr)
+                group => tmpgroup%getGroup(substr3)
+            else
+                group => null()
             end if
         end if
     end function
 
-    function getGroupByName(this,varName) result(group)
+    function getGroupByName(this,groupName) result(group)
         implicit none
 
         class(DataGroup)                  :: this
-        character(len=*),    intent(in)   :: varName
+        character(len=*),    intent(in)   :: groupName
 
         class(DataGroup),    pointer      :: group
 
         class(*),            pointer      :: optr      => null()
 
-        if (this%variables%hasKey(varName)) then
-            optr => this%subgroups%get(varName)
+        if (this%subgroups%hasKey(groupName)) then
+            optr => this%subgroups%get(groupName)
 
             select type(optr)
                 class is (DataGroup)
                     ! cast down
                     group => optr
                 class default
-                    call error('Unknown class in variable dictionary')
+                    call error('Unknown class in group dictionary')
             end select
         else
-            group => null()
+            call error("Could not find the group by name " // groupName)
+            ! group => null()
         end if
     end function
 
+    subroutine getGroupNames(this,keyNames)
+        implicit none
+
+        class(DataGroup)                 :: this
+
+        character(len=DICT_KEY_LENGTH), dimension(:), allocatable :: keyNames
+
+        call this%subgroups%keys(keyNames)
+    end subroutine
     function getOwnerGroup(this,locationString,groupFound,childString) result(ownerGroup)
         implicit none
 
@@ -1276,7 +1285,7 @@ module dataGroup_mod
 
         if (subgroupFound) then
             ! if there is a subgroup, we'll get it
-            ownerGroup => this%getGroup(substr2,ierr2)
+            ownerGroup => this%getGroup(substr2)
             if (.not. associated(ownerGroup)) then
                 childString = ''
                 groupFound = .false.
@@ -1291,12 +1300,22 @@ module dataGroup_mod
         end if
     end function
 
-    function getVariable(this,locationString,ierr) result(var)
+    function hasGroup(this,groupName)
+        implicit none
+
+        class(DataGroup)                  :: this
+        character(len=*),    intent(in)   :: groupName
+
+        logical :: hasGroup
+
+        hasGroup = this%variables%hasKey(groupName)
+    end function
+
+    function getVariable(this,locationString) result(var)
         implicit none
 
         class(DataGroup)                  :: this
         character(len=*),    intent(in)   :: locationString
-        integer,             intent(out)  :: ierr
 
         class(DataVariable), pointer      :: var
 
@@ -1306,7 +1325,7 @@ module dataGroup_mod
 
         logical             :: groupFound
         character(:), allocatable :: childString
-        integer             :: nstr
+        integer             :: nstr, ierr
 
         character(:), allocatable :: substr1
 
@@ -1331,6 +1350,10 @@ module dataGroup_mod
                 end if
             end if
         end if
+
+        if (ierr /= 0) then
+            call error("Could not find the variable at location " // locationString)
+        end if
     end function
 
     function getVariableByName(this,varName) result(var)
@@ -1354,7 +1377,8 @@ module dataGroup_mod
                     call error('Unknown class in variable dictionary')
             end select
         else
-            var => null()
+            call error('Could not find variable ' // varName)
+            !  var => null()
         end if
     end function
 
@@ -1368,19 +1392,28 @@ module dataGroup_mod
         call this%variables%keys(keyNames)
     end subroutine
 
+    function hasVariable(this,varName)
+        implicit none
 
-    function getDataArray(this,locationString,ierr) result(dArray)
+        class(DataGroup)                  :: this
+        character(len=*),    intent(in)   :: varName
+
+        logical :: hasVariable
+
+        hasVariable = this%variables%hasKey(varName)
+    end function
+
+    function getDataArray(this,locationString) result(dArray)
         implicit none
 
         class(DataGroup)                  :: this
         character(len=*),    intent(in)   :: locationString
-        integer,             intent(out)  :: ierr
 
         class(DataArray),    pointer      :: dArray
 
         class(DataVariable), pointer      :: var
 
-        var => this%getVariable(locationString,ierr)
+        var => this%getVariable(locationString)
         dArray => var%getDataArray()
     end function
 
@@ -1397,17 +1430,16 @@ module dataGroup_mod
         dArray => var%getDataArray()
     end function
 
-    function getMirroredArray(this,locationString,ierr) result(mArray)
+    function getMirroredArray(this,locationString) result(mArray)
         implicit none
 
         class(DataGroup)                  :: this
         character(len=*),     intent(in)  :: locationString
-        integer,              intent(out) :: ierr
 
         class(DataArray),     pointer     :: dArray
         class(MirroredArray), pointer     :: mArray
 
-        dArray => this%getDataArray(locationString,ierr)
+        dArray => this%getDataArray(locationString)
 
         select type(dArray)
             class is (MirroredArray)
@@ -1440,13 +1472,12 @@ module dataGroup_mod
         end select
     end function
 
-    function getAttribute(this,locationString,isGroupAttribute,ierr) result(attr)
+    function getAttribute(this,locationString,isGroupAttribute) result(attr)
         implicit none
 
         class(DataGroup)                  :: this
         character(len=*),    intent(in)   :: locationString
         logical,             intent(in)   :: isGroupAttribute
-        integer,             intent(out)  :: ierr
 
         class(DataAttribute), pointer     :: attr
 
@@ -1456,11 +1487,11 @@ module dataGroup_mod
         class(DataGroup),     pointer     :: subgroup => null()
         class(*),             pointer     :: optr     => null()
 
-        logical             :: groupFound
+        logical                   :: groupFound
         character(:), allocatable :: childString
         character(:), allocatable :: substr1, substr2, substr3
 
-        integer :: i, nstr
+        integer :: i, nstr, ierr
         integer :: attrInd
 
         logical :: hasAttribute
@@ -1521,8 +1552,8 @@ module dataGroup_mod
                 if (isGroupAttribute) then
 
                     ! on the group then we will look through the subgroup's list of attributes
-                    subGroup => this%getGroup(locationString,ierr)
-                    if (ierr .eq. 0 .and. associated(subGroup)) then
+                    subGroup => this%getGroup(locationString)
+                    if (associated(subGroup)) then
                         attr => subGroup%getAttributeByName(substr3)
 
                         if (associated(attr)) then
@@ -1532,9 +1563,9 @@ module dataGroup_mod
                         end if
                     end if
                 else
-                    var => this%getVariable(locationString,ierr)
+                    var => this%getVariable(locationString)
 
-                    if (ierr .eq. 0 .and. associated(var)) then
+                    if (associated(var)) then
                         ! it's up to the variable now
                         attr => var%getAttribute(substr3,ierr)
                     end if
@@ -1544,6 +1575,10 @@ module dataGroup_mod
             ! no attribute in the string. Error.
             attr => null()
             ierr = 3
+        end if
+
+        if (ierr /= 0) then
+            call error("Could not find the attribute " // locationString)
         end if
     end function
 
@@ -1569,17 +1604,17 @@ module dataGroup_mod
                     call error('Unknown class in variable dictionary')
             end select
         else
-            attr => null()
+            call error('Could not find the attribute named ' // trim(adjustl(attrName)))
+            !attr => null()
         end if
     end function
 
-    function getDimension(this,locationString,ierr) result(dimv)
+    function getDimension(this,locationString) result(dimv)
         implicit none
 
         class(DataGroup)                         :: this
 
         character(len=*),           intent(in)   :: locationString
-        integer,                    intent(out)  :: ierr
 
         class(DataDimension),       pointer      :: dimv
 
@@ -1587,11 +1622,11 @@ module dataGroup_mod
         class(DataGroup),           pointer :: subgroup => null()
         class(*),                   pointer :: optr     => null()
 
-        logical             :: groupFound
+        logical                   :: groupFound
         character(:), allocatable :: childString
 
         character(:), allocatable :: substr1, substr2, substr3
-        integer :: i, nstr
+        integer :: i, nstr, ierr
 
         subgroup => this%getOwnerGroup(locationString,groupFound,childString)
 
@@ -1614,6 +1649,10 @@ module dataGroup_mod
                     ierr = 2 ! dimension is not found
                 end if
             end if
+        end if
+
+        if (ierr /= 0) then
+            call error('Could not find the dimension at location ' // locationString)
         end if
     end function
 
@@ -1639,7 +1678,8 @@ module dataGroup_mod
                     call error('Unknown class in variable dictionary')
             end select
         else
-            ddim => null()
+            call error('Could not find the dimension named ' // dimName)
+            ! ddim => null()
         end if
     end function
 
@@ -1653,6 +1693,17 @@ module dataGroup_mod
         call this%dims%keys(keyNames)
     end subroutine
 
+    function hasDimension(this,dimName)
+        implicit none
+
+        class(DataGroup)             :: this
+        character(len=*), intent(in) :: dimName
+
+        logical :: hasDimension
+
+        hasDimension = this%dims%hasKey(dimName)
+    end function
+
     function getGlobalDimCount(this,dimName) result(ndim)
         implicit none
 
@@ -1663,13 +1714,9 @@ module dataGroup_mod
 
         integer :: ndim, ierr
 
-        ddim => this%getDimension(dimName,ierr)
+        ddim => this%getDimension(dimName)
 
-        if (associated(ddim) .and. ierr == 0) then
-            ndim = ddim%getGlobalCount()
-        else
-            ndim = 0
-        end if
+        ndim = ddim%getGlobalCount()
     end function
 
     function getNDimensions(this) result(ndim)
@@ -1681,13 +1728,12 @@ module dataGroup_mod
         ndim = this%dims%numkeys()
     end function
 
-    function getEnum(this,locationString,ierr) result(enumv)
+    function getEnum(this,locationString) result(enumv)
         implicit none
 
         class(DataGroup)                  :: this
 
         character(len=*),    intent(in)   :: locationString
-        integer,             intent(out)  :: ierr
 
         class(DataEnum),     pointer      :: enumv
 
@@ -1700,6 +1746,7 @@ module dataGroup_mod
         logical                   :: groupFound
         character(:), allocatable :: childString
         integer                   :: nstr
+        integer                   :: ierr
 
         character(:), allocatable :: substr1
 
@@ -1714,20 +1761,61 @@ module dataGroup_mod
             if (nstr .ne. 0) then
                 ! now let's see if the group has the variable being requested
 
-                if (subgroup%enums%hasKey(substr1)) then
-                    optr => subgroup%enums%get(substr1)
-
-                    select type(optr)
-                        class is (DataEnum)
-                            ! cast down
-                            enumv => optr
-                        class default
-                            call error('Unknown class in enum dictionary')
-                    end select
+                if (subgroup%hasEnum(substr1)) then
+                    enumv => subgroup%getEnumByName(substr1)
                     ierr = 0
                 end if
             end if
         end if
+
+        if (ierr /= 0) then
+            call error('Could not find the enum at location ' // locationString)
+        end if
+    end function
+
+    function getEnumByName(this,enumName) result(enumv)
+        implicit none
+
+        class(DataGroup)                  :: this
+
+        character(len=*),    intent(in)   :: enumName
+        class(DataEnum),     pointer      :: enumv
+
+        class(*),            pointer      :: optr      => null()
+
+        optr => this%enums%get(enumName)
+
+        if (associated(optr)) then
+            select type(optr)
+                class is (DataEnum)
+                    ! cast down
+                    enumv => optr
+                class default
+                    call error('A non DataEnum class was found in the enums dict.')
+            end select
+        else
+            write(msgstr,*) 'Could not find enum key ',trim(enumName),' in dictionary.'
+            call error(msgstr)
+        end if
+    end function
+
+    subroutine getEnumNames(this,keyNames)
+        implicit none
+
+        class(DataGroup)                 :: this
+
+        character(len=DICT_KEY_LENGTH), dimension(:), allocatable :: keyNames
+
+        call this%enums%keys(keyNames)
+    end subroutine
+
+    function hasEnum(this,enumName)
+        class(DataGroup)                  :: this
+        character(len=*),    intent(in)   :: enumName
+
+        logical :: hasEnum
+
+        hasEnum = this%enums%hasKey(enumName)
     end function
 
     subroutine addGroup(this,subgroup)
@@ -1737,6 +1825,10 @@ module dataGroup_mod
         class(DataGroup), pointer :: subgroup
 
         class(*), pointer :: optr
+
+        if (.not. associated(subgroup)) then
+            call error('The subgroup to add was not associated')
+        end if
 
         if (this%subgroups%haskey(subgroup%getName())) then
             call error('Cannot add group. The group ' // this%getName() // &
@@ -1776,22 +1868,65 @@ module dataGroup_mod
         deallocate(var)
     end subroutine
 
-    subroutine addVariablePointer(this,var)
+    subroutine addVariablePointer(this,var,checkName,checkType,checkDim)
         implicit none
 
-        class(DataGroup)             :: this
-        class(DataVariable), pointer :: var
+        class(DataGroup)                        :: this
 
-        class(DataShape),     pointer :: dshape
-        class(DataDimension), pointer :: ddim
+        class(DataVariable),        pointer     :: var
+        character(len=*), optional, intent(in)  :: checkName
+        integer,          optional, intent(in)  :: checkType
+        integer,          optional, intent(in)  :: checkDim
+
+        class(DataShape),     pointer    :: dshape
+        class(DataDimension), pointer    :: ddim
+
+        class(DataVariable),  pointer    :: ovar
 
         class(*), pointer :: optr
 
         integer :: i, ndim
 
+        if (.not. associated(var)) then
+            call error('The variable pointer was not initialized')
+        end if
+
+        if (present(checkName)) then
+            if (trim(adjustl(var%getName())) /= trim(adjustl(checkName))) then
+                call error('The name of the variable ' // trim(adjustl(var%getName())) // &
+                    ' was not ' // trim(adjustl(checkName)) // ' as expected.')
+            end if
+        end if
+
+        if (present(checkType)) then
+            if (var%getDataTypeNum() /= checkType) then
+                write(msgstr,*) 'The type of the variable ',&
+                    lookupDataTypeName(var%getDataTypeNum()), &
+                    ' was not ', &
+                    lookupDataTypeName(checkType), ' as expected'
+                call error(msgstr)
+            end if
+        end if
+
+        if (present(checkDim)) then
+            if (var%getNDimensions() /= checkDim) then
+                write(msgstr,*) 'The dimension of the variable ',var%getNDimensions(), &
+                    ' was not ', checkDim, ' as expected'
+                call error(msgstr)
+            end if
+        end if
+
         if (this%variables%haskey(var%getName())) then
-            call error('Cannot add variable. The data group ' // trim(this%getName()) // &
-                & ' already has a variable of name ' // trim(var%getName()))
+
+            ovar => this%getVariableByName(var%getName())
+
+            if (.not. associated(ovar,var)) then
+                call error('Cannot add variable. The data group ' // trim(this%getName()) // &
+                    & ' already has a variable of name ' // trim(this%getName()))
+            else
+                ! the variable is already in this data group.
+                return
+            end if
         end if
 
         ! now loop through the dimensions and see if any need to be added
@@ -1818,6 +1953,10 @@ module dataGroup_mod
 
         class(*), pointer :: optr
 
+        if (.not. associated(attr)) then
+            call error('The attribute pointer was not initialized')
+        end if
+
         if (this%attributes%haskey(attr%getName())) then
             call error('Cannot add attribute. The data group ' // trim(this%getName()) // &
                 & ' already has a attribute of name ' // trim(attr%getName()))
@@ -1836,6 +1975,10 @@ module dataGroup_mod
 
         class(*), pointer :: optr
 
+        if (.not. associated(dimv)) then
+            call error('The dimension pointer was not initialized')
+        end if
+
         if (this%dims%haskey(dimv%getName())) then
             call error('Cannot add dimension. The group ' // this%getName() // &
                 & ' already has a dimension of name ' // trim(dimv%getName()))
@@ -1846,7 +1989,7 @@ module dataGroup_mod
     end subroutine
 
     function addDimensionByName(this,name,globalSize,globalCount,globalStart,&
-        localCount,localStart,stagger,compareToDim) result(dimv)
+        stagger,compareToDim) result(dimv)
 
         implicit none
 
@@ -1856,8 +1999,6 @@ module dataGroup_mod
         integer,                    intent(in) :: globalSize
         integer,          optional, intent(in) :: globalCount
         integer,          optional, intent(in) :: globalStart
-        integer,          optional, intent(in) :: localCount
-        integer,          optional, intent(in) :: localStart
         integer,          optional, intent(in) :: stagger
         character(len=*), optional, intent(in) :: compareToDim
 
@@ -1879,6 +2020,10 @@ module dataGroup_mod
 
         class(*), pointer :: optr
 
+        if (.not. associated(enumPtr)) then
+            call error('The enum pointer was not initialized')
+        end if
+
         if (this%enums%haskey(enumPtr%getName())) then
             call error('Cannot add enum. The group ' // this%getName() // &
                 & ' already has an enum of name ' // trim(enumPtr%getName()))
@@ -1891,9 +2036,11 @@ module dataGroup_mod
     function cloneGroup(this,copyData) result(dgptr)
         implicit none
 
-        class(DataGroup), target :: this
-        logical, intent(in) :: copyData
-        class(DataGroup), pointer :: dgptr, sdgptr
+        class(DataGroup), target     :: this
+        logical,          intent(in) :: copyData
+        class(DataGroup), pointer    :: dgptr
+
+        class(DataGroup), pointer    :: sdgptr
         class(*), pointer :: optr
 
         allocate(dgptr)
@@ -1924,26 +2071,30 @@ module dataGroup_mod
 
         integer :: i
 
+        if (.not. associated(copyFrom)) then
+            call error('The copyFrom pointer was not associated.')
+        end if
+
+        ! now copy all the dimensions
+        call copyFrom%dims%keys(keynames)
+
+        do i=1,size(keyNames)
+            ! only add dimensions if they aren't already present
+            if (.not. this%hasDimension(keyNames(i))) then
+                ddptr => copyFrom%getDimensionByName(keyNames(i))
+                call this%addDimension(ddptr%clone())
+            end if
+        end do
+
+        deallocate(keyNames)
+
         ! now copy all the subgroups
         call copyFrom%subgroups%keys(keyNames)
 
         do i=1,size(keyNames)
-            optr => copyFrom%subgroups%get(keyNames(i))
+            sdgPtr => copyFrom%getGroupByName(keyNames(i))
 
-            if (associated(optr)) then
-                select type(optr)
-                    class is (DataGroup)
-                        ! cast down
-                        sdgPtr => optr
-                    class default
-                        call error('A non DataGroup class was found in the subgroups dict.')
-                end select
-
-                call this%addGroup(sdgptr%cloneGroup(copyData))
-            else
-                write(msgstr,*) 'Could not find key ',trim(keyNames(i)),'in dictionary.'
-                call error(msgstr)
-            end if
+            call this%addGroup(sdgptr%cloneGroup(copyData))
         end do
 
         deallocate(keyNames)
@@ -1952,22 +2103,8 @@ module dataGroup_mod
         call copyFrom%variables%keys(keyNames)
 
         do i=1,size(keyNames)
-            optr => copyFrom%variables%get(keyNames(i))
-
-            if (associated(optr)) then
-                select type(optr)
-                    class is (DataVariable)
-                        ! cast down
-                        dvPtr => optr
-                    class default
-                        call error('A non DataVariable class was found in the variables dict.')
-                end select
-
-                call this%addVariablePointer(dvptr%clone(copyData))
-            else
-                write(msgstr,*) 'Could not find key ',trim(keyNames(i)),'in dictionary.'
-                call error(msgstr)
-            end if
+            dvPtr => copyFrom%getVariableByName(keyNames(i))
+            call this%addVariablePointer(dvptr%clone(copyData))
         end do
 
         deallocate(keyNames)
@@ -1976,67 +2113,18 @@ module dataGroup_mod
         call copyFrom%attributes%keys(keyNames)
 
         do i=1,size(keyNames)
-            optr => copyFrom%attributes%get(keyNames(i))
-
-            if (associated(optr)) then
-                select type(optr)
-                    class is (DataAttribute)
-                        ! cast down
-                        daPtr => optr
-                    class default
-                        call error('A non DataAttribute class was found in the attributes dict.')
-                end select
-
-                call this%addAttribute(daPtr%clone())
-            else
-                write(msgstr,*) 'Could not find key ',trim(keyNames(i)),'in dictionary.'
-                call error(msgstr)
-            end if
+            daPtr => copyFrom%getAttributeByName(keyNames(i))
+            call this%addAttribute(daPtr%clone())
         end do
 
         deallocate(keyNames)
-
-        ! now copy all the dimensions
-        call copyFrom%dims%keys(keynames)
-
-        do i=1,size(keyNames)
-            optr => copyFrom%dims%get(keyNames(i))
-
-            if (associated(optr)) then
-                select type(optr)
-                    class is (DataDimension)
-                        ! cast down
-                        ddptr => optr
-                    class default
-                        call error('Unknown class in dimension list')
-                end select
-            else
-                call error('Dimension list is in an inconsistent state')
-            end if
-
-            call this%addDimension(ddptr%clone())
-        end do
 
         ! now copy all the enums
         call copyFrom%enums%keys(keyNames)
 
         do i=1,size(keyNames)
-            optr => copyFrom%enums%get(keyNames(i))
-
-            if (associated(optr)) then
-                select type(optr)
-                    class is (DataEnum)
-                        ! cast down
-                        dePtr => optr
-                    class default
-                        call error('A non DataEnum class was found in the enums dict.')
-                end select
-
-                call this%addEnum(dePtr%clone())
-            else
-                write(msgstr,*) 'Could not find key ',trim(keyNames(i)),'in dictionary.'
-                call error(msgstr)
-            end if
+            dePtr => copyFrom%getEnumByName(keyNames(i))
+            call this%addEnum(dePtr%clone())
         end do
 
         deallocate(keyNames)
@@ -2059,22 +2147,9 @@ module dataGroup_mod
         call this%subgroups%keys(keyNames)
 
         do i=1,size(keyNames)
-            optr => this%subgroups%get(keyNames(i))
+            dgptr => this%getGroupByName(keyNames(i))
 
-            if (associated(optr)) then
-                select type(optr)
-                    class is (DataGroup)
-                        ! cast down
-                        dgPtr => optr
-                    class default
-                        call error('A non DataGroup class was found in the subgroups dict.')
-                end select
-
-                call dgPtr%zeroAll()
-            else
-                write(msgstr,*) 'Could not find key ',trim(keyNames(i)),'in dictionary.'
-                call error(msgstr)
-            end if
+            call dgPtr%zeroAll()
         end do
 
         deallocate(keyNames)
@@ -2083,22 +2158,9 @@ module dataGroup_mod
         call this%variables%keys(keyNames)
 
         do i=1,size(keyNames)
-            optr => this%variables%get(keyNames(i))
+            dvPtr => this%getVariableByName(keyNames(i))
 
-            if (associated(optr)) then
-                select type(optr)
-                    class is (DataVariable)
-                        ! cast down
-                        dvPtr => optr
-                    class default
-                        call error('A non DataVariable class was found in the variables dict.')
-                end select
-
-                call dvPtr%zeroAll()
-            else
-                write(msgstr,*) 'Could not find key ',trim(keyNames(i)),'in dictionary.'
-                call error(msgstr)
-            end if
+            call dvPtr%zeroAll()
         end do
 
         deallocate(keyNames)
@@ -10404,23 +10466,7 @@ module dataGroup_mod
 
         ! loop through the list of variables
         do i=1,size(keyNames)
-            optr => this%variables%get(trim(keyNames(i)))
-
-            if (associated(optr)) then
-                select type(optr)
-                    class is (DataVariable)
-                        ! cast down
-                        var => optr
-                    class default
-                        call error('Unknown class in variable dictionary')
-                end select
-            else
-                var => null()
-            end if
-
-            if (.not. associated(var)) then
-                call error('Could not find the variable ' // trim(keyNames(i)))
-            end if
+            var => this%getVariableByName(keyNames(i))
 
             call var%synchronize(pinfo)
         end do

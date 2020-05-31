@@ -11,8 +11,8 @@ module scannedObservation_mod
     use satelliteObservation_mod
     use satellitePlatformInfo_mod
 
-    use dataGrid_mod
-    use triangularLatLonGrid_mod
+    !use dataGrid_mod
+    !use regularTriangularLatLonGrid_mod
 
     use dataSet_mod
     use dataGroup_mod
@@ -36,8 +36,8 @@ module scannedObservation_mod
             real(real64), dimension(:),  pointer :: fovAlong
             real(real64), dimension(:),  pointer :: fovCross
             real(real64), dimension(:),  pointer :: intTime
-            logical                              :: gridded  = .false.
-            class(TriangularLatLonGrid), pointer :: grid     => null()
+            !logical                              :: gridded  = .false.
+            !class(RegularTriangularLatLonGrid), pointer :: grid     => null()
 
             ! minimum distance between scans (km), used for quick distance approximations
             real(real64)                            :: scanDistance
@@ -52,8 +52,8 @@ module scannedObservation_mod
             procedure :: getIntegrationTime
             procedure :: getIntegrationTimePointer
             procedure :: getScanDistance
-            procedure :: getGrid
-            procedure :: findGrid
+            !procedure :: getGrid
+            !procedure :: findGrid
 
             procedure :: clone
             procedure :: cloneScannedObs
@@ -112,14 +112,13 @@ module scannedObservation_mod
             deallocate(this%intTime)
         end if
 
-        if (associated(this%grid)) then
-            deallocate(this%grid)
-        end if
+        !if (associated(this%grid)) then
+        !    deallocate(this%grid)
+        !end if
     end subroutine
 
     subroutine loadScannedObservation(this,pinfo,tbVar,latVar,lonVar,scLatVar,scLonVar,&
-        & yearVar,monthVar,dayVar,hourVar,minuteVar,secondVar,mobsExtent,nobsExtent,   &
-        & nlociExtent)
+        & yearVar,monthVar,dayVar,hourVar,minuteVar,secondVar)
 
         use mpi
 
@@ -151,17 +150,14 @@ module scannedObservation_mod
         class(DataVariable),  optional, pointer    :: minuteVar
         ! integer(1) nscan
         class(DataVariable),  optional, pointer    :: secondVar
-        class(DataExtent),    optional, pointer    :: mobsExtent
-        class(DataExtent),    optional, pointer    :: nobsExtent
-        class(DataExtent),    optional, pointer    :: nlociExtent
-
-        real(real32), pointer :: lat(:,:)
-        real(real32), pointer :: lon(:,:)
 
         real(real64) :: s12, azi1, azi2
         real(real64) :: s12min, s12minall
 
         integer :: i, j, ierr
+
+        real(real32), pointer :: lat(:,:)
+        real(real32), pointer :: lon(:,:)
 
         call latVar%getArray(lat)
         call lonVar%getArray(lon)
@@ -192,9 +188,7 @@ module scannedObservation_mod
         ! this is a quick estimate of the minimum distance between scans
         this%scanDistance = s12minAll
 
-        call this%loadSatelliteObservation(pinfo,tbVar,latVar,lonVar,scLatVar,scLonVar, &
-            & yearVar,monthVar,dayVar,hourVar,minuteVar,secondVar,mobsExtent,nobsExtent,&
-            & nlociExtent)
+        call this%loadSatelliteObservation_tb3d(pinfo,latVar,lonVar,tbVar)
     end subroutine
 
     function getFovAlong(this,channel) result(fovAlong)
@@ -298,41 +292,41 @@ module scannedObservation_mod
         scanDistance = this%scanDistance
     end function
 
-    function getGrid(this) result(grid)
-        implicit none
+!    function getGrid(this) result(grid)
+!        implicit none
+!
+!        class(ScannedObservation)  :: this
+!
+!        class(DataGrid), pointer :: grid
+!
+!        if (.not. this%gridded) then
+!            call error('Called getGrid before findGrid')
+!        else
+!            grid => this%grid
+!        end if
+!    end function
 
-        class(ScannedObservation)  :: this
-
-        class(DataGrid), pointer :: grid
-
-        if (.not. this%gridded) then
-            call error('Called getGrid before findGrid')
-        else
-            grid => this%grid
-        end if
-    end function
-
-    subroutine findGrid(this,pinfo,dimsToTriangulate)
-        implicit none
-
-        class(ScannedObservation)     :: this
-
-        class(ParallelInfo), pointer  :: pinfo
-
-        class(DataVariable), pointer  :: lat
-        class(DataVariable), pointer  :: lon
-        integer,             optional :: dimsToTriangulate(2)
-
-        lat => this%getLatVar()
-        lon => this%getLonVar()
-
-        allocate(this%grid)
-        call this%grid%triangularLatLonGridConstructor(lat,lon,dimsToTriangulate)
-
-        call this%grid%tile(pinfo)
-
-        this%gridded = .true.
-    end subroutine
+!    subroutine findGrid(this,pinfo,dimsToTriangulate)
+!        implicit none
+!
+!        class(ScannedObservation)     :: this
+!
+!        class(ParallelInfo), pointer  :: pinfo
+!
+!        class(DataVariable), pointer  :: lat
+!        class(DataVariable), pointer  :: lon
+!        integer,             optional :: dimsToTriangulate(2)
+!
+!        lat => this%getLatVar()
+!        lon => this%getLonVar()
+!
+!        allocate(this%grid)
+!        call this%grid%regularTriangularLatLonGridConstructor(lat,lon,dimsToTriangulate)
+!
+!        call this%grid%tile(pinfo)
+!
+!        this%gridded = .true.
+!    end subroutine
 
     function cloneScannedObs(this,shallow,copyData) result(soptr)
         implicit none
@@ -350,10 +344,17 @@ module scannedObservation_mod
         logical :: doCopy
 
         allocate(soptr)
-        call soptr%scannedObservationConstructor(this%getSatellitePlatform(), &
-            & this%reader%clone(),this%fovAlong,this%fovCross,this%intTime,   &
-            & this%getChannelOffset(),this%getObservationError(),             &
-            & this%getUniqueChannelOffset())
+        if (associated(this%reader)) then
+            call soptr%scannedObservationConstructor(this%getSatellitePlatform(), &
+                & this%reader%clone(),this%fovAlong,this%fovCross,this%intTime,   &
+                & this%getChannelOffset(),this%getObservationError(),             &
+                & this%getUniqueChannelOffset())
+        else
+            call soptr%scannedObservationConstructor(this%getSatellitePlatform(), &
+                & this%reader,        this%fovAlong,this%fovCross,this%intTime,   &
+                & this%getChannelOffset(),this%getObservationError(),             &
+                & this%getUniqueChannelOffset())
+        end if
 
         if (present(shallow)) then
             isShallow = shallow
@@ -373,10 +374,10 @@ module scannedObservation_mod
             call dsPtr%copy(dgPtr,doCopy)
         end if
 
-        if (this%gridded) then
-            soptr%grid => this%grid%cloneTriangularLatLonGrid(doCopy)
-            soptr%gridded = this%gridded
-        end if
+!        if (this%gridded) then
+!            soptr%grid => this%grid%cloneRegularTriangularLatLonGrid(doCopy)
+!            soptr%gridded = this%gridded
+!        end if
     end function
 
     function clone(this,shallow,copyData) result(dsPtr)
