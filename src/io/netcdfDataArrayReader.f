@@ -290,7 +290,7 @@ module netcdfDataArrayReader_mod
             end if
 
             select case (attr%getDataTypeNum())
-                case(STRINGS_TYPE_NUM : STRING_TYPE_NUM)
+                case(STRING_TYPE_NUM : STRINGS_TYPE_NUM)
 
                     allocate(character(len=attlen) :: attval)
                     rcode = nfmpi_get_att_text(fid, nf_global, attr%getName(), attval)
@@ -388,6 +388,14 @@ module netcdfDataArrayReader_mod
         integer :: rcode
         integer :: vid
 
+        integer(int8),  pointer :: bptr(:)
+        integer(int16), pointer :: sptr(:)
+        integer(int32), pointer :: iptr(:)
+        integer(int64), pointer :: lptr(:)
+        real(real32),   pointer :: rptr(:)
+        real(real64),   pointer :: dptr(:)
+
+
         logical :: isRequired
 
         if (present(required)) then
@@ -414,33 +422,33 @@ module netcdfDataArrayReader_mod
                 case (LOGICAL_TYPE_NUM)
                     call error('NetCDF does not have a logical type at the current time.')
                 case (BYTE_TYPE_NUM)
-                    rcode = nf90_get_var(fid, vid, dArray%getDataPointer_byte(), &
-                        dShape%getGlobalStarts(), dShape%getGlobalCounts())
+                    bptr => dArray%getDataPointer_byte()
+                    rcode = nf90_get_var(fid, vid, bptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local byte variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
                 case (SHORT_TYPE_NUM)
-                    rcode = nf90_get_var(fid, vid, dArray%getDataPointer_short(), &
-                        dShape%getGlobalStarts(), dShape%getGlobalCounts())
+                    sptr => dArray%getDataPointer_short()
+                    rcode = nf90_get_var(fid, vid, sptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local short variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
                 case (INT_TYPE_NUM)
-                    rcode = nf90_get_var(fid, vid, dArray%getDataPointer_int(), &
-                        dShape%getGlobalStarts(), dShape%getGlobalCounts())
+                    iptr => dArray%getDataPointer_int()
+                    rcode = nf90_get_var(fid, vid, iptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local int variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
                 case (LONG_TYPE_NUM)
-                    rcode = nf90_get_var(fid, vid, dArray%getDataPointer_long(), &
-                        dShape%getGlobalStarts(), dShape%getGlobalCounts())
+                    lptr => dArray%getDataPointer_long()
+                    rcode = nf90_get_var(fid, vid, lptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local long variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
                 case (REAL_TYPE_NUM)
-                    rcode = nf90_get_var(fid, vid, dArray%getDataPointer_real(), &
-                        dShape%getGlobalStarts(), dShape%getGlobalCounts())
+                    rptr => dArray%getDataPointer_real()
+                    rcode = nf90_get_var(fid, vid, rptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local real variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
                 case (DOUBLE_TYPE_NUM)
-                    rcode = nf90_get_var(fid, vid, dArray%getDataPointer_double(), &
-                        dShape%getGlobalStarts(), dShape%getGlobalCounts())
+                    dptr => dArray%getDataPointer_double()
+                    rcode = nf90_get_var(fid, vid, dptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local double variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
             end select
@@ -464,6 +472,13 @@ module netcdfDataArrayReader_mod
         integer :: comm
 
         logical :: isRequired
+
+        integer(int8),  pointer :: bptr(:)
+        integer(int16), pointer :: sptr(:)
+        integer(int32), pointer :: iptr(:)
+        integer(int64), pointer :: lptr(:)
+        real(real32),   pointer :: rptr(:)
+        real(real64),   pointer :: dptr(:)
 
         if (present(required)) then
             isRequired = required
@@ -490,22 +505,28 @@ module netcdfDataArrayReader_mod
                 case (LOGICAL_TYPE_NUM)
                     call error('NetCDF does not have a logical type at the current time.')
                 case (BYTE_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_byte(),   dArray%getLocalTotalSize(), 0, comm, &
+                    bptr => dArray%getDataPointer_byte()
+                    call bcast1d(bptr,   dArray%getLocalTotalSize(), 0, comm, &
                         'NetCDF load mirrored array (byte): '   // locationInFile)
                 case (SHORT_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_short(),  dArray%getLocalTotalSize(), 0, comm, &
+                    sptr => dArray%getDataPointer_short()
+                    call bcast1d(sptr,  dArray%getLocalTotalSize(), 0, comm, &
                         'NetCDF load mirrored array (short): '  // locationInFile)
                 case (INT_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_int(),    dArray%getLocalTotalSize(), 0, comm, &
+                    iptr => dArray%getDataPointer_int()
+                    call bcast1d(iptr,    dArray%getLocalTotalSize(), 0, comm, &
                         'NetCDF load mirrored array (int): '    // locationInFile)
                 case (LONG_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_long(),   dArray%getLocalTotalSize(), 0, comm, &
+                    lptr => dArray%getDataPointer_long()
+                    call bcast1d(lptr,   dArray%getLocalTotalSize(), 0, comm, &
                         'NetCDF load mirrored array (long): '   // locationInFile)
                 case (REAL_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_real(),   dArray%getLocalTotalSize(), 0, comm, &
+                    rptr => dArray%getDataPointer_real()
+                    call bcast1d(rptr,   dArray%getLocalTotalSize(), 0, comm, &
                         'NetCDF load mirrored array (real): '   // locationInFile)
                 case (DOUBLE_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_double(), dArray%getLocalTotalSize(), 0, comm, &
+                    dptr => dArray%getDataPointer_double()
+                    call bcast1d(dptr, dArray%getLocalTotalSize(), 0, comm, &
                         'NetCDF load mirrored array (double): ' // locationInFile)
             end select
         end if
@@ -542,6 +563,13 @@ module netcdfDataArrayReader_mod
 
         logical :: isRequired
 
+        integer(int8),  pointer :: bptr(:)
+        integer(int16), pointer :: sptr(:)
+        integer(int32), pointer :: iptr(:)
+        integer(int64), pointer :: lptr(:)
+        real(real32),   pointer :: rptr(:)
+        real(real64),   pointer :: dptr(:)
+
         if (present(required)) then
             isRequired = required
         else
@@ -571,38 +599,44 @@ module netcdfDataArrayReader_mod
             case (LOGICAL_TYPE_NUM)
                 call error('HDF does not have a logical type at the current time.')
             case (BYTE_TYPE_NUM)
+                bptr => dArray%getDataPointer_byte()
                 rcode = nfmpi_get_vara_int1_all(fid, vid, data_offset, &
-                    data_count, dArray%getDataPointer_byte())
+                    data_count, bptr)
 
                 call ncCheck(rcode,'Reading MPI byte variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
             case (SHORT_TYPE_NUM)
+                sptr => dArray%getDataPointer_short()
                 rcode = nfmpi_get_vara_int2_all(fid, vid, data_offset, &
-                    data_count, dArray%getDataPointer_short())
+                    data_count, sptr)
 
                 call ncCheck(rcode,'Reading MPI short variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
             case (INT_TYPE_NUM)
+                iptr => dArray%getDataPointer_int()
                 rcode = nfmpi_get_vara_int_all(fid, vid, data_offset, &
-                    data_count, dArray%getDataPointer_int())
+                    data_count, iptr)
 
                 call ncCheck(rcode,'Reading MPI int variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
             case (LONG_TYPE_NUM)
+                lptr => dArray%getDataPointer_long()
                 rcode = nfmpi_get_vara_int8_all(fid, vid, data_offset, &
-                    data_count, dArray%getDataPointer_long())
+                    data_count, lptr)
 
                 call ncCheck(rcode,'Reading MPI long variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
             case (REAL_TYPE_NUM)
+                rptr => dArray%getDataPointer_real()
                 rcode = nfmpi_get_vara_real_all(fid, vid, data_offset, &
-                    data_count, dArray%getDataPointer_real())
+                    data_count, rptr)
 
                 call ncCheck(rcode,'Reading MPI real variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
             case (DOUBLE_TYPE_NUM)
+                dptr => dArray%getDataPointer_double()
                 rcode = nfmpi_get_vara_double_all(fid, vid, data_offset, &
-                    data_count, dArray%getDataPointer_double())
+                    data_count, dptr)
 
                 call ncCheck(rcode,'Reading MPI real variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))

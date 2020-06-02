@@ -230,7 +230,7 @@ module rttovObservationOperator_mod
         this%opts%interpolation%addinterp  = .true.        ! Allow interpolation of input profile
         this%opts%config%apply_reg_limits  = .true.
         this%opts%interpolation%reg_limit_extrap = .true.
-        this%opts%config%do_checkinput     = .false. !this%rtmOpt%checkInput ! Check the input?
+        this%opts%config%do_checkinput     = .true. !this%rtmOpt%checkInput ! Check the input?
         this%opts%rt_all%addrefrac         = this%rtmOpt%includeRefraction  ! Include refraction in path calc?
         this%opts%rt_all%use_q2m           = .false.  ! Don't use surface humidity
         this%opts%rt_ir%addclouds          = .true. !this%rtmOpt%includeClouds ! Include cloud effects?
@@ -717,6 +717,7 @@ module rttovObservationOperator_mod
         else
             ! logarithmic average
             call baseState%getColumn(P_LEVEL_VAR,x,y,.true.,this%levptr)
+            print *,'p level var is:',this%levptr
             profile%p(1:nz) = exp((log(this%levptr(2:nz+1)) + log(this%levptr(1:nz)))/2.)
         end if
 
@@ -889,7 +890,7 @@ module rttovObservationOperator_mod
         ! Surface type and water type
         lu_index = baseState%getValue2D(LU_INDEX_VAR,x,y)
 
-        if (baseState%getLandCatCount() .eq. 20) then
+        if (baseState%getLandCatCount() .eq. 20 .or. baseState%getLandCatCount() .eq. 21) then
            water_class = 17
         elseif (baseState%getLandCatCount() .eq. 24) then
            water_class = 16

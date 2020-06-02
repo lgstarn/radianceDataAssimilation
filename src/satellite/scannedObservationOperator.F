@@ -108,8 +108,8 @@ module scannedObservationOperator_mod
             class(ScannedObservation),    pointer     :: obs_so
             class(DataGrid),              pointer     :: inputGrid
             real(real64), dimension(:,:), intent(out) :: minLat, maxLat, minLon, maxLon
-            integer, dimension(:,:),      intent(out) :: d_nnz
-            integer, dimension(:,:),      intent(out) :: o_nnz
+            PetscInt, dimension(:,:),      intent(out) :: d_nnz
+            PetscInt, dimension(:,:),      intent(out) :: o_nnz
         end subroutine
 
         subroutine getRowValues_abs(this,pinfo,obs_so,inputGrid,obsnum,il,chind,rowSum,&
@@ -128,11 +128,11 @@ module scannedObservationOperator_mod
             class(ScannedObservation),  pointer     :: obs_so
             class(DataGrid),            pointer     :: inputGrid
             integer,                    intent(in)  :: obsnum
-            integer,                    intent(in)  :: il
+            PetscInt,                   intent(in)  :: il
             integer,                    intent(in)  :: chind
             real(real64),               intent(out) :: rowSum
-            integer,                    intent(out) :: nind
-            integer,      dimension(:), intent(out) :: xinds
+            PetscInt,                   intent(out) :: nind
+            PetscInt,     dimension(:), intent(out) :: xinds
             real(real64), dimension(:), intent(out) :: fvals
             real(real64),               intent(in)  :: scLat
             real(real64),               intent(in)  :: scLon
@@ -144,8 +144,8 @@ module scannedObservationOperator_mod
             real(real64),               intent(in)  :: maxLat
             real(real64),               intent(in)  :: minLon
             real(real64),               intent(in)  :: maxLon
-            integer,                    intent(out) :: d_nnz_actual
-            integer,                    intent(out) :: o_nnz_actual
+            PetscInt,                   intent(out) :: d_nnz_actual
+            PetscInt,                   intent(out) :: o_nnz_actual
         end subroutine
 
         function getMaxStateIndices_abs(this,inputGrid) result(maxInd)
@@ -194,18 +194,20 @@ module scannedObservationOperator_mod
 
         integer :: chind, i, ind, iz, itime, j, k, ki, kj
         integer :: scanNum, pixelNum
-        integer :: ierr, oind
+        integer :: ierr
         integer :: nx_global, ny_global
         integer :: nobs_global
         integer :: xs, xe, ys, ye
         integer :: nx_local,  ny_local
         integer :: nobs_local
+        PetscInt :: oind
+        PetscInt :: s1_l, s1_g, s2_l, s2_g
 
-        integer, dimension(1) :: izs
+        PetscInt, dimension(1) :: izs
 
-        integer, dimension(:,:), pointer :: d_nnz, o_nnz
+        PetscInt, dimension(:,:), pointer :: d_nnz, o_nnz
 
-        integer, dimension(:),   pointer :: xinds
+        PetscInt, dimension(:),   pointer :: xinds
         real(real64), dimension(:),   pointer :: fvals
 
         real(real64), dimension(:),     allocatable :: colNorms
@@ -218,7 +220,8 @@ module scannedObservationOperator_mod
         real(real64) :: tin
         real(real64), dimension(:,:), pointer :: minLat, maxLat, minLon, maxLon
 
-        integer :: il, ncols, maxnz
+        PetscInt :: il
+        integer :: ncols, maxnz
         integer :: minj, mink, maxj, maxk
 
         character(4)   :: filenum
@@ -239,8 +242,11 @@ module scannedObservationOperator_mod
         class(DataVariable), pointer :: tbVar
         class(DataVariable), pointer :: obsData
 
-        integer :: d_nnz_actual
-        integer :: o_nnz_actual
+        PetscInt :: d_nnz_actual
+        PetscInt :: o_nnz_actual
+        PetscInt, parameter :: one = 1
+
+        PetscInt :: maxondiag, maxoffdiag
 
         PetscViewer :: viewer
 
@@ -340,14 +346,34 @@ module scannedObservationOperator_mod
                 nullify(hMat)
                 allocate(hMat)
 
-                call debug('Now creating the PETSc matrices... ch ' // &
-                    & int2str(chind+obs%getChannelOffset()) // ' max on/off diag: ' // &
-                    & int2str(maxval(d_nnz(:,chind))) // '/' // &
-                    & int2str(maxval(o_nnz(:,chind))))
+                maxondiag = 0
+
+                do i=1,size(d_nnz,1)
+                    if (d_nnz(i,chind) > maxondiag) then
+                        maxondiag = d_nnz(i,chind)
+                    end if
+                end do
+
+                maxoffdiag = 0
+
+                do i=1,size(d_nnz,1)
+                    if (o_nnz(i,chind) > maxoffdiag) then
+                        maxoffdiag = o_nnz(i,chind)
+                    end if
+                end do
+
+
+                write(msgstr,*) 'Now creating the PETSc matrices... ch ', &
+                    & chind+obs%getChannelOffset(), ' max on/off diag: ', &
+                    & maxondiag, '/', maxoffdiag
+                call debug(msgstr)
 
                 call MatCreate(pinfo%getCommunicator(),hMat,ierr)
-                call MatSetSizes(hMat, nobs_local,  nx_local *ny_local,  &
-                                    &  nobs_global, nx_global*ny_global, ierr)
+                s1_l = nobs_local
+                s1_g = nobs_global
+                s2_l = nx_local*ny_local
+                s2_g = nx_global*ny_global
+                call MatSetSizes(hMat, s1_l, s2_l, s1_g, s2_g, ierr)
                 call MatSetType(hMat,MATMPIAIJ,ierr)
                 call MatMPIAIJSetPreallocation(hMat, -1, d_nnz(:,chind), &
                                                    & -1, o_nnz(:,chind),ierr)
@@ -447,7 +473,7 @@ module scannedObservationOperator_mod
                 izs(1) = il-1 + this%obs_offsets(pinfo%getRank()+1)
                 fvals  = fvals/tin
 
-                call MatSetValues(hmat,1,izs,oind,xinds(1:oind),fvals(1:oind),ADD_VALUES,ierr)
+                call MatSetValues(hmat,one,izs,oind,xinds(1:oind),fvals(1:oind),ADD_VALUES,ierr)
 
                 if (mod(il,100) == 0) then
                     write(msgstr,*) 'Rank',pinfo%getRank(),'chnum:',chind+obs%getChannelOffset(),&
@@ -523,10 +549,12 @@ module scannedObservationOperator_mod
 
 !        call VecCreateMPIWithArray(pinfo%getCommunicator(),1,&
 !            nx_local*ny_local,nx_global*ny_global,PETSC_NULL_SCALAR,this%sooData%xvec,ierr)
-        call VecCreateMPI(pinfo%getCommunicator(),nx_local*ny_local,nx_global*ny_global,&
-            this%sooData%xvec,ierr)
-        call VecCreateMPI(pinfo%getCommunicator(),nobs_local,       nobs_global,&
-            this%sooData%yvec,ierr)
+        s1_l = nx_local*ny_local
+        s1_g = nx_global*ny_global
+        call VecCreateMPI(pinfo%getCommunicator(),s1_l,s1_g,this%sooData%xvec,ierr)
+        s1_l = nobs_local
+        s1_g = nobs_global
+        call VecCreateMPI(pinfo%getCommunicator(),s1_l,s1_g,this%sooData%yvec,ierr)
 
         deallocate(maxLat)
         deallocate(minLat)
@@ -820,7 +848,7 @@ module scannedObservationOperator_mod
         real(real64), dimension(:),   pointer :: xptr
         real(real64), dimension(:),   pointer :: yptr
 
-        integer :: chind, ierr, msize, nsize
+        integer :: chind, ierr
         integer :: i, j, ind, nobs_local
 
         class(ScannedObservation), pointer :: obs_so
@@ -831,7 +859,7 @@ module scannedObservationOperator_mod
         class(DataExtent), pointer :: chanExtent
         class(DataExtent), pointer :: nobsExtent
 
-        integer :: vsize
+        PetscInt :: vsize
 
         select type(obs)
             class is (ScannedObservation)
@@ -866,10 +894,6 @@ module scannedObservationOperator_mod
 
         do chind=1,this%nposting_channels
             hmat => this%nextMatrix()
-
-            call VecGetLocalSize(this%sooData%yvec,vsize,ierr)
-
-            call MatGetLocalSize(hMat,msize,nsize,ierr)
 
             yptr(1:nobs_local) = deltaY(chind,1:nobs_local)
 

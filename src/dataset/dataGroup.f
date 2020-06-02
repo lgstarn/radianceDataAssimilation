@@ -10447,7 +10447,7 @@ module dataGroup_mod
         include 'dataGroup_addDistributedVariable_dims.incl'
     end function
 
-    subroutine synchronize(this,pinfo)
+    recursive subroutine synchronize(this,pinfo)
         implicit none
 
         class(DataGroup)             :: this

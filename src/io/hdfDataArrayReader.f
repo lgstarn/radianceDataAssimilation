@@ -267,7 +267,7 @@ module hdfDataArrayReader_mod
         dims_i8 = 1
 
         select case (attr%getDataTypeNum())
-            case(STRINGS_TYPE_NUM : STRING_TYPE_NUM)
+            case(STRING_TYPE_NUM : STRINGS_TYPE_NUM)
 
                 call h5sget_simple_extent_dims_f(space_id, dims, maxdims, hdferr)
                 call h5check(hdferr,'h5sget_simple_extent_dims string')
@@ -296,8 +296,6 @@ module hdfDataArrayReader_mod
 
                     call attr%addString(bufr)
                 end do
-            case (STRING_TYPE_NUM)
-                call error('HDF does not have a logical type at the current time.')
             case (LOGICAL_TYPE_NUM)
                 call error('HDF does not have a logical type at the current time.')
             case (BYTE_TYPE_NUM)
@@ -438,6 +436,13 @@ module hdfDataArrayReader_mod
         integer,          allocatable :: dims(:)
         integer(hsize_t), allocatable :: dims_i8(:)
 
+        integer(int8),  pointer :: bptr(:)
+        integer(int16), pointer :: sptr(:)
+        integer(int32), pointer :: iptr(:)
+        integer(int64), pointer :: lptr(:)
+        real(real32),   pointer :: rptr(:)
+        real(real64),   pointer :: dptr(:)
+
         logical :: isRequired
 
         if (present(required)) then
@@ -480,22 +485,28 @@ module hdfDataArrayReader_mod
             case (LOGICAL_TYPE_NUM)
                 call error('HDF does not have a logical type at the current time.')
             case (BYTE_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_byte(), &
+                bptr => dArray%getDataPointer_byte()
+                call h5dread_f(dset_id, memType, bptr, &
                     dims_i8, hdferr); call h5check(hdferr)
             case (SHORT_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_short(), &
+                sptr => dArray%getDataPointer_short()
+                call h5dread_f(dset_id, memType, sptr, &
                     dims_i8, hdferr); call h5check(hdferr)
             case (INT_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_int(), &
+                iptr => dArray%getDataPointer_int()
+                call h5dread_f(dset_id, memType, iptr, &
                     dims_i8, hdferr); call h5check(hdferr)
             case (LONG_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_long(), &
+                lptr => dArray%getDataPointer_long()
+                call h5dread_f(dset_id, memType, lptr, &
                     dims_i8, hdferr); call h5check(hdferr)
             case (REAL_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_real(), &
+                rptr => dArray%getDataPointer_real()
+                call h5dread_f(dset_id, memType, rptr, &
                     dims_i8, hdferr); call h5check(hdferr)
             case (DOUBLE_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_double(), &
+                dptr => dArray%getDataPointer_double()
+                call h5dread_f(dset_id, memType, dptr, &
                     dims_i8, hdferr); call h5check(hdferr)
         end select
 
@@ -526,6 +537,13 @@ module hdfDataArrayReader_mod
 
         integer(hid_t) :: memType
 
+        integer(int8),  pointer :: bptr(:)
+        integer(int16), pointer :: sptr(:)
+        integer(int32), pointer :: iptr(:)
+        integer(int64), pointer :: lptr(:)
+        real(real32),   pointer :: rptr(:)
+        real(real64),   pointer :: dptr(:)
+
         integer :: comm
 
         logical :: loaded
@@ -553,22 +571,28 @@ module hdfDataArrayReader_mod
                 case (LOGICAL_TYPE_NUM)
                     call error('HDF does not have a logical type at the current time.')
                 case (BYTE_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_byte(),   dArray%getLocalTotalSize(), 0, comm, &
+                    bptr => dArray%getDataPointer_byte()
+                    call bcast1d(bptr,   dArray%getLocalTotalSize(), 0, comm, &
                         'HDF load mirrored array (byte): '   // locationInFile)
                 case (SHORT_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_short(),  dArray%getLocalTotalSize(), 0, comm, &
+                    sptr => dArray%getDataPointer_short()
+                    call bcast1d(sptr,  dArray%getLocalTotalSize(), 0, comm, &
                         'HDF load mirrored array (short): '  // locationInFile)
                 case (INT_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_int(),    dArray%getLocalTotalSize(), 0, comm, &
+                    iptr => dArray%getDataPointer_int()
+                    call bcast1d(iptr,    dArray%getLocalTotalSize(), 0, comm, &
                         'HDF load mirrored array (int): '    // locationInFile)
                 case (LONG_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_long(),   dArray%getLocalTotalSize(), 0, comm, &
+                    lptr => dArray%getDataPointer_long()
+                    call bcast1d(lptr,   dArray%getLocalTotalSize(), 0, comm, &
                         'HDF load mirrored array (long): '   // locationInFile)
                 case (REAL_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_real(),   dArray%getLocalTotalSize(), 0, comm, &
+                    rptr => dArray%getDataPointer_real()
+                    call bcast1d(rptr,   dArray%getLocalTotalSize(), 0, comm, &
                         'HDF load mirrored array (real): '   // locationInFile)
                 case (DOUBLE_TYPE_NUM)
-                    call bcast1d(dArray%getDataPointer_double(), dArray%getLocalTotalSize(), 0, comm, &
+                    dptr => dArray%getDataPointer_double()
+                    call bcast1d(dptr, dArray%getLocalTotalSize(), 0, comm, &
                         'HDF load mirrored array (double): ' // locationInFile)
             end select
         end if
@@ -613,6 +637,13 @@ module hdfDataArrayReader_mod
         class(DataShape), pointer :: dShape
 
         integer(hid_t) :: memType
+
+        integer(int8),  pointer :: bptr(:)
+        integer(int16), pointer :: sptr(:)
+        integer(int32), pointer :: iptr(:)
+        integer(int64), pointer :: lptr(:)
+        real(real32),   pointer :: rptr(:)
+        real(real64),   pointer :: dptr(:)
 
         logical :: isRequired
 
@@ -694,32 +725,38 @@ module hdfDataArrayReader_mod
             case (LOGICAL_TYPE_NUM)
                 call error('HDF does not have a logical type at the current time.')
             case (BYTE_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_byte(), &
+                bptr => dArray%getDataPointer_byte()
+                call h5dread_f(dset_id, memType, bptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'byte read from ' // trim(locationInFile))
             case (SHORT_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_short(), &
+                sptr => dArray%getDataPointer_short()
+                call h5dread_f(dset_id, memType, sptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'short read from ' // trim(locationInFile))
             case (INT_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_int(), &
+                iptr => dArray%getDataPointer_int()
+                call h5dread_f(dset_id, memType, iptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'int read from ' // trim(locationInFile))
             case (LONG_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_long(), &
+                lptr => dArray%getDataPointer_long()
+                call h5dread_f(dset_id, memType, lptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'long read from ' // trim(locationInFile))
             case (REAL_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_real(), &
+                rptr => dArray%getDataPointer_real()
+                call h5dread_f(dset_id, memType, rptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'float read from ' // trim(locationInFile))
             case (DOUBLE_TYPE_NUM)
-                call h5dread_f(dset_id, memType, dArray%getDataPointer_double(), &
+                dptr => dArray%getDataPointer_double()
+                call h5dread_f(dset_id, memType, dptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id, xfer_prp = plist_id); call h5check(hdferr, &
                     & 'double read from ' // trim(locationInFile))

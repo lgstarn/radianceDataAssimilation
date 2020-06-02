@@ -377,7 +377,12 @@ module netcdfDataArrayWriter_mod
         integer(kindnum), allocatable :: data_count(:)
         integer(kindnum), allocatable :: data_offset(:)
 
-        real(real32), pointer :: dptr(:,:,:)
+        integer(int8),  pointer :: bptr(:)
+        integer(int16), pointer :: sptr(:)
+        integer(int32), pointer :: iptr(:)
+        integer(int64), pointer :: lptr(:)
+        real(real32),   pointer :: rptr(:)
+        real(real64),   pointer :: dptr(:)
 
         inquire(file=this%getLocation(),exist=fileExists)
         if (fileExists) then
@@ -429,49 +434,60 @@ module netcdfDataArrayWriter_mod
             case (LOGICAL_TYPE_NUM)
                 call error('NetCDF does not have a logical type at the current time.')
             case (BYTE_TYPE_NUM)
+                bptr => dArray%getDataPointer_byte()
 
                 rcode = nfmpi_put_vara_int1_all(fid, varid, data_offset, &
-                    & data_count, dArray%getDataPointer_byte())
+                    & data_count, bptr)
 
                 call ncCheck(rcode,'Writing the distributed byte variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
             case (SHORT_TYPE_NUM)
 
+                sptr => dArray%getDataPointer_short()
+
                 rcode = nfmpi_put_vara_int2_all(fid, varid, data_offset, &
-                    & data_count, dArray%getDataPointer_short())
+                    & data_count, sptr)
 
                 call ncCheck(rcode,'Writing the distributed short variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
             case (INT_TYPE_NUM)
 
+                iptr => dArray%getDataPointer_int()
+
                 rcode = nfmpi_put_vara_int_all(fid, varid, data_offset, &
-                    & data_count, dArray%getDataPointer_int())
+                    & data_count, iptr)
 
                 call ncCheck(rcode,'Writing the distributed int variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
             case (LONG_TYPE_NUM)
 
+                lptr => dArray%getDataPointer_long()
+
                 rcode = nfmpi_put_vara_int8_all(fid, varid, data_offset, &
-                    & data_count, dArray%getDataPointer_long())
+                    & data_count, lptr)
 
                 call ncCheck(rcode,'Writing the distributed long variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
             case (REAL_TYPE_NUM)
 
+                rptr => dArray%getDataPointer_real()
+
                 rcode = nfmpi_put_vara_real_all(ncid=fid, varid=varid, start=data_offset, &
-                    & count=data_count, rvals=dArray%getDataPointer_real())
+                    & count=data_count, rvals=rptr)
 
                 call ncCheck(rcode,'Writing the distributed real variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
             case (DOUBLE_TYPE_NUM)
 
+                dptr => dArray%getDataPointer_double()
+
                 rcode = nfmpi_put_vara_double_all(fid, varid, data_offset, &
-                    & data_count, dArray%getDataPointer_double())
+                    & data_count, dptr)
 
                 call ncCheck(rcode,'Writing the distributed double variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))

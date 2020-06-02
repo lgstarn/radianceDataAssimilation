@@ -37,6 +37,8 @@ module conicalScanningObsOperator_mod
 
     implicit none
 
+#include <petsc/finclude/petscsys.h>
+
     private
 
     ! number of integration points in time for the time sweep of the instantaneous antenna pattern
@@ -417,7 +419,7 @@ module conicalScanningObsOperator_mod
         class(ScannedObservation),  pointer     :: obs_so
         class(DataGrid),            pointer     :: inputGrid
         integer,                    intent(in)  :: obsnum
-        integer,                    intent(in)  :: il
+        PetscInt,                   intent(in)  :: il
         integer,                    intent(in)  :: chind
         real(real64),               intent(in)  :: scLat
         real(real64),               intent(in)  :: scLon
@@ -429,11 +431,11 @@ module conicalScanningObsOperator_mod
         real(real64),               intent(in)  :: maxLat
         real(real64),               intent(in)  :: minLon
         real(real64),               intent(in)  :: maxLon
-        integer,          optional, intent(out) :: d_nnz
-        integer,          optional, intent(out) :: o_nnz
+        PetscInt,         optional, intent(out) :: d_nnz
+        PetscInt,         optional, intent(out) :: o_nnz
         real(real64),     optional, intent(out) :: rowSum
-        integer,          optional, intent(out) :: nind
-        integer,          optional, intent(out) :: xinds(:)
+        PetscInt,         optional, intent(out) :: nind
+        PetscInt,         optional, intent(out) :: xinds(:)
         real(real64),     optional, intent(out) :: fvals(:)
 
         class(ConicalScanningObservation), pointer :: obs
@@ -710,8 +712,8 @@ module conicalScanningObsOperator_mod
         class(ScannedObservation),    pointer     :: obs_so
         class(DataGrid),              pointer     :: inputGrid
         real(real64), dimension(:,:), intent(out) :: minLat, maxLat, minLon, maxLon
-        integer,      dimension(:,:), intent(out) :: d_nnz
-        integer,      dimension(:,:), intent(out) :: o_nnz
+        PetscInt,     dimension(:,:), intent(out) :: d_nnz
+        PetscInt,     dimension(:,:), intent(out) :: o_nnz
 
         integer :: minj, mink, maxj, maxk
 
@@ -746,7 +748,7 @@ module conicalScanningObsOperator_mod
         class(Tiling), pointer :: stateTri
         real(real64),  pointer :: node_xy(:,:)
 
-        integer :: il
+        PetscInt :: il
 
         call debug('Now beginning the count of non-zeroes')
 
@@ -913,11 +915,11 @@ module conicalScanningObsOperator_mod
         class(ScannedObservation),  pointer     :: obs_so
         class(DataGrid),            pointer     :: inputGrid
         integer,                    intent(in)  :: obsnum
-        integer,                    intent(in)  :: il
+        PetscInt,                   intent(in)  :: il
         integer,                    intent(in)  :: chind
         real(real64),               intent(out) :: rowSum
-        integer,                    intent(out) :: nind
-        integer,      dimension(:), intent(out) :: xinds
+        PetscInt,                   intent(out) :: nind
+        PetscInt,     dimension(:), intent(out) :: xinds
         real(real64), dimension(:), intent(out) :: fvals
         real(real64),               intent(in)  :: scLat
         real(real64),               intent(in)  :: scLon
@@ -929,8 +931,8 @@ module conicalScanningObsOperator_mod
         real(real64),               intent(in)  :: maxLat
         real(real64),               intent(in)  :: minLon
         real(real64),               intent(in)  :: maxLon
-        integer,                    intent(out) :: d_nnz_actual
-        integer,                    intent(out) :: o_nnz_actual
+        PetscInt,                   intent(out) :: d_nnz_actual
+        PetscInt,                   intent(out) :: o_nnz_actual
 
 !        class(ConicalScanningObservation), pointer :: obs
 !

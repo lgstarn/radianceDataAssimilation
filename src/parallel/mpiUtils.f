@@ -407,6 +407,8 @@ module mpiUtils_mod
             allocate(intentionalErrorToCauseStackTrace(0))
             ! proposefully cause a null pointer exception to get a stack trace
             print *,intentionalErrorToCauseStackTrace(1)
+
+            call abortParallel(comm)
         else
             call abortParallel(comm)
         end if

@@ -114,7 +114,7 @@ program runRtmForwardWithSweep
         call print('    [orbit file] is the orbit file to utilize for the satellite geometry.')
 
         call endParallel()
-        return
+        stop
     end if
 
     call getArg(1, inputFile)

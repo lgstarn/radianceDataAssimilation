@@ -94,7 +94,7 @@ program runRtmForward
         call print('    [obs op string] is the code for the observation operator, e.g. "' // &
             trim(CRTM_OBS_OP) // '" for the Community Radiative Transfer Model (see radianceAssimilationFactory.f)')
         call endParallel()
-        return
+        stop
     end if
 
     call getArg(1, inputFile)

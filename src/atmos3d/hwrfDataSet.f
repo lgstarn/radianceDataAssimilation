@@ -432,7 +432,7 @@ module HwrfDataSet_mod
         numLandCat = this%num_land_cat
     end function
 
-    function clone(this,shallow,copyData) result(dgPtr)
+    function clone(this,shallow,copyData) result(dsPtr)
         implicit none
 
         class(HwrfDataSet), target     :: this
@@ -441,10 +441,10 @@ module HwrfDataSet_mod
         logical, optional, intent(in) :: copyData
 
         class(HwrfDataSet), pointer    :: hwrfPtr
-        class(DataGroup),   pointer    :: dgPtr
+        class(DataSet),     pointer    :: dsPtr
 
         hwrfPtr => this%cloneHwrf(copyData)
-        dgPtr => hwrfPtr
+        dsPtr => hwrfPtr
 
     end function
 
@@ -494,6 +494,8 @@ module HwrfDataSet_mod
 
         class(DataGrid),      pointer :: grid
 
+        class(ParallelInfo),  pointer :: pinfo_null
+
         logical :: isShallow
         logical :: doCopy
 
@@ -509,8 +511,10 @@ module HwrfDataSet_mod
             doCopy = .false.
         end if
 
+        pinfo_null => null()
+
         allocate(hptr)
-        call hptr%hwrfDataSetConstructor(null(),this%getDataArrayReader(),this%time)
+        call hptr%hwrfDataSetConstructor(pinfo_null,this%getDataArrayReader(),this%time)
 
         if (.not. isShallow) then
             dgPtr => this
