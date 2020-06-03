@@ -511,7 +511,7 @@ module nDVarAssimilationStrategy_mod
         call PetscInitialize(PETSC_NULL_CHARACTER,ierr)
 
         if (ierr .ne. 0) then
-            print*,'Unable to initialize PETSc'
+            print *,'Unable to initialize PETSc'
             stop
         endif
 
@@ -529,6 +529,7 @@ module nDVarAssimilationStrategy_mod
         call TaoSetType(tao,TAOLMVM,ierr)
 
         call TaoSetObjectiveAndGradientRoutine(tao,funder_ndvar,0,ierr)
+        call TaoSetMaximumFunctionEvaluations(tao,100,ierr)
 
         call VecCreateMPIWithArray(PETSC_COMM_WORLD,1,size(z0),PETSC_DECIDE,z0,z0Vec,ierr)
         call VecCreateMPIWithArray(PETSC_COMM_WORLD,1,size(gradFinal),PETSC_DECIDE,gradFinal,gradVec,ierr)

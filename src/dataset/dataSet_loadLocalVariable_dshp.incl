@@ -15,9 +15,9 @@
 		end if
         
 		if (present(LocationInFile)) then
-	        call this%doLoadArray(pinfoToUse,dArray,locationInFile,required)
+	        call this%doLoadArray(pinfoToUse,dArray,locationInFile,required,loadDTypeNum)
         else
-	        call this%doLoadArray(pinfoToUse,dArray,variableName,required)
+	        call this%doLoadArray(pinfoToUse,dArray,variableName,required,loadDTypeNum)
         end if
         
         if (.not. present(pinfo)) then

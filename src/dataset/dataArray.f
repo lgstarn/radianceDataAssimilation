@@ -178,6 +178,23 @@ module dataArray_mod
             procedure, private :: copyData_real
             procedure, private :: copyData_double
 
+            generic            :: copyTo =>            &
+                                      copyTo_logical,  &
+                                      copyTo_byte,     &
+                                      copyTo_short,    &
+                                      copyTo_int,      &
+                                      copyTo_long,     &
+                                      copyTo_real,     &
+                                      copyTo_double
+
+            procedure, private :: copyTo_logical
+            procedure, private :: copyTo_byte
+            procedure, private :: copyTo_short
+            procedure, private :: copyTo_int
+            procedure, private :: copyTo_long
+            procedure, private :: copyTo_real
+            procedure, private :: copyTo_double
+
             generic,   private :: setDataPointer =>            &
                                       setDataPointer_logical,  &
                                       setDataPointer_byte,     &
@@ -2517,9 +2534,13 @@ module dataArray_mod
         class(DataArray)                  :: this
         logical, dimension(:), intent(in) :: dptr1d
 
-        call this%dtype%compareTypes(LOGICAL_TYPE_NUM)
-
-        this%dptr1d_logical(:) = dptr1d(:)
+        select case (this%getDataTypeNum())
+            case (LOGICAL_TYPE_NUM)
+                this%dptr1d_logical(:) = logical(dptr1d(:))
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to logical')
+        end select
     end subroutine
 
     subroutine copyData_byte(this,dptr1d)
@@ -2528,9 +2549,23 @@ module dataArray_mod
         class(DataArray)                        :: this
         integer(int8), dimension(:), intent(in) :: dptr1d
 
-        call this%dtype%compareTypes(BYTE_TYPE_NUM)
-
-        this%dptr1d_byte(:) = dptr1d(:)
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                this%dptr1d_byte(:) = int(dptr1d(:),kind=int8)
+            case (SHORT_TYPE_NUM)
+                this%dptr1d_short(:) = int(dptr1d(:),kind=int16)
+            case (INT_TYPE_NUM)
+                this%dptr1d_int(:) = int(dptr1d(:),kind=int32)
+            case (LONG_TYPE_NUM)
+                this%dptr1d_long(:) = int(dptr1d(:),kind=int64)
+            case (REAL_TYPE_NUM)
+                this%dptr1d_real(:) = real(dptr1d(:),kind=real32)
+            case (DOUBLE_TYPE_NUM)
+                this%dptr1d_dble(:) = real(dptr1d(:),kind=real64)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to byte')
+        end select
     end subroutine
 
     subroutine copyData_short(this,dptr1d)
@@ -2539,9 +2574,23 @@ module dataArray_mod
         class(DataArray)                         :: this
         integer(int16), dimension(:), intent(in) :: dptr1d
 
-        call this%dtype%compareTypes(SHORT_TYPE_NUM)
-
-        this%dptr1d_short(:) = dptr1d(:)
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                this%dptr1d_byte(:) = int(dptr1d(:),kind=int8)
+            case (SHORT_TYPE_NUM)
+                this%dptr1d_short(:) = int(dptr1d(:),kind=int16)
+            case (INT_TYPE_NUM)
+                this%dptr1d_int(:) = int(dptr1d(:),kind=int32)
+            case (LONG_TYPE_NUM)
+                this%dptr1d_long(:) = int(dptr1d(:),kind=int64)
+            case (REAL_TYPE_NUM)
+                this%dptr1d_real(:) = real(dptr1d(:),kind=real32)
+            case (DOUBLE_TYPE_NUM)
+                this%dptr1d_dble(:) = real(dptr1d(:),kind=real64)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to short')
+        end select
     end subroutine
 
     subroutine copyData_int(this,dptr1d)
@@ -2550,9 +2599,23 @@ module dataArray_mod
         class(DataArray)                        :: this
         integer(int32), dimension(:), intent(in) :: dptr1d
 
-        call this%dtype%compareTypes(INT_TYPE_NUM)
-
-        this%dptr1d_int(:) = dptr1d(:)
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                this%dptr1d_byte(:) = int(dptr1d(:),kind=int8)
+            case (SHORT_TYPE_NUM)
+                this%dptr1d_short(:) = int(dptr1d(:),kind=int16)
+            case (INT_TYPE_NUM)
+                this%dptr1d_int(:) = int(dptr1d(:),kind=int32)
+            case (LONG_TYPE_NUM)
+                this%dptr1d_long(:) = int(dptr1d(:),kind=int64)
+            case (REAL_TYPE_NUM)
+                this%dptr1d_real(:) = real(dptr1d(:),kind=real32)
+            case (DOUBLE_TYPE_NUM)
+                this%dptr1d_dble(:) = real(dptr1d(:),kind=real64)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to int')
+        end select
     end subroutine
 
     subroutine copyData_long(this,dptr1d)
@@ -2561,9 +2624,23 @@ module dataArray_mod
         class(DataArray)                        :: this
         integer(int64), dimension(:), intent(in) :: dptr1d
 
-        call this%dtype%compareTypes(LONG_TYPE_NUM)
-
-        this%dptr1d_long(:) = dptr1d(:)
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                this%dptr1d_byte(:) = int(dptr1d(:),kind=int8)
+            case (SHORT_TYPE_NUM)
+                this%dptr1d_short(:) = int(dptr1d(:),kind=int16)
+            case (INT_TYPE_NUM)
+                this%dptr1d_int(:) = int(dptr1d(:),kind=int32)
+            case (LONG_TYPE_NUM)
+                this%dptr1d_long(:) = int(dptr1d(:),kind=int64)
+            case (REAL_TYPE_NUM)
+                this%dptr1d_real(:) = real(dptr1d(:),kind=real32)
+            case (DOUBLE_TYPE_NUM)
+                this%dptr1d_dble(:) = real(dptr1d(:),kind=real64)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to long')
+        end select
     end subroutine
 
     subroutine copyData_real(this,dptr1d)
@@ -2572,9 +2649,23 @@ module dataArray_mod
         class(DataArray)                       :: this
         real(real32), dimension(:), intent(in) :: dptr1d
 
-        call this%dtype%compareTypes(REAL_TYPE_NUM)
-
-        this%dptr1d_real(:) = dptr1d(:)
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                this%dptr1d_byte(:) = int(dptr1d(:),kind=int8)
+            case (SHORT_TYPE_NUM)
+                this%dptr1d_short(:) = int(dptr1d(:),kind=int16)
+            case (INT_TYPE_NUM)
+                this%dptr1d_int(:) = int(dptr1d(:),kind=int32)
+            case (LONG_TYPE_NUM)
+                this%dptr1d_long(:) = int(dptr1d(:),kind=int64)
+            case (REAL_TYPE_NUM)
+                this%dptr1d_real(:) = real(dptr1d(:),kind=real32)
+            case (DOUBLE_TYPE_NUM)
+                this%dptr1d_dble(:) = real(dptr1d(:),kind=real64)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to real')
+        end select
     end subroutine
 
     subroutine copyData_double(this,dptr1d)
@@ -2583,9 +2674,188 @@ module dataArray_mod
         class(DataArray)                       :: this
         real(real64), dimension(:), intent(in) :: dptr1d
 
-        call this%dtype%compareTypes(DOUBLE_TYPE_NUM)
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                this%dptr1d_byte(:) = int(dptr1d(:),kind=int8)
+            case (SHORT_TYPE_NUM)
+                this%dptr1d_short(:) = int(dptr1d(:),kind=int16)
+            case (INT_TYPE_NUM)
+                this%dptr1d_int(:) = int(dptr1d(:),kind=int32)
+            case (LONG_TYPE_NUM)
+                this%dptr1d_long(:) = int(dptr1d(:),kind=int64)
+            case (REAL_TYPE_NUM)
+                this%dptr1d_real(:) = real(dptr1d(:),kind=real32)
+            case (DOUBLE_TYPE_NUM)
+                this%dptr1d_dble(:) = real(dptr1d(:),kind=real64)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to double')
+        end select
+    end subroutine
 
-        this%dptr1d_dble(:) = dptr1d(:)
+    subroutine copyTo_logical(this,dptr1d)
+        implicit none
+
+        class(DataArray)                   :: this
+        logical, dimension(:), intent(out) :: dptr1d
+
+        select case (this%getDataTypeNum())
+            case (LOGICAL_TYPE_NUM)
+                dptr1d(:) = this%dptr1d_logical(:)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to logical')
+        end select
+    end subroutine
+
+    subroutine copyTo_byte(this,dptr1d)
+        implicit none
+
+        class(DataArray)                         :: this
+        integer(int8), dimension(:), intent(out) :: dptr1d
+
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_byte(:),kind=int8)
+            case (SHORT_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_short(:),kind=int8)
+            case (INT_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_int(:),kind=int8)
+            case (LONG_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_long(:),kind=int8)
+            case (REAL_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_real(:),kind=int8)
+            case (DOUBLE_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_dble(:),kind=int8)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to byte')
+        end select
+    end subroutine
+
+    subroutine copyTo_short(this,dptr1d)
+        implicit none
+
+        class(DataArray)                          :: this
+        integer(int16), dimension(:), intent(out) :: dptr1d
+
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_byte(:),kind=int16)
+            case (SHORT_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_short(:),kind=int16)
+            case (INT_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_int(:),kind=int16)
+            case (LONG_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_long(:),kind=int16)
+            case (REAL_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_real(:),kind=int16)
+            case (DOUBLE_TYPE_NUM)
+                dptr1d(:) =  int(this%dptr1d_dble(:),kind=int16)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to byte')
+        end select
+    end subroutine
+
+    subroutine copyTo_int(this,dptr1d)
+        implicit none
+
+        class(DataArray)                          :: this
+        integer(int32), dimension(:), intent(out) :: dptr1d
+
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_byte(:),kind=int32)
+            case (SHORT_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_short(:),kind=int32)
+            case (INT_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_int(:),kind=int32)
+            case (LONG_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_long(:),kind=int32)
+            case (REAL_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_real(:),kind=int32)
+            case (DOUBLE_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_dble(:),kind=int32)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to int')
+        end select
+    end subroutine
+
+    subroutine copyTo_long(this,dptr1d)
+        implicit none
+
+        class(DataArray)                          :: this
+        integer(int64), dimension(:), intent(out) :: dptr1d
+
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_byte(:),kind=int64)
+            case (SHORT_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_short(:),kind=int64)
+            case (INT_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_int(:),kind=int64)
+            case (LONG_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_long(:),kind=int64)
+            case (REAL_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_real(:),kind=int64)
+            case (DOUBLE_TYPE_NUM)
+                dptr1d(:) = int(this%dptr1d_dble(:),kind=int64)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to long')
+        end select
+    end subroutine
+
+    subroutine copyTo_real(this,dptr1d)
+        implicit none
+
+        class(DataArray)                        :: this
+        real(real32), dimension(:), intent(out) :: dptr1d
+
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_byte(:),kind=real32)
+            case (SHORT_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_short(:),kind=real32)
+            case (INT_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_int(:),kind=real32)
+            case (LONG_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_long(:),kind=real32)
+            case (REAL_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_real(:),kind=real32)
+            case (DOUBLE_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_dble(:),kind=real32)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to real')
+        end select
+    end subroutine
+
+    subroutine copyTo_double(this,dptr1d)
+        implicit none
+
+        class(DataArray)                        :: this
+        real(real64), dimension(:), intent(out) :: dptr1d
+
+        select case (this%getDataTypeNum())
+            case (BYTE_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_byte(:),kind=real64)
+            case (SHORT_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_short(:),kind=real64)
+            case (INT_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_int(:),kind=real64)
+            case (LONG_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_long(:),kind=real64)
+            case (REAL_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_real(:),kind=real64)
+            case (DOUBLE_TYPE_NUM)
+                dptr1d(:) = real(this%dptr1d_dble(:),kind=real64)
+            case default
+                call error('Cannot convert data type num ' // int2str(this%getDataTypeNum()) // &
+                    ' to double')
+        end select
     end subroutine
 
     subroutine setDataPointer_logical(this,dptr1d)

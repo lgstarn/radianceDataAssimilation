@@ -1120,7 +1120,7 @@ module rttovObservationOperator_mod
                              init = .true._jplm)
 
         ! Allocate output radiance arrays
-        call rttov_alloc_rad( &
+        call rttov_alloc_rad(      &
             & this%errorstatus,    &
             & this%nchanprof,      &
             & this%radiance,       &

@@ -457,7 +457,7 @@ program roundTripTest
         end if
     end do
 
-!    ! now get the first guess
+    ! now get the first guess
     firstGuess_ds => obs_modelRes%clone(shallow=.false.,copyData=.true.)
 
     fg => getFirstGuesser(ADJOINT_AVE_FG)
@@ -545,7 +545,7 @@ program roundTripTest
 
     write(msgstr,*) 'Finalized deconvolution and wrote output to ',trim(deconvolvedOutputFile)
     call print(msgstr)
-!
+
 !    ! now interpolate the first guess, deconv, and true state to the observations
 !    do i=1,scannedObsBundle%getBundleSize()
 !        obs_so  => scannedObsBundle%getScannedObservation(i)

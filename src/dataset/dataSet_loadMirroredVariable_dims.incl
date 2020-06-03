@@ -8,4 +8,4 @@
         call dShape%dataShapeConstructor(nd, dim1, dim2, dim3, dim4, dim5, dim6, dim7)
         
         var => this%loadMirroredVariable(pinfo,variableName,dataptr,dShape,&
-        	& locationInFile,required,squeeze)        
+        	& locationInFile,required,squeeze,loadDTypeNum)        

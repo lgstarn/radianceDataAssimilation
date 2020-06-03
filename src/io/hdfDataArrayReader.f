@@ -335,7 +335,7 @@ module hdfDataArrayReader_mod
         call h5fclose_f(file, hdferr); call h5check(hdferr)
     end subroutine
 
-    subroutine loadDataArray_hdf(this,pinfo,dArray,locationInFile,required)
+    subroutine loadDataArray_hdf(this,pinfo,dArray,locationInFile,required,loadDTypeNum)
 
         implicit none
 
@@ -345,13 +345,14 @@ module hdfDataArrayReader_mod
         character(len=*),           intent(in)  :: locationInFile
         class(ParallelInfo),        pointer     :: pinfo
         logical,          optional, intent(in)  :: required
+        integer,          optional, intent(in)  :: loadDTypeNum
 
         if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
-            call this%loadLocalArray(dArray,locationInFile,required)
+            call this%loadLocalArray(dArray,locationInFile,required,loadDTypeNum)
         else if (pinfo%getParallelType() == MIRRORED_PARALLEL_TYPE) then
-            call this%loadMirroredArray(pinfo,dArray,locationInFile,required)
+            call this%loadMirroredArray(pinfo,dArray,locationInFile,required,loadDTypeNum)
         else if (pinfo%getParallelType() == DISTRIBUTED_PARALLEL_TYPE) then
-            call this%loadDistributedArray(pinfo,dArray,locationInFile,required)
+            call this%loadDistributedArray(pinfo,dArray,locationInFile,required,loadDTypeNum)
         else
             call error('Unknown parallel type: ' // int2str(pinfo%getParallelType()))
         end if
@@ -412,7 +413,7 @@ module hdfDataArrayReader_mod
         end select
     end function
 
-    subroutine loadLocalArray(this,dArray,locationInFile,required)
+    subroutine loadLocalArray(this,dArray,locationInFile,required,loadDTypeNum)
         use hdf5
 
         implicit none
@@ -422,6 +423,7 @@ module hdfDataArrayReader_mod
         class(DataArray),              pointer     :: dArray
         character(len=*),              intent(in)  :: locationInFile
         logical,             optional, intent(in)  :: required
+        integer,             optional, intent(in)  :: loadDTypeNum
 !        class(ParallelInfo), optional, pointer     :: pinfo
 
         integer :: hdferr
@@ -444,6 +446,8 @@ module hdfDataArrayReader_mod
         real(real64),   pointer :: dptr(:)
 
         logical :: isRequired
+
+        integer :: dtypeToLoad
 
         if (present(required)) then
             isRequired = required
@@ -480,34 +484,107 @@ module hdfDataArrayReader_mod
         allocate(dims_i8(size(dims)))
         dims_i8 = dims
 
+        if (present(loadDTypeNum)) then
+            dtypeToLoad = loadDTypeNum
+        else
+            dtypeToLoad = dArray%getDataTypeNum()
+        end if
+
         ! load the data according to type and endianness
-        select case (dArray%getDataTypeNum())
+        select case (dtypeToLoad)
             case (LOGICAL_TYPE_NUM)
                 call error('HDF does not have a logical type at the current time.')
             case (BYTE_TYPE_NUM)
-                bptr => dArray%getDataPointer_byte()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    bptr => dArray%getDataPointer_byte()
+                else
+                    allocate(bptr(dArray%getLocalTotalSize()))
+                end if
+
                 call h5dread_f(dset_id, memType, bptr, &
                     dims_i8, hdferr); call h5check(hdferr)
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(bptr)
+                    deallocate(bptr)
+                end if
+
             case (SHORT_TYPE_NUM)
-                sptr => dArray%getDataPointer_short()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    sptr => dArray%getDataPointer_short()
+                else
+                    allocate(sptr(dArray%getLocalTotalSize()))
+                end if
                 call h5dread_f(dset_id, memType, sptr, &
                     dims_i8, hdferr); call h5check(hdferr)
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(sptr)
+                    deallocate(sptr)
+                end if
             case (INT_TYPE_NUM)
-                iptr => dArray%getDataPointer_int()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    iptr => dArray%getDataPointer_int()
+                else
+                    allocate(iptr(dArray%getLocalTotalSize()))
+                end if
                 call h5dread_f(dset_id, memType, iptr, &
                     dims_i8, hdferr); call h5check(hdferr)
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(iptr)
+                    deallocate(iptr)
+                end if
+
             case (LONG_TYPE_NUM)
-                lptr => dArray%getDataPointer_long()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    lptr => dArray%getDataPointer_long()
+                else
+                    allocate(lptr(dArray%getLocalTotalSize()))
+                end if
+
                 call h5dread_f(dset_id, memType, lptr, &
                     dims_i8, hdferr); call h5check(hdferr)
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(lptr)
+                    deallocate(lptr)
+                end if
+
             case (REAL_TYPE_NUM)
-                rptr => dArray%getDataPointer_real()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    rptr => dArray%getDataPointer_real()
+                else
+                    allocate(rptr(dArray%getLocalTotalSize()))
+                end if
                 call h5dread_f(dset_id, memType, rptr, &
                     dims_i8, hdferr); call h5check(hdferr)
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(rptr)
+                    deallocate(rptr)
+                end if
+
             case (DOUBLE_TYPE_NUM)
-                dptr => dArray%getDataPointer_double()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    dptr => dArray%getDataPointer_double()
+                else
+                    allocate(dptr(dArray%getLocalTotalSize()))
+                end if
                 call h5dread_f(dset_id, memType, dptr, &
                     dims_i8, hdferr); call h5check(hdferr)
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(dptr)
+                    deallocate(dptr)
+                end if
+
         end select
 
         call dArray%setLoaded(.true.)
@@ -516,7 +593,7 @@ module hdfDataArrayReader_mod
         call h5fclose_f(file_id, hdferr); call h5check(hdferr)
     end subroutine
 
-    subroutine loadMirroredArray(this,pinfo,dArray,locationInFile,required)
+    subroutine loadMirroredArray(this,pinfo,dArray,locationInFile,required,loadDTypeNum)
         use hdf5
 
         implicit none
@@ -527,6 +604,7 @@ module hdfDataArrayReader_mod
         class(DataArray),           pointer     :: dArray
         character(len=*),           intent(in)  :: locationInFile
         logical,          optional, intent(in)  :: required
+        integer,             optional, intent(in)  :: loadDTypeNum
 
         integer :: hdferr
 
@@ -556,7 +634,7 @@ module hdfDataArrayReader_mod
         ! then do an allgather
         ! ideally, this would be an option the user could set through pinfo
         if (pinfo%getRank() == 0) then
-            call this%loadLocalArray(dArray,locationInFile,required)
+            call this%loadLocalArray(dArray,locationInFile,required,loadDTypeNum)
             loaded = dArray%isLoaded()
         end if
 
@@ -598,7 +676,7 @@ module hdfDataArrayReader_mod
         end if
     end subroutine
 
-    subroutine loadDistributedArray(this,pinfo,dArray,locationInFile,required)
+    subroutine loadDistributedArray(this,pinfo,dArray,locationInFile,required,loadDTypeNum)
 
         use hdf5
         use mpi
@@ -611,6 +689,7 @@ module hdfDataArrayReader_mod
         class(DataArray),           pointer     :: dArray
         character(len=*),           intent(in)  :: locationInFile
         logical,          optional, intent(in)  :: required
+        integer,             optional, intent(in)  :: loadDTypeNum
 
         integer(HID_T) :: plist_id
         integer(HID_T) :: file_id
@@ -646,6 +725,8 @@ module hdfDataArrayReader_mod
         real(real64),   pointer :: dptr(:)
 
         logical :: isRequired
+
+        integer :: dtypeToLoad
 
         if (present(required)) then
             isRequired = required
@@ -720,46 +801,122 @@ module hdfDataArrayReader_mod
         allocate(dims_i8(size(dims)))
         dims_i8 = dims
 
+        if (present(loadDTypeNum)) then
+            dtypeToLoad = loadDTypeNum
+        else
+            dtypeToLoad = dArray%getDataTypeNum()
+        end if
+
         ! load the data in parallel according to type and endianness
-        select case (dArray%getDataTypeNum())
+        select case (dtypeToLoad)
             case (LOGICAL_TYPE_NUM)
                 call error('HDF does not have a logical type at the current time.')
             case (BYTE_TYPE_NUM)
-                bptr => dArray%getDataPointer_byte()
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    bptr => dArray%getDataPointer_byte()
+                else
+                    allocate(bptr(dArray%getLocalTotalSize()))
+                end if
+
                 call h5dread_f(dset_id, memType, bptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'byte read from ' // trim(locationInFile))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(bptr)
+                    deallocate(bptr)
+                end if
+
             case (SHORT_TYPE_NUM)
-                sptr => dArray%getDataPointer_short()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    sptr => dArray%getDataPointer_short()
+                else
+                    allocate(sptr(dArray%getLocalTotalSize()))
+                end if
+
                 call h5dread_f(dset_id, memType, sptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'short read from ' // trim(locationInFile))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(sptr)
+                    deallocate(sptr)
+                end if
+
             case (INT_TYPE_NUM)
-                iptr => dArray%getDataPointer_int()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    iptr => dArray%getDataPointer_int()
+                else
+                    allocate(iptr(dArray%getLocalTotalSize()))
+                end if
+
                 call h5dread_f(dset_id, memType, iptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'int read from ' // trim(locationInFile))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(iptr)
+                    deallocate(iptr)
+                end if
+
             case (LONG_TYPE_NUM)
-                lptr => dArray%getDataPointer_long()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    lptr => dArray%getDataPointer_long()
+                else
+                    allocate(lptr(dArray%getLocalTotalSize()))
+                end if
+
                 call h5dread_f(dset_id, memType, lptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'long read from ' // trim(locationInFile))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(lptr)
+                    deallocate(lptr)
+                end if
+
             case (REAL_TYPE_NUM)
-                rptr => dArray%getDataPointer_real()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    rptr => dArray%getDataPointer_real()
+                else
+                    allocate(rptr(dArray%getLocalTotalSize()))
+                end if
+
                 call h5dread_f(dset_id, memType, rptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id,  xfer_prp = plist_id); call h5check(hdferr, &
                     & 'float read from ' // trim(locationInFile))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(rptr)
+                    deallocate(rptr)
+                end if
+
             case (DOUBLE_TYPE_NUM)
-                dptr => dArray%getDataPointer_double()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    dptr => dArray%getDataPointer_double()
+                else
+                    allocate(dptr(dArray%getLocalTotalSize()))
+                end if
+
                 call h5dread_f(dset_id, memType, dptr, &
                     & dims_i8, hdferr, file_space_id = slabspace_id, &
                     & mem_space_id = memspace_id, xfer_prp = plist_id); call h5check(hdferr, &
                     & 'double read from ' // trim(locationInFile))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(dptr)
+                    deallocate(dptr)
+                end if
         end select
 
         call h5dclose_f(dset_id, hdferr); call h5check(hdferr)

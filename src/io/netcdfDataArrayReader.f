@@ -347,7 +347,7 @@ module netcdfDataArrayReader_mod
         call ncCheck(rcode,'Closing the file ' // trim(this%getLocation()))
      end subroutine
 
-    subroutine loadDataArray_netcdf(this,pinfo,dArray,locationInFile,required)
+    subroutine loadDataArray_netcdf(this,pinfo,dArray,locationInFile,required,loadDTypeNum)
 
         implicit none
 
@@ -357,19 +357,20 @@ module netcdfDataArrayReader_mod
         character(len=*),           intent(in)  :: locationInFile
         class(ParallelInfo),        pointer     :: pinfo
         logical,          optional, intent(in)  :: required
+        integer,          optional, intent(in)  :: loadDTypeNum
 
         if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
-            call this%loadLocalArray(dArray,locationInFile,required)
+            call this%loadLocalArray(dArray,locationInFile,required,loadDTypeNum)
         else if (pinfo%getParallelType() == MIRRORED_PARALLEL_TYPE) then
-            call this%loadMirroredArray(pinfo,dArray,locationInFile,required)
+            call this%loadMirroredArray(pinfo,dArray,locationInFile,required,loadDTypeNum)
         else if (pinfo%getParallelType() == DISTRIBUTED_PARALLEL_TYPE) then
-            call this%loadDistributedArray(pinfo,dArray,locationInFile,required)
+            call this%loadDistributedArray(pinfo,dArray,locationInFile,required,loadDTypeNum)
         else
             call error('Unknown parallel type: ' // int2str(pinfo%getParallelType()))
         end if
     end subroutine
 
-    subroutine loadLocalArray(this,dArray,locationInFile,required)
+    subroutine loadLocalArray(this,dArray,locationInFile,required,loadDTypeNum)
         use netcdf
 
         implicit none
@@ -379,6 +380,7 @@ module netcdfDataArrayReader_mod
         class(DataArray),              pointer     :: dArray
         character(len=*),              intent(in)  :: locationInFile
         logical,             optional, intent(in)  :: required
+        integer,             optional, intent(in)  :: loadDTypeNum
 
         integer :: hdferr
 
@@ -395,6 +397,7 @@ module netcdfDataArrayReader_mod
         real(real32),   pointer :: rptr(:)
         real(real64),   pointer :: dptr(:)
 
+        integer :: dtypeToLoad
 
         logical :: isRequired
 
@@ -416,50 +419,121 @@ module netcdfDataArrayReader_mod
                 & ' in the file ' // trim(this%getLocation()))
         end if
 
+        if (present(loadDTypeNum)) then
+            dtypeToLoad = loadDTypeNum
+        else
+            dtypeToLoad = dArray%getDataTypeNum()
+        end if
+
+
         if (rcode == nf90_noerr) then
             ! load the data according to type
-            select case (dArray%getDataTypeNum())
+            select case (dtypeToLoad)
                 case (LOGICAL_TYPE_NUM)
                     call error('NetCDF does not have a logical type at the current time.')
                 case (BYTE_TYPE_NUM)
-                    bptr => dArray%getDataPointer_byte()
+
+                    if (dtypeToLoad == dArray%getDataTypeNum()) then
+                        bptr => dArray%getDataPointer_byte()
+                    else
+                        allocate(bptr(dArray%getLocalTotalSize()))
+                    end if
                     rcode = nf90_get_var(fid, vid, bptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local byte variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                    if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                        call dArray%copyData(bptr)
+                        deallocate(bptr)
+                    end if
+
                 case (SHORT_TYPE_NUM)
-                    sptr => dArray%getDataPointer_short()
+
+                    if (dtypeToLoad == dArray%getDataTypeNum()) then
+                        sptr => dArray%getDataPointer_short()
+                    else
+                        allocate(sptr(dArray%getLocalTotalSize()))
+                    end if
                     rcode = nf90_get_var(fid, vid, sptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local short variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                    if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                        call dArray%copyData(sptr)
+                        deallocate(sptr)
+                    end if
+
                 case (INT_TYPE_NUM)
-                    iptr => dArray%getDataPointer_int()
+
+                    if (dtypeToLoad == dArray%getDataTypeNum()) then
+                        iptr => dArray%getDataPointer_int()
+                    else
+                        allocate(iptr(dArray%getLocalTotalSize()))
+                    end if
                     rcode = nf90_get_var(fid, vid, iptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local int variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                    if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                        call dArray%copyData(iptr)
+                        deallocate(iptr)
+                    end if
+
                 case (LONG_TYPE_NUM)
-                    lptr => dArray%getDataPointer_long()
+
+                    if (dtypeToLoad == dArray%getDataTypeNum()) then
+                        lptr => dArray%getDataPointer_long()
+                    else
+                        allocate(lptr(dArray%getLocalTotalSize()))
+                    end if
                     rcode = nf90_get_var(fid, vid, lptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local long variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                    if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                        call dArray%copyData(lptr)
+                        deallocate(lptr)
+                    end if
+
                 case (REAL_TYPE_NUM)
-                    rptr => dArray%getDataPointer_real()
+
+                    if (dtypeToLoad == dArray%getDataTypeNum()) then
+                        rptr => dArray%getDataPointer_real()
+                    else
+                        allocate(rptr(dArray%getLocalTotalSize()))
+                    end if
                     rcode = nf90_get_var(fid, vid, rptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local real variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                    if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                        call dArray%copyData(rptr)
+                        deallocate(rptr)
+                    end if
+
                 case (DOUBLE_TYPE_NUM)
-                    dptr => dArray%getDataPointer_double()
+
+                    if (dtypeToLoad == dArray%getDataTypeNum()) then
+                        dptr => dArray%getDataPointer_double()
+                    else
+                        allocate(dptr(dArray%getLocalTotalSize()))
+                    end if
                     rcode = nf90_get_var(fid, vid, dptr, dShape%getGlobalStarts(), dShape%getGlobalCounts())
                     call ncCheck(rcode,'Reading local double variable data for ' // &
                         & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                    if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                        call dArray%copyData(dptr)
+                        deallocate(dptr)
+                    end if
+
             end select
 
             call dArray%setLoaded(.true.)
         end if
     end subroutine
 
-    subroutine loadMirroredArray(this,pinfo,dArray,locationInFile,required)
-        use hdf5
-
+    subroutine loadMirroredArray(this,pinfo,dArray,locationInFile,required,loadDTypeNum)
         implicit none
 
         class(NetcdfDataArrayReader)               :: this
@@ -468,6 +542,7 @@ module netcdfDataArrayReader_mod
         class(DataArray),           pointer     :: dArray
         character(len=*),           intent(in)  :: locationInFile
         logical,          optional, intent(in)  :: required
+        integer,          optional, intent(in)  :: loadDTypeNum
 
         integer :: comm
 
@@ -494,7 +569,7 @@ module netcdfDataArrayReader_mod
         ! then do an allgather
         ! ideally, this would be an option the user could set through pinfo
         if (pinfo%getRank() == 0) then
-            call this%loadLocalArray(dArray,locationInFile)
+            call this%loadLocalArray(dArray,locationInFile,required,loadDTypeNum)
         end if
 
         if (dArray%isLoaded()) then
@@ -532,7 +607,7 @@ module netcdfDataArrayReader_mod
         end if
     end subroutine
 
-    subroutine loadDistributedArray(this,pinfo,dArray,locationInFile,required)
+    subroutine loadDistributedArray(this,pinfo,dArray,locationInFile,required,loadDTypeNum)
 
         use mpi
         use pnetcdf
@@ -545,6 +620,7 @@ module netcdfDataArrayReader_mod
         class(DataArray),           pointer     :: dArray
         character(len=*),           intent(in)  :: locationInFile
         logical,          optional, intent(in)  :: required
+        integer,          optional, intent(in)  :: loadDTypeNum
 
         integer(kindnum), allocatable :: data_count(:)
         integer(kindnum), allocatable :: data_offset(:)
@@ -554,6 +630,7 @@ module netcdfDataArrayReader_mod
         integer :: rcode
         integer :: vid
         integer(kind=kindnum) :: attlen_kind
+        integer :: dtypeToLoad
 
         character(len=1), dimension(:), pointer :: data ! A pointer to a Fortran string
 
@@ -594,52 +671,113 @@ module netcdfDataArrayReader_mod
         data_offset = dShape%getLocalStarts()
         data_count = dShape%getLocalCounts()
 
+        if (present(loadDTypeNum)) then
+            dtypeToLoad = loadDTypeNum
+        else
+            dtypeToLoad = dArray%getDataTypeNum()
+        end if
+
         ! load the data in parallel according to type
-        select case (dArray%getDataTypeNum())
+        select case (dtypeToLoad)
             case (LOGICAL_TYPE_NUM)
                 call error('HDF does not have a logical type at the current time.')
             case (BYTE_TYPE_NUM)
-                bptr => dArray%getDataPointer_byte()
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    bptr => dArray%getDataPointer_byte()
+                else
+                    allocate(bptr(dArray%getLocalTotalSize()))
+                end if
                 rcode = nfmpi_get_vara_int1_all(fid, vid, data_offset, &
                     data_count, bptr)
-
                 call ncCheck(rcode,'Reading MPI byte variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(bptr)
+                    deallocate(bptr)
+                end if
             case (SHORT_TYPE_NUM)
-                sptr => dArray%getDataPointer_short()
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    sptr => dArray%getDataPointer_short()
+                else
+                    allocate(sptr(dArray%getLocalTotalSize()))
+                end if
                 rcode = nfmpi_get_vara_int2_all(fid, vid, data_offset, &
                     data_count, sptr)
-
                 call ncCheck(rcode,'Reading MPI short variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(sptr)
+                    deallocate(sptr)
+                end if
             case (INT_TYPE_NUM)
-                iptr => dArray%getDataPointer_int()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    iptr => dArray%getDataPointer_int()
+                else
+                    allocate(iptr(dArray%getLocalTotalSize()))
+                end if
                 rcode = nfmpi_get_vara_int_all(fid, vid, data_offset, &
                     data_count, iptr)
-
                 call ncCheck(rcode,'Reading MPI int variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(iptr)
+                    deallocate(iptr)
+                end if
+
             case (LONG_TYPE_NUM)
-                lptr => dArray%getDataPointer_long()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    lptr => dArray%getDataPointer_long()
+                else
+                    allocate(lptr(dArray%getLocalTotalSize()))
+                end if
                 rcode = nfmpi_get_vara_int8_all(fid, vid, data_offset, &
                     data_count, lptr)
-
                 call ncCheck(rcode,'Reading MPI long variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(lptr)
+                    deallocate(lptr)
+                end if
+
             case (REAL_TYPE_NUM)
-                rptr => dArray%getDataPointer_real()
+
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    rptr => dArray%getDataPointer_real()
+                else
+                    allocate(rptr(dArray%getLocalTotalSize()))
+                end if
                 rcode = nfmpi_get_vara_real_all(fid, vid, data_offset, &
                     data_count, rptr)
-
                 call ncCheck(rcode,'Reading MPI real variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(rptr)
+                    deallocate(rptr)
+                end if
+
             case (DOUBLE_TYPE_NUM)
-                dptr => dArray%getDataPointer_double()
+                if (dtypeToLoad == dArray%getDataTypeNum()) then
+                    dptr => dArray%getDataPointer_double()
+                else
+                    allocate(dptr(dArray%getLocalTotalSize()))
+                end if
                 rcode = nfmpi_get_vara_double_all(fid, vid, data_offset, &
                     data_count, dptr)
-
-                call ncCheck(rcode,'Reading MPI real variable data for ' // &
+                call ncCheck(rcode,'Reading MPI double variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
+
+                if (dtypeToLoad /= dArray%getDataTypeNum()) then
+                    call dArray%copyData(dptr)
+                    deallocate(dptr)
+                end if
+
             case default
                 call error('In load distributed array, unknown data type: ' // &
                     int2str(dArray%getDataTypeNum()))

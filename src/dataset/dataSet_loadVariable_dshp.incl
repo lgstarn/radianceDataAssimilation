@@ -1,15 +1,15 @@
 		if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
 		
             var => this%loadLocalVariable(variableName,dataptr,dShape,locationInFile,&
-            	& pinfo,required,squeeze)
+            	& pinfo,required,squeeze,loadDTypeNum)
             	
         else if (pinfo%getParallelType() == MIRRORED_PARALLEL_TYPE) then
         
             var => this%loadMirroredVariable(pinfo,variableName,dataptr,dShape,&
-            	& locationInFile,required,squeeze)
+            	& locationInFile,required,squeeze,loadDTypeNum)
             	
         else if (pinfo%getParallelType() == DISTRIBUTED_PARALLEL_TYPE) then
         
             var => this%loadDistributedVariable(pinfo,variableName,dataptr,dShape,&
-            	& locationInFile,required,squeeze)
+            	& locationInFile,required,squeeze,loadDTypeNum)
         end if

@@ -178,7 +178,7 @@ module netcdfDataArrayWriter_mod
         end select
     end function
 
-    subroutine writeVariable(this,pinfo,var,locationInFile)
+    subroutine writeVariable(this,pinfo,var,locationInFile,writeDTypeNum)
 
         implicit none
 
@@ -187,22 +187,23 @@ module netcdfDataArrayWriter_mod
         class(ParallelInfo),        pointer     :: pinfo
         class(DataVariable),        pointer     :: var
         character(len=*), optional, intent(in)  :: locationInFile
+        integer,          optional, intent(in)  :: writeDTypeNum
 
         call debug('Now writing variable ' // trim(var%getName()) // ' to file ' // &
             & trim(this%getLocation()))
 
         if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
-            call this%writeLocalVariable(var,locationInFile)
+            call this%writeLocalVariable(var,locationInFile,writeDTypeNum)
         else if (pinfo%getParallelType() == MIRRORED_PARALLEL_TYPE) then
-            call this%writeMirroredVariable(pinfo,var,locationInFile)
+            call this%writeMirroredVariable(pinfo,var,locationInFile,writeDTypeNum)
         else if (pinfo%getParallelType() == DISTRIBUTED_PARALLEL_TYPE) then
-            call this%writeDistributedVariable(pinfo,var,locationInFile)
+            call this%writeDistributedVariable(pinfo,var,locationInFile,writeDTypeNum)
         else
             call error('Unknown parallel type ' // int2str(pinfo%getParallelType()))
         end if
     end subroutine
 
-    subroutine writeLocalVariable(this,var,locationInFile)
+    subroutine writeLocalVariable(this,var,locationInFile,writeDTypeNum)
         use netcdf
 
         implicit none
@@ -211,6 +212,7 @@ module netcdfDataArrayWriter_mod
 
         class(DataVariable),        pointer    :: var
         character(len=*), optional, intent(in) :: locationInFile
+        integer,          optional, intent(in) :: writeDTypeNum
 
         class(DataArray),          pointer :: dArray
         class(DataShape),          pointer :: dShape
@@ -224,7 +226,16 @@ module netcdfDataArrayWriter_mod
 
         logical :: fileExists
 
+        integer :: dtypeToWrite
+
         integer, allocatable :: dimids(:)
+
+        integer(int8),  pointer :: bptr(:)
+        integer(int16), pointer :: sptr(:)
+        integer(int32), pointer :: iptr(:)
+        integer(int64), pointer :: lptr(:)
+        real(real32),   pointer :: rptr(:)
+        real(real64),   pointer :: dptr(:)
 
         inquire(file=this%getLocation(),exist=fileExists)
         if (fileExists) then
@@ -267,56 +278,130 @@ module netcdfDataArrayWriter_mod
         call ncCheck(rcode,'Taking the file ' // trim(this%getLocation()) // &
             & ' out of definition mode')
 
-        select case (dArray%getDataTypeNum())
+        if (present(writeDTypeNum)) then
+            dtypeToWrite = writeDTypeNum
+        else
+            dtypeToWrite = dArray%getDataTypeNum()
+        end if
+
+        select case (dtypeToWrite)
             case (LOGICAL_TYPE_NUM)
+
                 call error('NetCDF does not have a logical type at the current time.')
+
             case (BYTE_TYPE_NUM)
 
-                rcode = nf90_put_var(fid, varid, dArray%getDataPointer_byte(), &
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    bptr => dArray%getDataPointer_byte()
+                else
+                    allocate(bptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(bptr)
+                end if
+
+                rcode = nf90_put_var(fid, varid, bptr, &
                     & dShape%getGlobalStarts(), dShape%getGlobalCounts())
 
                 call ncCheck(rcode,'Writing the local byte variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(bptr)
+                end if
+
             case (SHORT_TYPE_NUM)
 
-                rcode = nf90_put_var(fid, varid, dArray%getDataPointer_short(), &
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    sptr => dArray%getDataPointer_short()
+                else
+                    allocate(sptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(sptr)
+                end if
+
+                rcode = nf90_put_var(fid, varid, sptr, &
                     & dShape%getGlobalStarts(), dShape%getGlobalCounts())
 
                 call ncCheck(rcode,'Writing the local short variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(sptr)
+                end if
+
             case (INT_TYPE_NUM)
 
-                rcode = nf90_put_var(fid, varid, dArray%getDataPointer_int(), &
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    iptr => dArray%getDataPointer_int()
+                else
+                    allocate(iptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(iptr)
+                end if
+
+                rcode = nf90_put_var(fid, varid, iptr, &
                     & dShape%getGlobalStarts(), dShape%getGlobalCounts())
 
                 call ncCheck(rcode,'Writing the local int variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(iptr)
+                end if
+
             case (LONG_TYPE_NUM)
 
-                rcode = nf90_put_var(fid, varid, dArray%getDataPointer_long(), &
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    lptr => dArray%getDataPointer_long()
+                else
+                    allocate(lptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(lptr)
+                end if
+
+                rcode = nf90_put_var(fid, varid, lptr, &
                     & dShape%getGlobalStarts(), dShape%getGlobalCounts())
 
                 call ncCheck(rcode,'Writing the local long variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(lptr)
+                end if
+
             case (REAL_TYPE_NUM)
 
-                rcode = nf90_put_var(fid, varid, dArray%getDataPointer_real(), &
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    rptr => dArray%getDataPointer_real()
+                else
+                    allocate(rptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(rptr)
+                end if
+
+                rcode = nf90_put_var(fid, varid, rptr, &
                     & dShape%getGlobalStarts(), dShape%getGlobalCounts())
 
                 call ncCheck(rcode,'Writing the local real variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(rptr)
+                end if
+
             case (DOUBLE_TYPE_NUM)
 
-                rcode = nf90_put_var(fid, varid, dArray%getDataPointer_double(), &
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    dptr => dArray%getDataPointer_double()
+                else
+                    allocate(dptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(dptr)
+                end if
+
+                rcode = nf90_put_var(fid, varid, dptr, &
                     & dShape%getGlobalStarts(), dShape%getGlobalCounts())
 
                 call ncCheck(rcode,'Writing the local double variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
+
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(dptr)
+                end if
 
             case default
                 call error('Unknown data type ' // int2str(dArray%getDataTypeNum()))
@@ -326,7 +411,7 @@ module netcdfDataArrayWriter_mod
         call ncCheck(rcode,'Closing the file ' // trim(this%getLocation()))
     end subroutine
 
-    subroutine writeMirroredVariable(this,pinfo,var,locationInFile)
+    subroutine writeMirroredVariable(this,pinfo,var,locationInFile,writeDTypeNum)
 
         implicit none
 
@@ -335,6 +420,7 @@ module netcdfDataArrayWriter_mod
         class(ParallelInfo),        pointer     :: pinfo
         class(DataVariable),        pointer     :: var
         character(len=*), optional, intent(in)  :: locationInFile
+        integer,          optional, intent(in)  :: writeDTypeNum
 
         ! read the data from the given location.
         ! note: currently only the root writes the data, leaving all of the processors
@@ -343,11 +429,11 @@ module netcdfDataArrayWriter_mod
         ! members
         ! ideally, this would be an option the user could set through pinfo
         if (pinfo%getRank() == 0) then
-            call this%writeLocalVariable(var,locationInFile)
+            call this%writeLocalVariable(var,locationInFile,writeDTypeNum)
         end if
     end subroutine
 
-    subroutine writeDistributedVariable(this,pinfo,var,locationInFile)
+    subroutine writeDistributedVariable(this,pinfo,var,locationInFile,writeDTypeNum)
 
         use pnetcdf
         use mpi
@@ -359,6 +445,7 @@ module netcdfDataArrayWriter_mod
         class(ParallelInfo),        pointer     :: pinfo
         class(DataVariable),        pointer     :: var
         character(len=*), optional, intent(in)  :: locationInFile
+        integer,          optional, intent(in)  :: writeDTypeNum
 
         class(DataArray),           pointer :: dArray
         class(DataShape),           pointer :: dShape
@@ -371,6 +458,8 @@ module netcdfDataArrayWriter_mod
         integer :: i
 
         logical :: fileExists
+
+        integer :: dtypeToWrite
 
         integer, allocatable :: dimids(:)
 
@@ -430,11 +519,25 @@ module netcdfDataArrayWriter_mod
         data_offset = dShape%getLocalStarts()
         data_count  = dShape%getLocalCounts()
 
-        select case (dArray%getDataTypeNum())
+        if (present(writeDTypeNum)) then
+            dtypeToWrite = writeDTypeNum
+        else
+            dtypeToWrite = dArray%getDataTypeNum()
+        end if
+
+        select case (dtypeToWrite)
             case (LOGICAL_TYPE_NUM)
+
                 call error('NetCDF does not have a logical type at the current time.')
+
             case (BYTE_TYPE_NUM)
-                bptr => dArray%getDataPointer_byte()
+
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    bptr => dArray%getDataPointer_byte()
+                else
+                    allocate(bptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(bptr)
+                end if
 
                 rcode = nfmpi_put_vara_int1_all(fid, varid, data_offset, &
                     & data_count, bptr)
@@ -442,9 +545,18 @@ module netcdfDataArrayWriter_mod
                 call ncCheck(rcode,'Writing the distributed byte variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(bptr)
+                end if
+
             case (SHORT_TYPE_NUM)
 
-                sptr => dArray%getDataPointer_short()
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    sptr => dArray%getDataPointer_short()
+                else
+                    allocate(sptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(sptr)
+                end if
 
                 rcode = nfmpi_put_vara_int2_all(fid, varid, data_offset, &
                     & data_count, sptr)
@@ -452,9 +564,18 @@ module netcdfDataArrayWriter_mod
                 call ncCheck(rcode,'Writing the distributed short variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(sptr)
+                end if
+
             case (INT_TYPE_NUM)
 
-                iptr => dArray%getDataPointer_int()
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    iptr => dArray%getDataPointer_int()
+                else
+                    allocate(iptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(iptr)
+                end if
 
                 rcode = nfmpi_put_vara_int_all(fid, varid, data_offset, &
                     & data_count, iptr)
@@ -462,9 +583,18 @@ module netcdfDataArrayWriter_mod
                 call ncCheck(rcode,'Writing the distributed int variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(iptr)
+                end if
+
             case (LONG_TYPE_NUM)
 
-                lptr => dArray%getDataPointer_long()
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    lptr => dArray%getDataPointer_long()
+                else
+                    allocate(lptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(lptr)
+                end if
 
                 rcode = nfmpi_put_vara_int8_all(fid, varid, data_offset, &
                     & data_count, lptr)
@@ -472,9 +602,18 @@ module netcdfDataArrayWriter_mod
                 call ncCheck(rcode,'Writing the distributed long variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(lptr)
+                end if
+
             case (REAL_TYPE_NUM)
 
-                rptr => dArray%getDataPointer_real()
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    rptr => dArray%getDataPointer_real()
+                else
+                    allocate(rptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(rptr)
+                end if
 
                 rcode = nfmpi_put_vara_real_all(ncid=fid, varid=varid, start=data_offset, &
                     & count=data_count, rvals=rptr)
@@ -482,15 +621,28 @@ module netcdfDataArrayWriter_mod
                 call ncCheck(rcode,'Writing the distributed real variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
 
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(rptr)
+                end if
+
             case (DOUBLE_TYPE_NUM)
 
-                dptr => dArray%getDataPointer_double()
+                if (dtypeToWrite == dArray%getDataTypeNum()) then
+                    dptr => dArray%getDataPointer_double()
+                else
+                    allocate(dptr(dArray%getLocalTotalSize()))
+                    call dArray%copyTo(dptr)
+                end if
 
                 rcode = nfmpi_put_vara_double_all(fid, varid, data_offset, &
                     & data_count, dptr)
 
                 call ncCheck(rcode,'Writing the distributed double variable ' //      &
                     & trim(var%getName()) // ' to the file ' // trim(this%getLocation()))
+
+                if (dtypeToWrite /= dArray%getDataTypeNum()) then
+                    deallocate(dptr)
+                end if
 
             case default
                 call error('Unknown data type ' // int2str(dArray%getDataTypeNum()))

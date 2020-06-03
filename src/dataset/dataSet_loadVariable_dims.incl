@@ -12,7 +12,8 @@
 	        call dShape%dataShapeConstructor(nd, dim1, dim2, dim3, dim4, dim5, dim6, dim7)
         end if
         
-        var => this%loadVariable(pinfo,variableName,dataptr,dShape,locationInFile,required)
+        var => this%loadVariable(pinfo,variableName,dataptr,dShape,locationInFile,&
+        	required,squeeze,loadDTypeNum)
         
         if (present(squeeze)) then
         	if (squeeze) then

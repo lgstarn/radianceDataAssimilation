@@ -40,7 +40,7 @@ module dataArrayWriter_mod
             character(len=*), optional, intent(in)  :: locationInFile
         end subroutine
 
-        subroutine writeVariableAbstract(this,pinfo,var,locationInFile)
+        subroutine writeVariableAbstract(this,pinfo,var,locationInFile,writeDTypeNum)
 
             import DataArrayWriter
             import ParallelInfo
@@ -51,6 +51,7 @@ module dataArrayWriter_mod
             class(ParallelInfo),        pointer     :: pinfo
             class(DataVariable),        pointer     :: var
             character(len=*), optional, intent(in)  :: locationInFile
+            integer,          optional, intent(in)  :: writeDTypeNum
         end subroutine
     end interface
 

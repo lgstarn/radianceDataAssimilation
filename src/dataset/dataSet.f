@@ -1225,7 +1225,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dim1(this,pinfo,dTypeNum,variableName,dim1,locationInFile,&
-        & required,squeeze) result(var)
+        & required,squeeze,loadDTypeNum) result(var)
 
         implicit none
 
@@ -1238,6 +1238,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
+        integer,                      optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),                    pointer    :: var
 
@@ -1254,7 +1255,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dim2(this,pinfo,dTypeNum,variableName,dim1,dim2,locationInFile, &
-        & required,squeeze) result(var)
+        & required,squeeze,loadDTypeNum) result(var)
 
         implicit none
 
@@ -1267,6 +1268,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
+        integer,                      optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),                    pointer    :: var
 
@@ -1282,7 +1284,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dim3(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,&
-        & locationInFile,required,squeeze) result(var)
+        & locationInFile,required,squeeze,loadDTypeNum) result(var)
 
         implicit none
 
@@ -1295,6 +1297,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
+        integer,                      optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),                    pointer    :: var
 
@@ -1309,7 +1312,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dim4(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,&
-        & locationInFile,required,squeeze) result(var)
+        & locationInFile,required,squeeze,loadDTypeNum) result(var)
 
         implicit none
 
@@ -1322,6 +1325,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
+        integer,                      optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),                    pointer    :: var
 
@@ -1335,7 +1339,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dim5(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,&
-        & locationInFile,required,squeeze) result(var)
+        & locationInFile,required,squeeze,loadDTypeNum) result(var)
 
         implicit none
 
@@ -1348,6 +1352,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
+        integer,                      optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),                    pointer    :: var
 
@@ -1360,7 +1365,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dim6(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,dim6,&
-        locationInFile,required,squeeze) result(var)
+        locationInFile,required,squeeze,loadDTypeNum) result(var)
 
         implicit none
 
@@ -1373,6 +1378,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
+        integer,                      optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),                    pointer    :: var
 
@@ -1384,7 +1390,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dim7(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,dim6,dim7,&
-            locationInFile,required,squeeze) result(var)
+            locationInFile,required,squeeze,loadDTypeNum) result(var)
 
         implicit none
 
@@ -1397,6 +1403,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in) :: locationInFile
         logical,                      optional, intent(in) :: required
         logical,                      optional, intent(in) :: squeeze
+        integer,                      optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),                    pointer    :: var
 
@@ -1406,7 +1413,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze,loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1418,6 +1425,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1425,7 +1433,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1437,6 +1445,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1444,7 +1453,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1456,6 +1465,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1463,7 +1473,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1475,6 +1485,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1482,7 +1493,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1494,6 +1505,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1501,7 +1513,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1513,6 +1525,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1520,7 +1533,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1532,6 +1545,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1539,7 +1553,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1551,6 +1565,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1558,7 +1573,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1570,6 +1585,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1577,7 +1593,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1589,6 +1605,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1596,7 +1613,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1608,6 +1625,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1615,7 +1633,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1627,6 +1645,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1634,7 +1653,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1646,6 +1665,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1653,7 +1673,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1665,6 +1685,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1672,7 +1693,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1684,6 +1705,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1691,7 +1713,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1703,6 +1725,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1710,7 +1733,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1722,6 +1745,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1729,7 +1753,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1741,6 +1765,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1748,7 +1773,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1760,6 +1785,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1767,7 +1793,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1779,6 +1805,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1786,7 +1813,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1798,6 +1825,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1805,7 +1833,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1817,6 +1845,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1825,7 +1854,7 @@ module dataSet_mod
 
 
     function loadVariable_byte4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1837,6 +1866,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1844,7 +1874,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1856,6 +1886,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1863,7 +1894,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1875,6 +1906,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1882,7 +1914,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1894,6 +1926,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1901,7 +1934,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1913,6 +1946,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1920,7 +1954,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1932,6 +1966,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1939,7 +1974,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1951,6 +1986,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1958,7 +1994,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1970,6 +2006,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1977,7 +2014,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -1989,6 +2026,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -1996,7 +2034,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2008,6 +2046,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2015,7 +2054,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2027,6 +2066,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2034,7 +2074,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2046,6 +2086,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2053,7 +2094,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2065,6 +2106,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2072,7 +2114,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2084,6 +2126,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2091,7 +2134,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2103,6 +2146,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2110,7 +2154,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2122,6 +2166,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2129,7 +2174,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2141,6 +2186,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2148,7 +2194,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2160,6 +2206,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2167,7 +2214,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2179,6 +2226,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2186,7 +2234,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2198,6 +2246,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2205,7 +2254,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2217,6 +2266,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2224,7 +2274,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                       :: this
@@ -2236,6 +2286,7 @@ module dataSet_mod
         character(len=*),              optional, intent(in)  :: locationInFile
         logical,                       optional, intent(in)  :: required
         logical,                       optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                     pointer     :: var
 
@@ -2243,7 +2294,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -2255,6 +2306,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -2262,7 +2314,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -2274,6 +2326,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -2281,7 +2334,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -2293,6 +2346,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -2300,7 +2354,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2312,6 +2366,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2319,7 +2374,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2331,6 +2386,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2338,7 +2394,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2350,6 +2406,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2357,7 +2414,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2369,6 +2426,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2376,7 +2434,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2388,6 +2446,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2395,7 +2454,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2407,6 +2466,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2414,7 +2474,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2426,6 +2486,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2433,7 +2494,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2445,6 +2506,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2452,7 +2514,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2464,6 +2526,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2471,7 +2534,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2483,6 +2546,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2490,7 +2554,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2502,6 +2566,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2509,7 +2574,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2521,6 +2586,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2528,7 +2594,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2540,6 +2606,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2547,7 +2614,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2559,6 +2626,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2566,7 +2634,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2578,6 +2646,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2585,7 +2654,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2597,6 +2666,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2604,7 +2674,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2616,6 +2686,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2623,7 +2694,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2635,6 +2706,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2642,7 +2714,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2654,6 +2726,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2661,7 +2734,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2673,6 +2746,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2680,7 +2754,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2692,6 +2766,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2699,7 +2774,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2711,6 +2786,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2718,7 +2794,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2730,6 +2806,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2737,7 +2814,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2749,6 +2826,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2757,7 +2835,7 @@ module dataSet_mod
 
 
     function loadVariable_byte4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2769,6 +2847,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2776,7 +2855,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2788,6 +2867,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2795,7 +2875,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2807,6 +2887,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2814,7 +2895,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2826,6 +2907,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2833,7 +2915,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2845,6 +2927,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2852,7 +2935,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2864,6 +2947,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2871,7 +2955,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2883,6 +2967,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2890,7 +2975,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2902,6 +2987,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2909,7 +2995,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2921,6 +3007,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2928,7 +3015,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2940,6 +3027,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2947,7 +3035,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2959,6 +3047,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2966,7 +3055,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2978,6 +3067,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -2985,7 +3075,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -2997,6 +3087,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3004,7 +3095,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3016,6 +3107,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3023,7 +3115,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3035,6 +3127,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3042,7 +3135,7 @@ module dataSet_mod
     end function
 
     function loadVariable_short6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3054,6 +3147,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3061,7 +3155,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3073,6 +3167,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3080,7 +3175,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3092,6 +3187,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3099,7 +3195,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3111,6 +3207,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3118,7 +3215,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3130,6 +3227,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3137,7 +3235,7 @@ module dataSet_mod
     end function
 
     function loadVariable_logical7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3149,6 +3247,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3156,7 +3255,7 @@ module dataSet_mod
     end function
 
     function loadVariable_byte7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                       :: this
@@ -3169,12 +3268,13 @@ module dataSet_mod
         logical,                       optional, intent(in)  :: required
         logical,                       optional, intent(in)  :: squeeze
         class(DataVariable),                     pointer     :: var
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         include 'dataSet_loadVariable_dshp.incl'
     end function
 
     function loadVariable_short7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -3186,6 +3286,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -3193,7 +3294,7 @@ module dataSet_mod
     end function
 
     function loadVariable_int7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -3205,6 +3306,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -3212,7 +3314,7 @@ module dataSet_mod
     end function
 
     function loadVariable_long7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -3224,6 +3326,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -3231,7 +3334,7 @@ module dataSet_mod
     end function
 
     function loadVariable_real7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3243,6 +3346,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3250,7 +3354,7 @@ module dataSet_mod
     end function
 
     function loadVariable_dble7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3262,6 +3366,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -3269,7 +3374,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_dim1(this,dTypeNum,variableName,dim1,locationInFile,pinfo,&
-        required,squeeze) result(var)
+        required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -3282,6 +3387,7 @@ module dataSet_mod
         class(ParallelInfo), optional, pointer    :: pinfo
         logical,             optional, intent(in) :: required
         logical,             optional, intent(in) :: squeeze
+        integer,             optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),           pointer    :: var
 
@@ -3291,7 +3397,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_dim2(this,dTypeNum,variableName,dim1,dim2,locationInFile,&
-        & pinfo,required,squeeze) result(var)
+        & pinfo,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -3304,6 +3410,7 @@ module dataSet_mod
         class(ParallelInfo), optional, pointer    :: pinfo
         logical,             optional, intent(in) :: required
         logical,             optional, intent(in) :: squeeze
+        integer,             optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),           pointer    :: var
 
@@ -3313,7 +3420,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_dim3(this,dTypeNum,variableName,dim1,dim2,dim3,&
-        locationInFile,pinfo,required,squeeze) result(var)
+        locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -3326,6 +3433,7 @@ module dataSet_mod
         class(ParallelInfo), optional, pointer    :: pinfo
         logical,             optional, intent(in) :: required
         logical,             optional, intent(in) :: squeeze
+        integer,             optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),           pointer    :: var
 
@@ -3335,7 +3443,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_dim4(this,dTypeNum,variableName,dim1,dim2,dim3,dim4,&
-            locationInFile,pinfo,required,squeeze) result(var)
+            locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -3348,6 +3456,7 @@ module dataSet_mod
         class(ParallelInfo), optional, pointer    :: pinfo
         logical,             optional, intent(in) :: required
         logical,             optional, intent(in) :: squeeze
+        integer,             optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),           pointer    :: var
 
@@ -3357,7 +3466,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_dim5(this,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,&
-        & locationInFile,pinfo,required,squeeze) result(var)
+        & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -3370,6 +3479,7 @@ module dataSet_mod
         class(ParallelInfo), optional, pointer    :: pinfo
         logical,             optional, intent(in) :: required
         logical,             optional, intent(in) :: squeeze
+        integer,             optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),           pointer    :: var
 
@@ -3379,7 +3489,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_dim6(this,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,dim6,&
-        locationInFile,pinfo,required,squeeze) result(var)
+        locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -3392,6 +3502,7 @@ module dataSet_mod
         class(ParallelInfo), optional, pointer    :: pinfo
         logical,             optional, intent(in) :: required
         logical,             optional, intent(in) :: squeeze
+        integer,             optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),           pointer    :: var
 
@@ -3401,7 +3512,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_dim7(this,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,dim6,dim7,&
-            locationInFile,pinfo,required,squeeze) result(var)
+            locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -3414,6 +3525,7 @@ module dataSet_mod
         class(ParallelInfo), optional, pointer    :: pinfo
         logical,             optional, intent(in) :: required
         logical,             optional, intent(in) :: squeeze
+        integer,             optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),           pointer    :: var
 
@@ -3423,7 +3535,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_logical1d_dims(this,variableName,dataptr,dim1, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3435,13 +3547,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_byte1d_dims(this,variableName,dataptr,dim1, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3453,13 +3567,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_short1d_dims(this,variableName,dataptr,dim1, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3471,13 +3587,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_int1d_dims(this,variableName,dataptr,dim1, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3489,13 +3607,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_long1d_dims(this,variableName,dataptr,dim1, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3507,13 +3627,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_real1d_dims(this,variableName,dataptr,dim1, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3525,13 +3647,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_dble1d_dims(this,variableName,dataptr,dim1, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3543,13 +3667,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_logical2d_dims(this,variableName,dataptr,dim1,dim2, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3561,13 +3687,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_byte2d_dims(this,variableName,dataptr,dim1,dim2, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3579,13 +3707,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_short2d_dims(this,variableName,dataptr,dim1,dim2, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3597,13 +3727,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_int2d_dims(this,variableName,dataptr,dim1,dim2, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3615,13 +3747,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_long2d_dims(this,variableName,dataptr,dim1,dim2, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3633,13 +3767,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_real2d_dims(this,variableName,dataptr,dim1,dim2, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3651,13 +3787,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_dble2d_dims(this,variableName,dataptr,dim1,dim2, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3669,13 +3807,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_logical3d_dims(this,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3687,13 +3827,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_byte3d_dims(this,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3705,13 +3847,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_short3d_dims(this,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3723,13 +3867,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_int3d_dims(this,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3741,13 +3887,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_long3d_dims(this,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3759,13 +3907,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_real3d_dims(this,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3777,13 +3927,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_dble3d_dims(this,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3795,13 +3947,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_logical4d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3813,6 +3967,8 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
@@ -3820,7 +3976,7 @@ module dataSet_mod
 
 
     function loadLocalVariable_byte4d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3832,13 +3988,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_short4d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3850,13 +4008,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_int4d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3868,13 +4028,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_long4d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3886,13 +4048,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_real4d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3904,13 +4068,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_dble4d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3922,13 +4088,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_logical5d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3940,13 +4108,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_byte5d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3958,13 +4128,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_short5d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3976,13 +4148,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_int5d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -3994,13 +4168,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_long5d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4012,13 +4188,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_real5d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4030,13 +4208,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_dble5d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4048,13 +4228,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_logical6d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4066,13 +4248,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_byte6d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4084,13 +4268,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_short6d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4102,13 +4288,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_int6d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4120,13 +4308,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_long6d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4138,13 +4328,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_real6d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4156,13 +4348,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_dble6d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4174,13 +4368,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_logical7d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4192,13 +4388,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
     function loadLocalVariable_byte7d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                       :: this
@@ -4210,6 +4408,7 @@ module dataSet_mod
         character(len=*),              optional, intent(in)  :: locationInFile
         logical,                       optional, intent(in)  :: required
         logical,                       optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                     pointer     :: var
 
@@ -4217,7 +4416,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_short7d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -4229,6 +4428,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -4236,7 +4436,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_int7d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -4248,6 +4448,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -4255,7 +4456,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_long7d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -4267,6 +4468,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -4274,7 +4476,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_real7d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4286,6 +4488,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -4293,7 +4496,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_dble7d_dims(this,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4305,15 +4508,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dims.incl'
     end function
 
-
     function loadLocalVariable_logical1d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4325,6 +4528,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -4332,7 +4536,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_byte1d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4344,6 +4548,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -4351,7 +4556,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_short1d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4363,6 +4568,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -4370,7 +4576,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_int1d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4382,13 +4588,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_long1d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4400,13 +4608,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_real1d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4418,13 +4628,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_dble1d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4436,13 +4648,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_logical2d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4454,13 +4668,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_byte2d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4472,13 +4688,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_short2d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4490,13 +4708,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_int2d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4508,13 +4728,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_long2d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4526,13 +4748,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_real2d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4544,13 +4768,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_dble2d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4562,13 +4788,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_logical3d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4580,13 +4808,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_byte3d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4598,13 +4828,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_short3d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4616,13 +4848,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_int3d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4634,13 +4868,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_long3d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4652,13 +4888,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_real3d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4670,13 +4908,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_dble3d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4688,13 +4928,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_logical4d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4706,6 +4948,8 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
@@ -4713,7 +4957,7 @@ module dataSet_mod
 
 
     function loadLocalVariable_byte4d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4725,13 +4969,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_short4d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4743,13 +4989,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_int4d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4761,13 +5009,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_long4d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4779,13 +5029,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_real4d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4797,13 +5049,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_dble4d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4815,13 +5069,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_logical5d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4833,13 +5089,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_byte5d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4851,13 +5109,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_short5d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4869,13 +5129,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_int5d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4887,13 +5149,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_long5d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4905,13 +5169,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_real5d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4923,13 +5189,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_dble5d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4941,13 +5209,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_logical6d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4959,31 +5229,35 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_byte6d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
         character(len=*),                       intent(in)  :: variableName
 
-        integer(int8), dimension(:,:,:,:,:,:), pointer      :: dataptr
+        integer(int8), dimension(:,:,:,:,:,:),  pointer     :: dataptr
         class(DataShape),                       pointer     :: dShape
         class(ParallelInfo),          optional, pointer     :: pinfo
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_short6d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -4995,13 +5269,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_int6d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5013,13 +5289,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_long6d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5031,13 +5309,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_real6d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5049,13 +5329,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_dble6d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5067,13 +5349,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_logical7d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5085,13 +5369,15 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
+
         class(DataVariable),                    pointer     :: var
 
         include 'dataSet_loadLocalVariable_dshp.incl'
     end function
 
     function loadLocalVariable_byte7d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                       :: this
@@ -5103,6 +5389,7 @@ module dataSet_mod
         character(len=*),              optional, intent(in)  :: locationInFile
         logical,                       optional, intent(in)  :: required
         logical,                       optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                     pointer     :: var
 
@@ -5110,7 +5397,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_short7d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -5122,6 +5409,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -5129,7 +5417,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_int7d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -5141,6 +5429,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -5148,7 +5437,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_long7d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -5160,6 +5449,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -5167,7 +5457,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_real7d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5179,6 +5469,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5186,7 +5477,7 @@ module dataSet_mod
     end function
 
     function loadLocalVariable_dble7d_dshp(this,variableName,dataptr,dShape, &
-            & locationInFile,pinfo,required,squeeze) result(var)
+            & locationInFile,pinfo,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5198,6 +5489,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5205,7 +5497,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dim1(this,pinfo,dTypeNum,variableName,dim1,locationInFile, &
-        required,squeeze) result(var)
+        required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -5218,6 +5510,7 @@ module dataSet_mod
         character(len=*),  optional, intent(in) :: locationInFile
         logical,           optional, intent(in) :: required
         logical,           optional, intent(in) :: squeeze
+        integer,           optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),         pointer    :: var
 
@@ -5227,7 +5520,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dim2(this,pinfo,dTypeNum,variableName,dim1,dim2,&
-        & locationInFile,required,squeeze) result(var)
+        & locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -5240,6 +5533,7 @@ module dataSet_mod
         character(len=*),  optional, intent(in) :: locationInFile
         logical,           optional, intent(in) :: required
         logical,           optional, intent(in) :: squeeze
+        integer,           optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),         pointer    :: var
 
@@ -5249,7 +5543,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dim3(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,&
-        & locationInFile,required,squeeze) result(var)
+        & locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -5262,6 +5556,7 @@ module dataSet_mod
         character(len=*),  optional, intent(in) :: locationInFile
         logical,           optional, intent(in) :: required
         logical,           optional, intent(in) :: squeeze
+        integer,           optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),         pointer    :: var
 
@@ -5271,7 +5566,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dim4(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,&
-            locationInFile,required,squeeze) result(var)
+            locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -5284,6 +5579,7 @@ module dataSet_mod
         character(len=*),  optional, intent(in) :: locationInFile
         logical,           optional, intent(in) :: required
         logical,           optional, intent(in) :: squeeze
+        integer,           optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),         pointer    :: var
 
@@ -5293,7 +5589,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dim5(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,&
-        & locationInFile,required,squeeze) result(var)
+        & locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -5306,6 +5602,7 @@ module dataSet_mod
         character(len=*),  optional, intent(in) :: locationInFile
         logical,           optional, intent(in) :: required
         logical,           optional, intent(in) :: squeeze
+        integer,           optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),         pointer    :: var
 
@@ -5315,7 +5612,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dim6(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,dim6,&
-        locationInFile,required,squeeze) result(var)
+        locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -5328,6 +5625,7 @@ module dataSet_mod
         character(len=*),  optional, intent(in) :: locationInFile
         logical,           optional, intent(in) :: required
         logical,           optional, intent(in) :: squeeze
+        integer,           optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),         pointer    :: var
 
@@ -5337,7 +5635,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dim7(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,dim6,dim7,&
-            locationInFile,required,squeeze) result(var)
+            locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -5350,6 +5648,7 @@ module dataSet_mod
         character(len=*),  optional, intent(in) :: locationInFile
         logical,           optional, intent(in) :: required
         logical,           optional, intent(in) :: squeeze
+        integer,           optional, intent(in) :: loadDTypeNum
 
         class(DataVariable),         pointer    :: var
 
@@ -5359,7 +5658,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5371,6 +5670,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5380,7 +5680,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5392,6 +5692,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5401,7 +5702,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5413,6 +5714,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5422,7 +5724,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5434,6 +5736,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5443,7 +5746,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5455,6 +5758,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5464,7 +5768,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5476,6 +5780,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5485,7 +5790,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5497,6 +5802,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5506,7 +5812,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5518,6 +5824,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5527,7 +5834,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5539,6 +5846,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5548,7 +5856,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5560,6 +5868,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5569,7 +5878,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5581,6 +5890,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5590,7 +5900,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5602,6 +5912,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5611,7 +5922,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5623,6 +5934,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5632,7 +5944,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5644,6 +5956,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5653,7 +5966,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5665,6 +5978,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5674,7 +5988,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5686,6 +6000,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5695,7 +6010,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5707,6 +6022,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5716,7 +6032,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5728,6 +6044,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5737,7 +6054,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5749,6 +6066,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5758,7 +6076,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5770,6 +6088,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5779,7 +6098,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5791,6 +6110,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5800,7 +6120,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5812,6 +6132,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5822,7 +6143,7 @@ module dataSet_mod
 
 
     function loadMirroredVariable_byte4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5834,6 +6155,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5843,7 +6165,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5855,6 +6177,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5864,7 +6187,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5876,6 +6199,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5885,7 +6209,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5897,6 +6221,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5906,7 +6231,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5918,6 +6243,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5927,7 +6253,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5939,6 +6265,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5948,7 +6275,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5960,6 +6287,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5969,7 +6297,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -5981,6 +6309,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -5990,7 +6319,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6002,6 +6331,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6011,7 +6341,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6023,6 +6353,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6032,7 +6363,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6044,6 +6375,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6053,7 +6385,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6065,6 +6397,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6074,7 +6407,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6086,6 +6419,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6095,7 +6429,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6107,6 +6441,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6116,7 +6451,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6128,6 +6463,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6137,7 +6473,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6149,6 +6485,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6158,7 +6495,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6170,6 +6507,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6179,7 +6517,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6191,6 +6529,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6200,7 +6539,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6212,6 +6551,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6221,7 +6561,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6233,6 +6573,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6242,7 +6583,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6254,6 +6595,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6263,7 +6605,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                       :: this
@@ -6275,6 +6617,7 @@ module dataSet_mod
         character(len=*),              optional, intent(in)  :: locationInFile
         logical,                       optional, intent(in)  :: required
         logical,                       optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                     pointer     :: var
 
@@ -6284,7 +6627,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -6296,6 +6639,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -6305,7 +6649,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -6317,6 +6661,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -6326,7 +6671,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -6338,6 +6683,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -6347,7 +6693,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6359,6 +6705,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6368,7 +6715,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble7d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6,dim7, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6380,6 +6727,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6389,7 +6737,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6401,6 +6749,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6410,7 +6759,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6422,6 +6771,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6431,7 +6781,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6443,6 +6793,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6452,7 +6803,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6464,6 +6815,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6473,7 +6825,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6485,6 +6837,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6494,7 +6847,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6506,6 +6859,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6515,7 +6869,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6527,6 +6881,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6536,7 +6891,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6548,6 +6903,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6557,7 +6913,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6569,6 +6925,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6578,7 +6935,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6590,6 +6947,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6599,7 +6957,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6611,6 +6969,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6620,7 +6979,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6632,6 +6991,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6641,7 +7001,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6653,6 +7013,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6662,7 +7023,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6674,6 +7035,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6683,7 +7045,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6695,6 +7057,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6704,7 +7067,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6716,6 +7079,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6725,7 +7089,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6737,6 +7101,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6746,7 +7111,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6758,6 +7123,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6767,7 +7133,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6779,6 +7145,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6788,7 +7155,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6800,6 +7167,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6809,7 +7177,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6821,6 +7189,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6830,7 +7199,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6842,6 +7211,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6852,7 +7222,7 @@ module dataSet_mod
 
 
     function loadMirroredVariable_byte4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6864,6 +7234,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6873,7 +7244,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6885,6 +7256,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6894,7 +7266,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6906,6 +7278,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6915,7 +7288,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6927,6 +7300,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6936,7 +7310,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6948,6 +7322,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6957,7 +7332,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6969,6 +7344,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6978,7 +7354,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -6990,6 +7366,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -6999,7 +7376,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7011,6 +7388,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7020,7 +7398,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7032,6 +7410,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7041,7 +7420,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7053,6 +7432,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7062,7 +7442,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7074,6 +7454,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7083,7 +7464,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7095,6 +7476,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7104,7 +7486,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7116,6 +7498,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7125,7 +7508,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7137,6 +7520,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7146,7 +7530,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7158,6 +7542,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7167,7 +7552,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7179,6 +7564,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7188,7 +7574,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7200,6 +7586,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7209,7 +7596,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7221,6 +7608,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7230,7 +7618,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7242,6 +7630,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7251,7 +7640,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7263,6 +7652,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7272,7 +7662,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_logical7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7284,6 +7674,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7293,7 +7684,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_byte7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                       :: this
@@ -7305,6 +7696,7 @@ module dataSet_mod
         character(len=*),              optional, intent(in)  :: locationInFile
         logical,                       optional, intent(in)  :: required
         logical,                       optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                     pointer     :: var
 
@@ -7314,7 +7706,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_short7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -7326,6 +7718,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -7335,7 +7728,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_int7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -7347,6 +7740,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -7356,7 +7750,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_long7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -7368,6 +7762,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                        optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -7377,7 +7772,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_real7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7389,6 +7784,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7398,7 +7794,7 @@ module dataSet_mod
     end function
 
     function loadMirroredVariable_dble7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7410,6 +7806,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7419,7 +7816,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dim1(this,pinfo,dTypeNum,variableName,dim1, &
-        & locationInFile,required,squeeze) result(var)
+        & locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -7432,6 +7829,7 @@ module dataSet_mod
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
+        integer,           optional,  intent(in) :: loadDTypeNum
 
         class(DataDimension),         pointer    :: dim2 => null()
         class(DataDimension),         pointer    :: dim3 => null()
@@ -7448,7 +7846,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dim2(this,pinfo,dTypeNum,variableName,dim1,dim2,&
-        & locationInFile,required,squeeze) result(var)
+        & locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -7461,6 +7859,7 @@ module dataSet_mod
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
+        integer,           optional,  intent(in) :: loadDTypeNum
 
         class(DataVariable),          pointer    :: var
 
@@ -7476,7 +7875,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dim3(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,&
-        locationInFile,required,squeeze) result(var)
+        locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -7489,6 +7888,7 @@ module dataSet_mod
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
+        integer,           optional,  intent(in) :: loadDTypeNum
 
         class(DataVariable),          pointer    :: var
 
@@ -7503,7 +7903,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dim4(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,&
-            locationInFile,required,squeeze) result(var)
+            locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -7516,6 +7916,7 @@ module dataSet_mod
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
+        integer,           optional,  intent(in) :: loadDTypeNum
 
         class(DataVariable),          pointer    :: var
 
@@ -7529,7 +7930,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dim5(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,&
-        & locationInFile,required,squeeze) result(var)
+        & locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -7542,6 +7943,7 @@ module dataSet_mod
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
+        integer,           optional,  intent(in) :: loadDTypeNum
 
         class(DataVariable),          pointer    :: var
 
@@ -7554,7 +7956,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dim6(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,dim6,&
-        locationInFile,required,squeeze) result(var)
+        locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -7567,6 +7969,7 @@ module dataSet_mod
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
+        integer,           optional,  intent(in) :: loadDTypeNum
 
         class(DataVariable),          pointer    :: var
 
@@ -7578,7 +7981,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dim7(this,pinfo,dTypeNum,variableName,dim1,dim2,dim3,dim4,dim5,dim6,dim7,&
-            locationInFile,required,squeeze) result(var)
+            locationInFile,required,squeeze, loadDTypeNum) result(var)
 
         implicit none
 
@@ -7591,6 +7994,7 @@ module dataSet_mod
         character(len=*),  optional,  intent(in) :: locationInFile
         logical,           optional,  intent(in) :: required
         logical,           optional,  intent(in) :: squeeze
+        integer,           optional,  intent(in) :: loadDTypeNum
 
         class(DataVariable),          pointer    :: var
 
@@ -7600,7 +8004,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7612,6 +8016,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional,  intent(in) :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7621,7 +8026,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7633,6 +8038,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7642,7 +8048,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7654,6 +8060,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7663,7 +8070,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7675,6 +8082,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7684,7 +8092,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7696,6 +8104,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7705,7 +8114,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7717,6 +8126,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7726,7 +8136,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble1d_dims(this,pinfo,variableName,dataptr,dim1, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7738,6 +8148,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7747,7 +8158,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7759,6 +8170,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7768,7 +8180,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7780,6 +8192,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7789,7 +8202,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7801,6 +8214,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7810,7 +8224,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7822,6 +8236,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7831,7 +8246,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7843,6 +8258,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7852,7 +8268,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7864,6 +8280,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7873,7 +8290,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble2d_dims(this,pinfo,variableName,dataptr,dim1,dim2, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7885,6 +8302,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7894,7 +8312,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7906,6 +8324,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7915,7 +8334,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7927,6 +8346,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7936,7 +8356,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7948,6 +8368,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7957,7 +8378,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7969,6 +8390,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7978,7 +8400,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -7990,6 +8412,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -7999,7 +8422,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8011,6 +8434,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8020,7 +8444,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble3d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8032,6 +8456,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8041,7 +8466,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8053,6 +8478,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8063,7 +8489,7 @@ module dataSet_mod
 
 
     function loadDistributedVariable_byte4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8075,6 +8501,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8084,7 +8511,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8096,6 +8523,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8105,7 +8533,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8117,6 +8545,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8126,7 +8555,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8138,6 +8567,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8147,7 +8577,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8159,6 +8589,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8168,7 +8599,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble4d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8180,6 +8611,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8189,7 +8621,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8201,6 +8633,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8210,7 +8643,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8222,6 +8655,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8231,7 +8665,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8243,6 +8677,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8252,7 +8687,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8264,6 +8699,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8273,7 +8709,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8285,6 +8721,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8294,7 +8731,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8306,6 +8743,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8315,7 +8753,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble5d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8327,6 +8765,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8336,7 +8775,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8348,6 +8787,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8357,7 +8797,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8369,6 +8809,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8378,7 +8819,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8390,6 +8831,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8399,7 +8841,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8411,6 +8853,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8420,7 +8863,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8432,6 +8875,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8441,7 +8885,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8453,6 +8897,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8462,7 +8907,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble6d_dims(this,pinfo,variableName,dataptr,dim1,dim2,dim3,dim4,dim5,dim6, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8474,6 +8919,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8483,7 +8929,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical7d_dims(this,pinfo,variableName,dataptr,&
-            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze) result(var)
+            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8495,6 +8941,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8504,7 +8951,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte7d_dims(this,pinfo,variableName,dataptr,&
-            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze) result(var)
+            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                       :: this
@@ -8516,6 +8963,7 @@ module dataSet_mod
         character(len=*),              optional, intent(in)  :: locationInFile
         logical,                       optional, intent(in)  :: required
         logical,                       optional, intent(in)  :: squeeze
+        integer,                       optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                     pointer     :: var
 
@@ -8525,7 +8973,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short7d_dims(this,pinfo,variableName,dataptr,&
-            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze) result(var)
+            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -8537,6 +8985,7 @@ module dataSet_mod
         character(len=*),              optional,  intent(in)  :: locationInFile
         logical,                       optional,  intent(in)  :: required
         logical,                       optional,  intent(in)  :: squeeze
+        integer,                       optional,  intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -8546,7 +8995,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int7d_dims(this,pinfo,variableName,dataptr,&
-            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze) result(var)
+            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -8558,6 +9007,7 @@ module dataSet_mod
         character(len=*),              optional,  intent(in)  :: locationInFile
         logical,                       optional,  intent(in)  :: required
         logical,                       optional,  intent(in)  :: squeeze
+        integer,                       optional,  intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -8567,7 +9017,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long7d_dims(this,pinfo,variableName,dataptr,&
-            & dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze) result(var)
+            & dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -8579,6 +9029,7 @@ module dataSet_mod
         character(len=*),              optional,  intent(in)  :: locationInFile
         logical,                       optional,  intent(in)  :: required
         logical,                       optional,  intent(in)  :: squeeze
+        integer,                       optional,  intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -8588,7 +9039,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real7d_dims(this,pinfo,variableName,dataptr,&
-            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze) result(var)
+            &dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8600,6 +9051,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8609,7 +9061,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble7d_dims(this,pinfo,variableName,dataptr,&
-            & dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze) result(var)
+            & dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8621,6 +9073,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8630,7 +9083,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8642,6 +9095,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8651,7 +9105,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8663,6 +9117,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8672,7 +9127,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8684,6 +9139,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8693,7 +9149,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8705,6 +9161,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8714,7 +9171,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8726,6 +9183,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8735,7 +9193,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8747,6 +9205,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8756,7 +9215,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble1d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8768,6 +9227,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8777,7 +9237,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8789,6 +9249,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8798,7 +9259,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8810,6 +9271,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8819,7 +9281,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8831,6 +9293,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8840,7 +9303,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8852,6 +9315,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8861,7 +9325,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8873,6 +9337,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8882,7 +9347,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8894,6 +9359,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8903,7 +9369,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble2d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8915,6 +9381,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8924,7 +9391,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8936,6 +9403,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8945,7 +9413,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8957,6 +9425,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8966,7 +9435,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8978,6 +9447,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -8987,7 +9457,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -8999,6 +9469,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9008,7 +9479,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9020,6 +9491,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9029,7 +9501,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9041,6 +9513,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9050,7 +9523,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble3d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9062,6 +9535,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9071,7 +9545,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9083,6 +9557,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9093,7 +9568,7 @@ module dataSet_mod
 
 
     function loadDistributedVariable_byte4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9105,6 +9580,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9114,7 +9590,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9126,6 +9602,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9135,7 +9612,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9147,6 +9624,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9156,7 +9634,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9168,6 +9646,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9177,7 +9656,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9189,6 +9668,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9198,7 +9678,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble4d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9210,6 +9690,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9219,7 +9700,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9231,6 +9712,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9240,7 +9722,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9252,6 +9734,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9261,7 +9744,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9273,6 +9756,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9282,7 +9766,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9294,6 +9778,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9303,7 +9788,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9315,6 +9800,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9324,7 +9810,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9336,6 +9822,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9345,7 +9832,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble5d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9357,6 +9844,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9366,7 +9854,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9378,6 +9866,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9387,7 +9876,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9399,6 +9888,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9408,7 +9898,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9420,6 +9910,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9429,7 +9920,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9441,6 +9932,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9450,7 +9942,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9462,6 +9954,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9471,7 +9964,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9483,6 +9976,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9492,7 +9986,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble6d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9504,6 +9998,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9513,7 +10008,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_logical7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9525,6 +10020,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9534,7 +10030,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_byte7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                       :: this
@@ -9546,6 +10042,7 @@ module dataSet_mod
         character(len=*),              optional, intent(in)  :: locationInFile
         logical,                       optional, intent(in)  :: required
         logical,                       optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                     pointer     :: var
 
@@ -9555,7 +10052,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_short7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -9567,6 +10064,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -9576,7 +10074,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_int7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -9588,6 +10086,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -9597,7 +10096,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_long7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                        :: this
@@ -9609,6 +10108,7 @@ module dataSet_mod
         character(len=*),               optional, intent(in)  :: locationInFile
         logical,                        optional, intent(in)  :: required
         logical,                        optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                      pointer     :: var
 
@@ -9618,7 +10118,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_real7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9630,6 +10130,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9639,7 +10140,7 @@ module dataSet_mod
     end function
 
     function loadDistributedVariable_dble7d_dshp(this,pinfo,variableName,dataptr,dShape, &
-            & locationInFile,required,squeeze) result(var)
+            & locationInFile,required,squeeze, loadDTypeNum) result(var)
         implicit none
 
         class(DataSet)                                      :: this
@@ -9651,6 +10152,7 @@ module dataSet_mod
         character(len=*),             optional, intent(in)  :: locationInFile
         logical,                      optional, intent(in)  :: required
         logical,                      optional, intent(in)  :: squeeze
+        integer,                      optional, intent(in)  :: loadDTypeNum
 
         class(DataVariable),                    pointer     :: var
 
@@ -9682,7 +10184,7 @@ module dataSet_mod
         end if
     end function
 
-    subroutine doLoadArray(this,pinfo,dArray,locationInFile,required)
+    subroutine doLoadArray(this,pinfo,dArray,locationInFile,required,loadDTypeNum)
 
         implicit none
 
@@ -9692,25 +10194,27 @@ module dataSet_mod
         class(DataArray),           pointer     :: dArray
         character(len=*),           intent(in)  :: locationInFile
         logical,          optional, intent(in)  :: required
+        integer,          optional, intent(in)  :: loadDTypeNum
 
         class(DataArrayReader), pointer :: reader
 
         reader => this%getDataArrayReader()
 
         if (associated(reader)) then
-            call reader%loadDataArray(pinfo,dArray,locationInFile,required)
+            call reader%loadDataArray(pinfo,dArray,locationInFile,required,loadDTypeNum)
         else
             call error('The reader was not associated for loadLocalArray')
         end if
     end subroutine
 
-    subroutine writeToFile(this,pinfo,writer)
+    subroutine writeToFile(this,pinfo,writer,writeDTypeNum)
         implicit none
 
-        class(DataSet)                  :: this
+        class(DataSet)                     :: this
 
-        class(ParallelInfo),    pointer :: pinfo
-        class(DataArrayWriter), pointer :: writer
+        class(ParallelInfo),    pointer    :: pinfo
+        class(DataArrayWriter), pointer    :: writer
+        integer,  optional,     intent(in) :: writeDTypeNum
 
         class(DataDimension), pointer :: ddim
         class(DataVariable),  pointer :: dvar
@@ -9731,7 +10235,7 @@ module dataSet_mod
 
         do i=1,size(varNames)
             dvar => this%getVariableByName(varNames(i))
-            call writer%writeVariable(pinfo,dvar)
+            call writer%writeVariable(pinfo,dvar,writeDTypeNum=writeDTypeNum)
         end do
     end subroutine
 

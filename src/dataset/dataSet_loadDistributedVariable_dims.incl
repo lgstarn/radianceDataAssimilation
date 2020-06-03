@@ -10,4 +10,4 @@
         	decomp=pinfo%getParallelDecomposition())
                 
         var => this%loadDistributedVariable(pinfo,variableName,dataptr,dShape,&
-        	locationInFile,required,squeeze)
+        	locationInFile,required,squeeze,loadDTypeNum)

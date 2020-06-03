@@ -61,7 +61,7 @@ module dataArrayReader_mod
             logical,          optional, intent(in) :: required
         end subroutine
 
-        subroutine loadDataArrayAbstract(this,pinfo,dArray,locationInFile,required)
+        subroutine loadDataArrayAbstract(this,pinfo,dArray,locationInFile,required,loadDTypeNum)
 
             import DataArrayReader
             import ParallelInfo
@@ -73,6 +73,7 @@ module dataArrayReader_mod
             class(DataArray),    pointer    :: dArray
             character(len=*),    intent(in) :: locationInFile
             logical,   optional, intent(in) :: required
+            integer,   optional, intent(in) :: loadDTypeNum
         end subroutine
 
         function cloneAbstract(this) result(newReader)

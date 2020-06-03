@@ -3,70 +3,70 @@
 		if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
 			if (ndim == 1) then
 	            var => this%loadLocalVariable(dTypeNum,variableName,&
-	            	dim1,locationInFile,pinfo,required,squeeze)
+	            	dim1,locationInFile,pinfo,required,squeeze,loadDTypeNum)
         	else if (ndim == 2) then
 	            var => this%loadLocalVariable(dTypeNum,variableName,&
-	            	dim1,dim2,locationInFile,pinfo,required,squeeze)
+	            	dim1,dim2,locationInFile,pinfo,required,squeeze,loadDTypeNum)
         	else if (ndim == 3) then
 	            var => this%loadLocalVariable(dTypeNum,variableName,&
-	            	dim1,dim2,dim3,locationInFile,pinfo,required,squeeze)
+	            	dim1,dim2,dim3,locationInFile,pinfo,required,squeeze,loadDTypeNum)
         	else if (ndim == 4) then
 	            var => this%loadLocalVariable(dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,locationInFile,pinfo,required,squeeze)
+	            	dim1,dim2,dim3,dim4,locationInFile,pinfo,required,squeeze,loadDTypeNum)
         	else if (ndim == 5) then
 	            var => this%loadLocalVariable(dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,dim5,locationInFile,pinfo,required,squeeze)
+	            	dim1,dim2,dim3,dim4,dim5,locationInFile,pinfo,required,squeeze,loadDTypeNum)
         	else if (ndim == 6) then
 	            var => this%loadLocalVariable(dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,dim5,dim6,locationInFile,pinfo,required,squeeze)
+	            	dim1,dim2,dim3,dim4,dim5,dim6,locationInFile,pinfo,required,squeeze,loadDTypeNum)
         	else
 	            var => this%loadLocalVariable(dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,pinfo,required,squeeze)
+	            	dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,pinfo,required,squeeze,loadDTypeNum)
         	end if
         else if (pinfo%getParallelType() == MIRRORED_PARALLEL_TYPE) then
 			if (ndim == 1) then
 	            var => this%loadMirroredVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,locationInFile,required,squeeze)
+	            	dim1,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 2) then
 	            var => this%loadMirroredVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,locationInFile,required,squeeze)
+	            	dim1,dim2,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 3) then
 	            var => this%loadMirroredVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 4) then
 	            var => this%loadMirroredVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,dim4,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 5) then
 	            var => this%loadMirroredVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,dim5,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,dim4,dim5,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 6) then
 	            var => this%loadMirroredVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,dim5,dim6,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,dim4,dim5,dim6,locationInFile,required,squeeze,loadDTypeNum)
         	else
 	            var => this%loadMirroredVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze,loadDTypeNum)
 			end if			            	
         else if (pinfo%getParallelType() == DISTRIBUTED_PARALLEL_TYPE) then        
 			if (ndim == 1) then
 	            var => this%loadDistributedVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,locationInFile,required,squeeze)
+	            	dim1,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 2) then
 	            var => this%loadDistributedVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,locationInFile,required,squeeze)
+	            	dim1,dim2,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 3) then
 	            var => this%loadDistributedVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 4) then
 	            var => this%loadDistributedVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,dim4,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 5) then
 	            var => this%loadDistributedVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,dim5,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,dim4,dim5,locationInFile,required,squeeze,loadDTypeNum)
         	else if (ndim == 6) then
 	            var => this%loadDistributedVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,dim5,dim6,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,dim4,dim5,dim6,locationInFile,required,squeeze,loadDTypeNum)
         	else
 	            var => this%loadDistributedVariable(pinfo,dTypeNum,variableName,&
-	            	dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze)
+	            	dim1,dim2,dim3,dim4,dim5,dim6,dim7,locationInFile,required,squeeze,loadDTypeNum)
         	end if
         end if

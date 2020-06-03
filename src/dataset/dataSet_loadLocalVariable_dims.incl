@@ -7,4 +7,4 @@
         call dShape%dataShapeConstructor(nd, dim1, dim2, dim3, dim4, dim5, dim6, dim7)
 
         var => this%loadLocalVariable(variableName,dataptr,dShape,locationInFile,&
-        	& pinfo,required,squeeze)
+        	& pinfo,required,squeeze,loadDTypeNum)

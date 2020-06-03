@@ -12,10 +12,11 @@ module ArwDataSet_mod
     use dataGrid_mod
     use regularTriangularLatLonGrid_mod
 
+    use dataType_mod
     use dataGroup_mod
+    use dataVariable_mod
     use dataAttribute_mod
     use dataDimension_mod
-    use dataVariable_mod
     use dataArrayReader_mod
 
     use mpiUtils_mod
@@ -286,18 +287,22 @@ module ArwDataSet_mod
         call debug('Now loading the ARW variables')
 
         qvaporVar => this%loadVariable(pinfo, QVAPOR_VAR, q, &
-            & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QVAPOR', squeeze=.true.)
+            & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QVAPOR', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
         ! convert from kg/kg to g/kg
         q = q*1000.d0
 
         tVar => this%loadVariable(pinfo, T_VAR, t, &
-            & westEastDim, southNorthDim, bottomTopDim, timeDim,'T', squeeze=.true.)
+            & westEastDim, southNorthDim, bottomTopDim, timeDim,'T', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         pVar => this%loadVariable(pinfo, 'P', p, &
-            & westEastDim, southNorthDim, bottomTopDim, timeDim, squeeze=.true.)
+            & westEastDim, southNorthDim, bottomTopDim, timeDim, squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         pbVar => this%loadVariable(pinfo, 'PB', pb, &
-            & westEastDim, southNorthDim, bottomTopDim, timeDim, squeeze=.true.)
+            & westEastDim, southNorthDim, bottomTopDim, timeDim, squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         ! convert p and t to Pa and K, respectively
         p = p + pb
@@ -305,7 +310,8 @@ module ArwDataSet_mod
         t = t*(p/100000.)**(2.0/7.0)
 
         psfcVar => this%loadVariable(pinfo, P_SFC_VAR, psfc, &
-            & westEastDim, southNorthDim, timeDim,'PSFC', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim,'PSFC', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         ! WRF doesn't have a p level variable, so we'll need to fudge one
         pLevelVar => this%addVariable(pinfo, P_LEVEL_VAR, pLevel, &
@@ -327,7 +333,8 @@ module ArwDataSet_mod
             pLevel(:,:,z,1) = exp(2*log(p(:,:,z-1,1)) - log(pLevel(:,:,z-1,1)))
         end do
 
-        ptopVar => this%loadVariable(pinfo, 'P_TOP', p_top, timeDim, squeeze=.true.)
+        ptopVar => this%loadVariable(pinfo, 'P_TOP', p_top, timeDim, squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         ! end with the model-top pressure
         pLevel (:,:,nzl+1,1) = p_top(1)
@@ -353,9 +360,11 @@ module ArwDataSet_mod
         pLevel = pLevel/100.
 
         phVar => this%loadVariable(pinfo, 'PH', ph, &
-           & westEastDim, southNorthDim, bottomTopStagDim, timeDim, squeeze=.true.)
+           & westEastDim, southNorthDim, bottomTopStagDim, timeDim, squeeze=.true., &
+           & loadDTypeNum=REAL_TYPE_NUM)
         phbVar => this%loadVariable(pinfo, 'PHB', phb, &
-           & westEastDim, southNorthDim, bottomTopStagDim, timeDim, squeeze=.true.)
+           & westEastDim, southNorthDim, bottomTopStagDim, timeDim, squeeze=.true., &
+           & loadDTypeNum=REAL_TYPE_NUM)
 
         ph = ph+phb
 
@@ -368,38 +377,44 @@ module ArwDataSet_mod
         end do
 
         cldfraVar => this%loadVariable(pinfo, CLDFRA_VAR, cldfra, &
-           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'CLDFRA', squeeze=.true.)
+           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'CLDFRA', squeeze=.true., &
+           & loadDTypeNum=REAL_TYPE_NUM)
 
         qcloudVar => this%loadVariable(pinfo, QCLOUD_VAR, qcloud, &
-           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QCLOUD', squeeze=.true.)
+           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QCLOUD', squeeze=.true., &
+           & loadDTypeNum=REAL_TYPE_NUM)
         ! convert from kg/kg to g/kg
         qcloud = qcloud*1000.
 
         qiceVar => this%loadVariable(pinfo, QICE_VAR, qice, &
-           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QICE', squeeze=.true.)
+           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QICE', squeeze=.true., &
+            loadDTypeNum=REAL_TYPE_NUM)
         ! convert from kg/kg to g/kg
         qice = qice*1000.
 
         qrainVar => this%loadVariable(pinfo, QRAIN_VAR, qrain, &
-           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QRAIN', squeeze=.true.)
+           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QRAIN', squeeze=.true., &
+           & loadDTypeNum=REAL_TYPE_NUM)
         ! convert from kg/kg to g/kg
         qrain = qrain*1000.
 
         qsnowVar => this%loadVariable(pinfo, QSNOW_VAR, qsnow, &
-           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QSNOW', squeeze=.true.)
+           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QSNOW', squeeze=.true., &
+            loadDTypeNum=REAL_TYPE_NUM)
         ! convert from kg/kg to g/kg
         qsnow = qsnow*1000.
 
         ! TODO: add the option to find the integral of the exponential distribution between
         ! 0 and 5 mm for graupel, and 5 to infinity for hail
         qgraupVar => this%loadVariable(pinfo, QGRAUP_VAR, qgraup, &
-           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QGRAUP', squeeze=.true.)
+           & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QGRAUP', squeeze=.true., &
+           & loadDTypeNum=REAL_TYPE_NUM)
         ! convert from kg/kg to g/kg
         qgraup = qgraup*1000.
 
         qhailVar => this%loadVariable(pinfo, QHAIL_VAR, qhail, &
            & westEastDim, southNorthDim, bottomTopDim, timeDim, 'QHAIL', &
-           & required=.false., squeeze=.true.)
+           & required=.false., squeeze=.true., loadDTypeNum=REAL_TYPE_NUM)
         ! convert from kg/kg to g/kg
         qhail = qhail*1000.
 
@@ -410,7 +425,8 @@ module ArwDataSet_mod
         cwm = qcloud + qice + qrain + qsnow + qgraup + qhail
 
         uStagVar => this%loadVariable(pinfo, 'U_STAG', u_stag, &
-           & westEastStagDim, southNorthDim, bottomTopDim, timeDim, 'U', squeeze=.true.)
+           & westEastStagDim, southNorthDim, bottomTopDim, timeDim, 'U', squeeze=.true., &
+           & loadDTypeNum=REAL_TYPE_NUM)
 
         uVar => this%addVariable(pinfo, U_VAR, u, &
            & westEastDim, southNorthDim, bottomTopDim, timeDim)
@@ -421,7 +437,8 @@ module ArwDataSet_mod
         u(:,:,:,1:1) = 0.5*(u_stag(1:nxl,:,:,1:1) + u_stag(2:nxl+1,:,:,1:1))
 
         vStagVar => this%loadVariable(pinfo, 'V_STAG', v_stag, &
-           & westEastDim, southNorthStagDim, bottomTopDim, timeDim, 'V', squeeze=.true.)
+            & westEastDim, southNorthStagDim, bottomTopDim, timeDim, 'V', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         vVar => this%addVariable(pinfo, V_VAR, v, &
            & westEastDim, southNorthDim, bottomTopDim, timeDim)
@@ -432,7 +449,8 @@ module ArwDataSet_mod
         v(:,:,:,1:1) = 0.5*(v_stag(:,1:nyl,:,1:1) + v_stag(:,2:nyl+1,:,1:1))
 
         wStagVar => this%loadVariable(pinfo, 'W_STAG', w_stag, &
-           & westEastDim, southNorthDim, bottomTopStagDim, timeDim, 'W', squeeze=.true.)
+            & westEastDim, southNorthDim, bottomTopStagDim, timeDim, 'W', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         wVar => this%addVariable(pinfo, W_VAR, w, &
            & westEastDim, southNorthDim, bottomTopDim, timeDim)
@@ -441,37 +459,48 @@ module ArwDataSet_mod
         w(:,:,:,1:1) = 0.5*(w_stag(:,:,1:nzl,1:1) + w_stag(:,:,2:nzl+1,1:1))
 
         u10Var => this%loadVariable(pinfo, U10_VAR, u10, &
-           & westEastDim, southNorthDim, timeDim, 'U10', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'U10', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         v10Var => this%loadVariable(pinfo, V10_VAR, v10, &
-           & westEastDim, southNorthDim, timeDim, 'V10', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'V10', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         tSurfVar => this%loadVariable(pinfo, T_SURF_VAR, tSurf, &
-           & westEastDim, southNorthDim, timeDim, 'TSK', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'TSK', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         soilTypeVar => this%loadVariable(pinfo, SOIL_TYPE_VAR, soilType, &
-           & westEastDim, southNorthDim, timeDim, 'ISLTYP', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'ISLTYP', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         vegTypeVar => this%loadVariable(pinfo, VEG_TYPE_VAR, vegType, &
-           & westEastDim, southNorthDim, timeDim, 'IVGTYP', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'IVGTYP', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         luIndexVar => this%loadVariable(pinfo, LU_INDEX_VAR, luIndex, &
-           & westEastDim, southNorthDim, timeDim, 'LU_INDEX', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'LU_INDEX', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         sfcZVar => this%loadVariable(pinfo, SFC_HGT_VAR, sfc_z, &
-            & westEastDim, southNorthDim, timeDim,'HGT', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim,'HGT', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         latVar => this%loadVariable(pinfo, A3D_LAT_VAR, lat, &
-            & westEastDim, southNorthDim, timeDim, 'XLAT', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'XLAT', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         lonVar => this%loadVariable(pinfo, A3D_LON_VAR, lon, &
-            & westEastDim, southNorthDim, timeDim, 'XLONG', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'XLONG', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         t2Var => this%loadVariable(pinfo, T2_VAR, t2, &
-            & westEastDim, southNorthDim, timeDim, 'T2', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'T2', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         q2Var => this%loadVariable(pinfo, Q2_VAR, q2, &
-            & westEastDim, southNorthDim, timeDim, 'Q2', squeeze=.true.)
+            & westEastDim, southNorthDim, timeDim, 'Q2', squeeze=.true., &
+            & loadDTypeNum=REAL_TYPE_NUM)
 
         call debug('Now transposing the WRF variables to z-x-y order')
 

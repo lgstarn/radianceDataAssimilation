@@ -79,7 +79,7 @@ module hdfDataArrayWriter_mod
 
     end subroutine
 
-    subroutine writeVariable(this,pinfo,var,locationInFile)
+    subroutine writeVariable(this,pinfo,var,locationInFile,writeDTypeNum)
 
         use hdf5
 
@@ -90,6 +90,7 @@ module hdfDataArrayWriter_mod
         class(ParallelInfo),        pointer     :: pinfo
         class(DataVariable),        pointer     :: var
         character(len=*), optional, intent(in)  :: locationInFile
+        integer,          optional, intent(in)  :: writeDTypeNum
 
     end subroutine
 

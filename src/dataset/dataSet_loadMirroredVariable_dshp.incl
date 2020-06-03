@@ -7,9 +7,9 @@
         dArray => mArray
         
 		if (present(LocationInFile)) then
-	        call this%doLoadArray(pinfo,dArray,locationInFile,required)
+	        call this%doLoadArray(pinfo,dArray,locationInFile,required,loadDTypeNum)
         else
-	        call this%doLoadArray(pinfo,dArray,variableName,required)
+	        call this%doLoadArray(pinfo,dArray,variableName,required,loadDTypeNum)
         end if
 
        	allocate(var)
