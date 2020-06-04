@@ -175,7 +175,7 @@ program runRtmForward
     writer => ncWriter
     call satObs%writeSatObsToFile(pinfo,writer)
     deallocate(ncWriter)
-    deallocate(modelState)
+    !deallocate(modelState)
     deallocate(rtmOpts)
     deallocate(obsOp)
     deallocate(platform)
