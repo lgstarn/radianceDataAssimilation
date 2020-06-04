@@ -717,7 +717,6 @@ module rttovObservationOperator_mod
         else
             ! logarithmic average
             call baseState%getColumn(P_LEVEL_VAR,x,y,.true.,this%levptr)
-            print *,'p level var is:',this%levptr
             profile%p(1:nz) = exp((log(this%levptr(2:nz+1)) + log(this%levptr(1:nz)))/2.)
         end if
 

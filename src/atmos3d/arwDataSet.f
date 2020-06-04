@@ -340,7 +340,7 @@ module ArwDataSet_mod
         pLevel (:,:,nzl+1,1) = p_top(1)
 
         ! now do a second logarithmic interpolation in reverse so we can take the average
-        allocate(pLevel2,mold=plevel)
+        allocate(pLevel2(size(plevel,1),size(plevel,2),size(plevel,3),size(plevel,4)))
 
         pLevel2(:,:,nzl+1,1) = p_top(1)
 
@@ -547,7 +547,7 @@ module ArwDataSet_mod
         call this%wrfDataSetDestructor()
     end subroutine
 
-    function clone(this,shallow,copyData) result(dgPtr)
+    function clone(this,shallow,copyData) result(dsPtr)
         implicit none
 
         class(ArwDataSet),  target     :: this
@@ -556,10 +556,10 @@ module ArwDataSet_mod
         logical, optional,  intent(in) :: copyData
 
         class(ArwDataSet),  pointer    :: aptr
-        class(DataGroup),   pointer    :: dgPtr
+        class(DataSet),     pointer    :: dsPtr
 
         aptr => this%cloneArw(copyData)
-        dgptr => aptr
+        dsptr => aptr
     end function
 
     function cloneArw(this,shallow,copyData) result(aPtr)
@@ -608,6 +608,8 @@ module ArwDataSet_mod
 
         class(DataGrid),      pointer :: grid
 
+        class(ParallelInfo),  pointer :: pinfo_null
+
         logical :: isShallow
         logical :: doCopy
 
@@ -623,8 +625,10 @@ module ArwDataSet_mod
             doCopy = .false.
         end if
 
+        pinfo_null => null()
+
         allocate(aptr)
-        call aptr%arwDataSetConstructor(null(),this%getDataArrayReader(),this%time)
+        call aptr%arwDataSetConstructor(pinfo_null,this%getDataArrayReader(),this%time)
 
         if (.not. isShallow) then
             dgPtr => this
