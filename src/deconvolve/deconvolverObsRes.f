@@ -57,7 +57,6 @@ program deconvolverObsRes
     use assimilationProblem_mod
     use assimilationStrategy_mod
     use nDVarAssimilationStrategy_mod
-    use optimizerFactory_mod
     use assimStrategyFactory_mod
 
     use firstGuesser_mod
@@ -89,7 +88,6 @@ program deconvolverObsRes
 
     class(NDVarAssimilationStrategy), pointer :: deconvstrategy
     class(AssimilationStrategy),      pointer :: strategy
-    class(Optimizer),                 pointer :: opt
     class(DataSet),                   pointer :: state
     class(DataSet),                   pointer :: background
     class(DataSet),                   pointer :: finalState
@@ -487,7 +485,6 @@ program deconvolverObsRes
     allocate(problem)
 
     nctrl = fftOp%getNumControl()
-    opt => getOptimizer(LBFGS_OPTIMIZER,nctrl,maxiter)
 
     allocate(initGuess(nctrl))
     initGuess = 0.
@@ -513,7 +510,7 @@ program deconvolverObsRes
 
     bHalf => fftOp
 
-    call problem%assimilationProblemConstructor(pinfo_state,nctrl,initGuess,opt,converter,obsvr,&
+    call problem%assimilationProblemConstructor(pinfo_state,nctrl,initGuess,converter,obsvr,&
         &background,bHalf,penmgr,alphaTest)
 
     allocate(deconvstrategy)

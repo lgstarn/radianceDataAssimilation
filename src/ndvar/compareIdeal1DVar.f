@@ -19,7 +19,6 @@ program compareIdeal1DVar
     use rtmUtils_mod
     use rtmOptions_mod
     use dataSetFactory_mod
-    use optimizerFactory_mod
     use radianceAssimilationFactory_mod
     use assimStrategyFactory_mod
     use fullMatrixOperator_mod
@@ -45,7 +44,6 @@ program compareIdeal1DVar
     character(len=1024) :: inputFile
 
     class(AssimilationStrategy), pointer :: strategy
-    class(Optimizer),  pointer :: opt
     class(DataSet), pointer :: state
     class(DataSet), pointer :: background
     class(Atmos3DDataSet), pointer :: state_a3d
@@ -148,7 +146,6 @@ program compareIdeal1DVar
         call radCcvManager%initialize(nplatforms,ccvConfigPath,ccvCoeffsPath,1,6)
     end if
 
-    opt        => getOptimizer(LMBM_OPTIMIZER,nctrl,maxiter)
     ! strategy   => getAssimilationStrategy(ONE_D_VAR_STRATEGY,requestedFields,nfields,fieldNz,opt)
     strategy   => getAssimilationStrategy(NDVAR_STRATEGY) !,requestedFields,nfields,fieldNz,opt)
     state      => getDataSet(WRF_ARW_MODEL,inputFile,time,.true.,requestedFields,fieldNz)
@@ -240,12 +237,11 @@ program compareIdeal1DVar
     initGuess = 0.
 
     allocate(problem)
-    call problem%assimilationProblemConstructor(nctrl,initGuess,opt,converter,observer_ptr,&
+    call problem%assimilationProblemConstructor(nctrl,initGuess,converter,observer_ptr,&
         &background,bHalf,alphaTest=alphaTest)
 
     call strategy%assimilate(problem)
 
-    deallocate(opt)
     deallocate(strategy)
     deallocate(state)
     deallocate(background)

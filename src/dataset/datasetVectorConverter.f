@@ -8,9 +8,9 @@ module datasetVectorConverter_mod
 
     type, abstract, public :: DatasetVectorConverter
         contains
-            procedure(convertToState_abs),     deferred :: convertToState
-            procedure(convertFromState_abs),   deferred :: convertFromState
-            procedure(getStateVectorSize_abs), deferred :: getStateVectorSize
+            procedure(convertToState_abs),          deferred :: convertToState
+            procedure(convertFromState_abs),        deferred :: convertFromState
+            procedure(getLocalStateVectorSize_abs), deferred :: getLocalStateVectorSize
     end type
 
     abstract interface
@@ -34,7 +34,7 @@ module datasetVectorConverter_mod
             class(AbstractVector),   pointer :: vector
         end subroutine
 
-        function getStateVectorSize_abs(this, state) result(svsize)
+        function getLocalStateVectorSize_abs(this, state) result(svsize)
             import DatasetVectorConverter
             import Dataset
 

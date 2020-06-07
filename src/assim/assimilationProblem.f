@@ -4,7 +4,6 @@ module assimilationProblem_mod
     use observation_mod
     use observationOperator_mod
     use observer_mod
-    use optimizer_mod
     use penalizer_mod
     use datasetVectorConverter_mod
     use abstractVector_mod
@@ -31,7 +30,7 @@ module assimilationProblem_mod
             class(DataSet),                pointer :: baseState        => NULL() ! Passed in
             class(DataSet),                pointer :: deltaX           => NULL() ! Passed in
             class(AbstractVectorOperator), pointer :: bHalf            => NULL() ! Passed in
-            class(Optimizer),              pointer :: opt              => NULL() ! Passed in; optional
+            !class(Optimizer),              pointer :: opt              => NULL() ! Passed in; optional
             class(Penalizer),              pointer :: penmgr           => NULL() ! Passed in; optional
             real(8), dimension(:),         pointer :: finalGrad        => NULL() ! nctrl x 1. Alloced in variational solvers
             class(AbstractVector),         pointer :: ydiff            => NULL() ! Alloced based on observer
@@ -46,7 +45,7 @@ module assimilationProblem_mod
             procedure :: getParallelInfo
             procedure :: getNControl
             procedure :: getInitialGuess
-            procedure :: getOptimizer
+            !procedure :: getOptimizer
             procedure :: getBaseDataSet
             procedure :: getDeltaXDataSet
             procedure :: getDatasetVectorConverter
@@ -67,7 +66,7 @@ module assimilationProblem_mod
 
     contains
 
-    subroutine assimilationProblemConstructor(this,pinfo,nctrl,initGuess,opt,converter,obsvr,&
+    subroutine assimilationProblemConstructor(this,pinfo,nctrl,initGuess,converter,obsvr,&
         &background,bHalf,penmgr,alphaTest)
 
         implicit none
@@ -76,7 +75,6 @@ module assimilationProblem_mod
         class(ParallelInfo),           pointer  :: pinfo
         integer, intent(in)                     :: nctrl
         real(8), dimension(:),         pointer  :: initGuess
-        class(Optimizer),              pointer  :: opt
         class(DatasetVectorConverter), pointer  :: converter
         class(Observer),               pointer  :: obsvr
         class(DataSet),                pointer  :: background
@@ -90,12 +88,11 @@ module assimilationProblem_mod
 
         this%nctrl  = nctrl
 
-        nstate = converter%getStateVectorSize(background)
+        nstate = converter%getLocalStateVectorSize(background)
         nobs   = obsvr%getTotalObs()
 
         this%pinfo      => pinfo
         this%initGuess  => initGuess
-        this%opt        => opt
         this%converter  => converter
         this%obsvr      => obsvr
         this%background => background
@@ -194,15 +191,6 @@ module assimilationProblem_mod
         real(8), dimension(:), pointer :: initGuess
 
         initGuess => this%initGuess
-    end function
-
-    function getOptimizer(this) result(optimizer_ptr)
-        implicit none
-
-        class(AssimilationProblem) :: this
-        class(Optimizer), pointer  :: optimizer_ptr
-
-        optimizer_ptr => this%opt
     end function
 
     function getBaseDataSet(this) result(baseState)

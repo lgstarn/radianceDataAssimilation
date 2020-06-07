@@ -70,9 +70,6 @@ program roundTripTest
 
     ! from package ndvar
     use nDVarAssimilationStrategy_mod
-
-    ! from package opt
-    use optimizerFactory_mod
     
     ! from package str
     use asciiUtils_mod
@@ -124,7 +121,6 @@ program roundTripTest
 
     class(NDVarAssimilationStrategy),    pointer :: deconvstrategy
     class(AssimilationStrategy),         pointer :: strategy
-    class(Optimizer),                    pointer :: opt
 
     class(AssimilationProblem),          pointer :: problem
 
@@ -394,6 +390,9 @@ program roundTripTest
 
     obs_dataSet => obs_modelRes
 
+    write(msgstr,*) 'Now sweeping the antenna pattern.'
+    call print(msgstr)
+
     ! now sweep the antenna pattern
     call sweepAntennaPattern(pinfo,obs_dataSet,scannedObsBundle,scannedObsBundle,&
         noNoiseScannedOutputPrefix)
@@ -491,11 +490,10 @@ program roundTripTest
     call veofOp%vertEofOperatorConstructor(1,nchans,npc,veofs)
 
     allocate(converter_dcnv)
-    call converter_dcnv%deconvolutionConverterConstructor(OBS_DATA_VAR_NAME)
+    call converter_dcnv%deconvolutionConverterConstructor(OBS_DATA_VAR_NAME,QC_CODES_VAR_NAME)
 
-    nctrl = npc*size(obsData,2)
-
-    !opt => getOptimizer(LBFGS_OPTIMIZER,nctrl,MAX_ITER)
+    ! the number of control variables is the local size with channels swapped for PCs
+    nctrl = npc*converter_dcnv%getLocalStateVectorSize(firstGuess_ds)/size(obsData,1)
 
     allocate(initGuess(nctrl))
     initGuess = 0.
@@ -512,7 +510,7 @@ program roundTripTest
 
     allocate(problem)
     ! FIXME: remove pinfo from here, only pass in during assimilate. Stale pointers are bad.
-    call problem%assimilationProblemConstructor(pinfo,nctrl,initGuess,opt,converter,obsvr,&
+    call problem%assimilationProblemConstructor(pinfo,nctrl,initGuess,converter,obsvr,&
         &firstGuess_ds,bHalf)
 
     allocate(deconvstrategy)
