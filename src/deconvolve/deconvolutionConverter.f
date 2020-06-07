@@ -188,14 +188,14 @@ module deconvolutionConverter_mod
             call tbVar%getArray(tbDble)
 
             if (this%hasMask) then
-                if (all(mask(:,j) == 0)) then
-                    do j=1,size(tbDble,2)
+                do j=1,size(tbDble,2)
+                    if (all(mask(:,j) == 0)) then
                         do i=1,size(tbDble,1)
                             ind = ind + 1
                             data1d(ind) = tbDble(i,j)
                         end do
-                    end do
-                end if
+                    end if
+                end do
             else
                 do j=1,size(tbDble,2)
                     do i=1,size(tbDble,1)

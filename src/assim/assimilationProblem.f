@@ -30,7 +30,6 @@ module assimilationProblem_mod
             class(DataSet),                pointer :: baseState        => NULL() ! Passed in
             class(DataSet),                pointer :: deltaX           => NULL() ! Passed in
             class(AbstractVectorOperator), pointer :: bHalf            => NULL() ! Passed in
-            !class(Optimizer),              pointer :: opt              => NULL() ! Passed in; optional
             class(Penalizer),              pointer :: penmgr           => NULL() ! Passed in; optional
             real(8), dimension(:),         pointer :: finalGrad        => NULL() ! nctrl x 1. Alloced in variational solvers
             class(AbstractVector),         pointer :: ydiff            => NULL() ! Alloced based on observer
@@ -45,7 +44,6 @@ module assimilationProblem_mod
             procedure :: getParallelInfo
             procedure :: getNControl
             procedure :: getInitialGuess
-            !procedure :: getOptimizer
             procedure :: getBaseDataSet
             procedure :: getDeltaXDataSet
             procedure :: getDatasetVectorConverter
