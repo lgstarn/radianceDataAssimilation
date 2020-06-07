@@ -134,15 +134,17 @@ module adjointAveFirstGuesser_mod
 
             obsData => obs%getObsData()
 
-            do ind2=1,npts
-                do ind1=1,nchan
-                    if (obsData(ind1,ind2) > 0) then !obs_so%passesQC(ind1,ind2)) then
-                        output(ind1,ind2) = obsData(ind1,ind2)
-                    else
-                        output(ind1,ind2) = 0.d0
-                    end if
-                end do
-            end do
+            output(:,:) = obsData(:,:)
+
+            ! do ind2=1,npts
+            !     do ind1=1,nchan
+            !         if (obsData(ind1,ind2) > 0) then !obs_so%passesQC(ind1,ind2)) then
+            !             output(ind1,ind2) = obsData(ind1,ind2)
+            !         else
+            !             output(ind1,ind2) = 0.d0
+            !         end if
+            !     end do
+            ! end do
 
             do ind1=1,nchan
                 write(msgstr,*) 'min/max value for channel ',ind1+obs_so%getChannelOffset(),&
@@ -152,15 +154,17 @@ module adjointAveFirstGuesser_mod
 
             call obsOp_conv%adjoint(firstGuess, obs, output, firstGuess)
 
-            do ind2=1,npts
-                do ind1=1,nchan
-                    if (obsData(ind1,ind2) > 0) then !obs_so%passesQC(ind1, ind2)) then
-                        output(ind1,ind2) = 1.d0
-                    else
-                        output(ind1,ind2) = 0.d0
-                    end if
-                end do
-            end do
+            output(:,:) = 1.0d0
+
+            ! do ind2=1,npts
+            !     do ind1=1,nchan
+            !         if (obsData(ind1,ind2) > 0) then !obs_so%passesQC(ind1, ind2)) then
+            !             output(ind1,ind2) = 1.d0
+            !         else
+            !             output(ind1,ind2) = 0.d0
+            !         end if
+            !     end do
+            ! end do
 
             call obsOp_conv%adjoint(tmpState, obs, output, tmpState)
 

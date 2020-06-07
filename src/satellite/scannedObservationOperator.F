@@ -750,12 +750,13 @@ module scannedObservationOperator_mod
         class(DataExtent), pointer :: chanExtent
         class(DataExtent), pointer :: nobsExtent
 
-        real(real64), dimension(:),               pointer :: dptr1d
+        real(real64), pointer :: dptr1d(:)
+        integer,      pointer :: qcCodes(:,:)
 
         class(ScannedObservation), pointer :: obs_so
 
         integer :: chind, ierr
-        integer :: i, j, ind
+        integer :: i
 
         integer :: nobs_local
         integer :: nobs_global
@@ -770,6 +771,8 @@ module scannedObservationOperator_mod
             class default
                 call error('The observation type was not ScannedObservation')
         end select
+
+        qcCodes => obs%getQCCodes()
 
         inputDataVar => input%getVariableByName(this%xVarName)
         obsDataVar   => obs_so%getObsDataVar()
@@ -790,8 +793,13 @@ module scannedObservationOperator_mod
         nobs_global =  nobsExtent%getGlobalCount()
 
         if (nobs_local /= size(output,2)) then
-            call error('nobs does not match in scannedObservationOperator' // &
+            call error('nobs does not match in scannedObservationOperator ' // &
                 int2str(nobs_local) // ' vs. ' // int2str(size(output,2)))
+        end if
+
+        if (size(qcCodes,1) /= size(output,1)) then
+            call error('nchan does not match in scannedObservationOperator ' // &
+                int2str(size(qcCodes,1)) // ' vs. ' // int2str(size(output,1)))
         end if
 
         call this%firstMatrix()
@@ -801,15 +809,20 @@ module scannedObservationOperator_mod
         do chind=1,this%nposting_channels
             hmat => this%nextMatrix()
 
-            dptr1d => inputData(chind+obs_so%getChannelOffset(),:)
+            call VecGetArrayF90(this%sooData%xvec,dptr1d,ierr)
+            dptr1d(:) = inputData(chind+obs_so%getChannelOffset(),:)
+            call VecRestoreArrayF90(this%sooData%xvec,dptr1d,ierr)
 
-            ! TODO: need to include QC here
-            call VecPlaceArray(this%sooData%xvec, dptr1d, ierr)
             call MatMult(hMat, this%sooData%xvec, this%sooData%yvec, ierr)
-            call VecResetArray(this%sooData%xvec,ierr)
 
             call VecGetArrayReadF90(this%sooData%yvec,dptr1d,ierr)
-            output(chind,1:nobs_local) = dptr1d(1:nobs_local)
+            do i=1,size(qcCodes,2)
+                 if (qcCodes(chind,i) <= QC_OBEVAL) then
+                     output(chind,i) = dptr1d(i)
+                 else
+                     output(chind,i) = QC_NOVALUE
+                 end if
+            end do
             call VecRestoreArrayReadF90(this%sooData%yvec,dptr1d,ierr)
         end do
     end subroutine
@@ -848,8 +861,10 @@ module scannedObservationOperator_mod
         real(real64), dimension(:),   pointer :: xptr
         real(real64), dimension(:),   pointer :: yptr
 
+        integer,      pointer :: qcCodes(:,:)
+
         integer :: chind, ierr
-        integer :: i, j, ind, nobs_local
+        integer :: i, nobs_local
 
         class(ScannedObservation), pointer :: obs_so
 
@@ -881,9 +896,15 @@ module scannedObservationOperator_mod
         obsDataVar  => obs%getObsDataVar()
         nobsExtent  => obsDataVar%getExtentNumber(2)
         nobs_local  =  nobsExtent%getLocalCount()
+        qcCodes     => obs%getQCCodes()
 
         if (nobs_local /= size(deltaY,2)) then
-            call error('nobs does not match in scannedObservationOperator')
+            call error('nobs does not match in scannedObservationOperator adjoint')
+        end if
+
+        if (size(qcCodes,1) /= size(deltaY,1)) then
+            call error('nchan does not match in scannedObservationOperator adjoint ' // &
+                int2str(size(qcCodes,1)) // ' vs. ' // int2str(size(deltaY,1)))
         end if
 
         call outDataVar%getArray(obsOutData)
@@ -895,28 +916,31 @@ module scannedObservationOperator_mod
         do chind=1,this%nposting_channels
             hmat => this%nextMatrix()
 
-            yptr(1:nobs_local) = deltaY(chind,1:nobs_local)
-
-            !xptr => obsOutData(chind+obs_so%getChannelOffset(),:)
+            do i=1,size(qcCodes,2)
+                if (qcCodes(chind,i) <= QC_OBEVAL .and. deltaY(chind,i) /= QC_NOVALUE) then
+                    yptr(i) = deltaY(chind,i)
+                else
+                    yptr(i) = 0.d0
+                end if
+            end do
 
             call VecGetLocalSize(this%sooData%xvec,vsize,ierr)
 
             if (vsize /= size(obsOutData,2)) then
-                write (msgstr,*) 'Incompatible sizes',vsize,'vs.',size(obsOutData,2)
-
+                write (msgstr,*) 'Incompatible adjoint sizes ',vsize,' vs. ',size(obsOutData,2)
                 call error(msgstr)
             end if
 
-            ! FIXME: it would be better to use the second formulation
+            ! it would be nice if VecPlaceArray could work here, but it segfaults on some systems
             call VecGetArrayF90(this%sooData%xvec,xptr,ierr)
             xptr(1:vsize) = obsOutData(chind+obs_so%getChannelOffset(),1:vsize)
             call MatMultTransposeAdd(hMat, this%sooData%yvec, this%sooData%xvec, this%sooData%xvec, ierr)
             obsOutData(chind+obs_so%getChannelOffset(),1:vsize) = xptr(1:vsize)
             call VecRestoreArrayF90(this%sooData%xvec,xptr,ierr)
 
-!            call VecPlaceArray(this%sooData%xvec, xptr, ierr)
-!            call MatMultTransposeAdd(hMat, this%sooData%yvec, this%sooData%xvec, this%sooData%xvec, ierr)
-!            call VecResetArray(this%sooData%xvec, ierr)
+            ! call VecPlaceArray(this%sooData%xvec, xptr, ierr)
+            ! call MatMultTransposeAdd(hMat, this%sooData%yvec, this%sooData%xvec, this%sooData%xvec, ierr)
+            ! call VecResetArray(this%sooData%xvec, ierr)
         end do
 
         call VecRestoreArrayF90(this%sooData%yvec,yptr,ierr)

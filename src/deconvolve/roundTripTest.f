@@ -538,13 +538,14 @@ program roundTripTest
     call ncWriter%netcdfDataArrayWriterConstructor(deconvolvedOutputFile)
     writer => ncWriter
 
-    ! FIXME: should have tb point to obsData
     call finalState_so%writeSatObsToFile(pinfo,writer)
 
     deallocate(ncWriter)
 
     write(msgstr,*) 'Finalized deconvolution and wrote output to ',trim(deconvolvedOutputFile)
     call print(msgstr)
+
+    call endParallel()
 
 !    ! now interpolate the first guess, deconv, and true state to the observations
 !    do i=1,scannedObsBundle%getBundleSize()
