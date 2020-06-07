@@ -8,6 +8,7 @@ module adjointAveFirstGuesser_mod
     use dataExtent_mod
     use dataVariable_mod
 
+    use obsQCCodes_mod
     use observation_mod
 
     use satelliteObservation_mod
@@ -69,11 +70,9 @@ module adjointAveFirstGuesser_mod
         class(DataExtent),                 pointer :: nobsExtent
         class(DataVariable),               pointer :: tbVar1
         class(DataVariable),               pointer :: tbVar2
-        class(DataExtent),                 pointer :: chanExtent
-        class(DataExtent),                 pointer :: pixExtent
-        class(DataExtent),                 pointer :: scanExtent
+        class(DataVariable),               pointer :: obsQcVar
 
-        integer :: i, ind1, ind2, nchan, npts
+        integer :: i, ind1, ind2, j, nchan, npts
 
         integer      :: nloc
         real(real64) :: mslon
@@ -85,6 +84,8 @@ module adjointAveFirstGuesser_mod
 
         real(real64), pointer :: tb1(:,:)
         real(real64), pointer :: tb2(:,:)
+
+        integer,      pointer :: qcCodes(:,:)
 
         class(SatelliteObservation), pointer :: firstGuess_so
         class(SatelliteObservation), pointer :: tmpState_so
@@ -183,6 +184,18 @@ module adjointAveFirstGuesser_mod
             write(msgstr,*) 'min/max value for channel ',i,':',minval(tb1(i,:)),&
                 maxval(tb1(i,:))
             call print(msgstr)
+        end do
+
+        qcCodes => firstGuess_so%getQcCodes()
+
+        do j=1,size(qcCodes,2)
+            do i=1,size(qcCodes,1)
+                if (tb2(i,j) > 0.d0) then
+                    qcCodes(i,j) = QC_NOERR
+                else
+                    qcCodes(i,j) = QC_OUTDOM
+                end if
+            end do
         end do
 
         deallocate(tmpState)
