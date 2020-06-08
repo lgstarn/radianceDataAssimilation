@@ -24,7 +24,7 @@ module deconvolutionConverter_mod
         logical :: hasMask
 
         character(len=:), allocatable :: stateVarName
-        character(len=:), allocatable :: maskVarName
+        integer,          pointer     :: mask(:,:)
 
         contains
             procedure :: deconvolutionConverterConstructor
@@ -37,21 +37,18 @@ module deconvolutionConverter_mod
 
     contains
 
-    subroutine deconvolutionConverterConstructor(this,stateVarName,maskVarName)
+    subroutine deconvolutionConverterConstructor(this,stateVarName,mask)
 
         class(DeconvolutionConverter) :: this
 
         character(len=*),           intent(in) :: stateVarName
-        character(len=*), optional, intent(in) :: maskVarName
+        integer,          optional, pointer    :: mask(:,:)
 
         allocate(character(len=len_trim(stateVarName)) :: this%stateVarName)
         this%stateVarName = trim(stateVarName)
 
-        if (present(maskVarName)) then
-            this%hasMask = .true.
-
-            allocate(character(len=len_trim(maskVarName)) :: this%maskVarName)
-            this%maskVarName = trim(maskVarName)
+        if (present(mask)) then
+            this%mask => mask
         end if
     end subroutine
 
@@ -76,7 +73,6 @@ module deconvolutionConverter_mod
         real(real32), dimension(:,:), pointer :: tbReal
 
         class(DataVariable), pointer :: tbVar
-        class(DataVariable), pointer :: maskVar
 
         integer, pointer :: mask(:,:)
 
@@ -89,8 +85,7 @@ module deconvolutionConverter_mod
         ind = 0
 
         if (this%hasMask) then
-            maskVar => state%getVariableByName(this%maskVarName)
-            call maskVar%getArray(mask)
+            mask => this%mask
         end if
 
         if (tbVar%getDataTypeNum() == REAL_TYPE_NUM) then
@@ -147,7 +142,6 @@ module deconvolutionConverter_mod
         real(real32), dimension(:,:), pointer :: tbReal
 
         class(DataVariable), pointer :: tbVar
-        class(DataVariable), pointer :: maskVar
 
         integer, pointer :: mask(:,:)
 
@@ -158,8 +152,7 @@ module deconvolutionConverter_mod
         tbVar   => state%getVariableByName(this%stateVarName)
 
         if (this%hasMask) then
-            maskVar => state%getVariableByName(this%maskVarName)
-            call maskVar%getArray(mask)
+            mask => this%mask
         end if
 
         ind = 0
@@ -188,7 +181,7 @@ module deconvolutionConverter_mod
             call tbVar%getArray(tbDble)
 
             if (this%hasMask) then
-                do j=1,size(tbDble,2)
+                do j=1,size(mask,2)
                     if (all(mask(:,j) == 0)) then
                         do i=1,size(tbDble,1)
                             ind = ind + 1
@@ -228,8 +221,7 @@ module deconvolutionConverter_mod
         tbVar => state%getVariableByName(this%stateVarName)
 
         if (this%hasMask) then
-            maskVar => state%getVariableByName(this%maskVarName)
-            call maskVar%getArray(mask)
+            mask => this%mask
 
             svsize = 0
 
