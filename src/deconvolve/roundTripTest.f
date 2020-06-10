@@ -489,10 +489,16 @@ program roundTripTest
     call veofOp%vertEofOperatorConstructor(1,nchans,npc,veofs)
 
     allocate(converter_dcnv)
-    call converter_dcnv%deconvolutionConverterConstructor(OBS_DATA_VAR_NAME,QC_CODES_VAR_NAME)
+    call converter_dcnv%deconvolutionConverterConstructor(OBS_DATA_VAR_NAME,firstGuess%getQCCodes())
+
+    nctrl = converter_dcnv%getLocalStateVectorSize(firstGuess_ds)
+    if (mod(nctrl,size(obsData,1)) /= 0) then
+        call error('The number of control variables was not compatible with the obsData size: ' // &
+            int2str(nctrl) // ' vs. ' // int2str(size(obsData,1)))
+    end if
 
     ! the number of control variables is the local size with channels swapped for PCs
-    nctrl = npc*converter_dcnv%getLocalStateVectorSize(firstGuess_ds)/size(obsData,1)
+    nctrl = npc*(nctrl/size(obsData,1))
 
     allocate(initGuess(nctrl))
     initGuess = 0.
