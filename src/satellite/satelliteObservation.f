@@ -368,6 +368,8 @@ module satelliteObservation_mod
         ! data set classes
     end subroutine
 
+    ! Migrate the lat/lon/tb format to the obsData/obsLoci format. NOTE: latVar, lonVar, and tbVar
+    ! will be deleted if they exist!
     subroutine loadSatelliteObservation_tb3d(this, pinfo, latVar, lonVar, tbVar)
 
         implicit none
@@ -527,6 +529,19 @@ module satelliteObservation_mod
                 end do
             end do
         end do
+
+        ! now that the lat/lon/tb have been migrated to the 2d obsLoci/obsData format, remove them
+        if (this%hasVariable(latVar%getName())) then
+            call this%deleteVariable(latVar)
+        end if
+
+        if (this%hasVariable(lonVar%getName())) then
+            call this%deleteVariable(lonVar)
+        end if
+
+        if (this%hasVariable(tbVar%getName())) then
+            call this%deleteVariable(tbVar)
+        end if
 
         call this%loadSatelliteObservation(pinfo,obsDataVar,obsLociVar)
     end subroutine

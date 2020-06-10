@@ -900,22 +900,26 @@ module observation_mod
         class(ParallelInfo),    pointer    :: pinfo
         class(DataArrayWriter), pointer    :: writer
 
-        call writer%writeDimension(pinfo, this%getNObsDim())
-        call writer%writeDimension(pinfo, this%getMObsDim())
-        call writer%writeDimension(pinfo, this%getNLociDim())
+        call this%writeToFile(pinfo,writer)
 
-        if (associated(this%getNAuxDim())) then
-            call writer%writeDimension(pinfo, this%getNAuxDim())
-        end if
+!        call writer%writeDimension(pinfo, this%getNObsDim())
+!        call writer%writeDimension(pinfo, this%getMObsDim())
+!        call writer%writeDimension(pinfo, this%getNLociDim())
+!
+!        if (associated(this%getNAuxDim())) then
+!            call writer%writeDimension(pinfo, this%getNAuxDim())
+!        end if
+!
+!        call writer%writeVariable(pinfo, this%getObsDataVar())
+!        call writer%writeVariable(pinfo, this%getObsLociVar())
+!
+!        if (associated(this%getAuxDataVar())) then
+!            call writer%writeVariable(pinfo, this%getAuxDataVar())
+!        end if
+!
+!        call writer%writeVariable(pinfo, this%getQcCodesVar())
 
-        call writer%writeVariable(pinfo, this%getObsDataVar())
-        call writer%writeVariable(pinfo, this%getObsLociVar())
-
-        if (associated(this%getAuxDataVar())) then
-            call writer%writeVariable(pinfo, this%getAuxDataVar())
-        end if
-
-        call writer%writeVariable(pinfo, this%getQcCodesVar())
+        ! now write the additional variables in the data set
 
         !call writer%writeVariable(pinfo, this%getObsOwnersVar())
         !call writer%writeVariable(pinfo, this%getContributesVar())

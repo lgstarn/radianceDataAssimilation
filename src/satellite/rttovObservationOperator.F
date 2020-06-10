@@ -264,10 +264,11 @@ module rttovObservationOperator_mod
 
         class(RttovObservationOperator) :: this
 
-        class(Atmos3DDataSet),    pointer :: input
-        class(SatelliteObservation), pointer :: obs
-        real(real64), dimension(:,:),     pointer :: output
+        class(Atmos3DDataSet),        pointer :: input
+        class(SatelliteObservation),  pointer :: obs
+        real(real64), dimension(:,:), pointer :: output
 
+        real(real64), dimension(:), pointer :: obslat, obslon
         real(real64), dimension(:), pointer :: obsx, obsy
 
         integer :: nprofiles  ! m
@@ -284,11 +285,9 @@ module rttovObservationOperator_mod
 
         real :: start, finish
 
-        real(real64) :: lat, lon, lu_index
+        real(real64) :: lat, lon
 
-        integer :: j, z, nz, chanprofnum, prof
-
-        integer :: water_class
+        integer :: i, j, z, nz, chanprofnum, prof
 
         real(real64), pointer :: obsLoci(:,:)
 
@@ -298,10 +297,17 @@ module rttovObservationOperator_mod
 
         obsLoci => obs%getObsLoci()
 
-        obsx => obsLoci(SO_PIX_DIM,:)
-        obsy => obsLoci(SO_SCAN_DIM,:)
+        obslat => obsLoci(SO_LAT_DIM,:)
+        obslon => obsLoci(SO_LON_DIM,:)
 
-        nprofiles = size(obsx,1)
+        nprofiles = size(obslat,1)
+
+        allocate(obsx(nprofiles))
+        allocate(obsy(nprofiles))
+
+        do i=1,nprofiles
+            call input%convertLatLonToIJ(obslat(i),obslon(i),obsx(i),obsy(i))
+        end do
 
         zExtent => input%getBottomTopExtent()
 
@@ -387,6 +393,9 @@ module rttovObservationOperator_mod
             & ') to (',    nint(maxval(obsx)),',',nint(maxval(obsy)),&
             & ') in ',finish-start,' seconds'
         call print(msgstr)
+
+        deallocate(obsx)
+        deallocate(obsy)
     end subroutine
 
     subroutine doTLM(this, baseState, obs, deltaX, deltaY)
@@ -394,16 +403,17 @@ module rttovObservationOperator_mod
 
         class(RttovObservationOperator) :: this
 
-        class(Atmos3DDataSet),    pointer :: baseState
-        class(SatelliteObservation), pointer :: obs
-        class(Atmos3DDataSet),    pointer :: deltaX
-        real(real64), dimension(:,:),     pointer :: deltaY
+        class(Atmos3DDataSet),        pointer :: baseState
+        class(SatelliteObservation),  pointer :: obs
+        class(Atmos3DDataSet),        pointer :: deltaX
+        real(real64), dimension(:,:), pointer :: deltaY
 
+        real(real64), dimension(:), pointer :: obslat, obslon
         real(real64), dimension(:), pointer :: obsx, obsy
         integer :: nz,nabsorbers,nclouds,naerosols,nchannels
         real(real64), pointer :: obsptr(:), obsptr_tl(:)
 
-        integer :: errStat, prof, z
+        integer :: i, errStat, prof, z
         integer :: obsnum, chanprofnum, nprofiles
 
         real(real64) :: x, y
@@ -420,8 +430,17 @@ module rttovObservationOperator_mod
 
         obsLoci => obs%getObsLoci()
 
-        obsx => obsLoci(SO_PIX_DIM,:)
-        obsy => obsLoci(SO_SCAN_DIM,:)
+        obslat => obsLoci(SO_LAT_DIM,:)
+        obslon => obsLoci(SO_LON_DIM,:)
+
+        nprofiles = size(obslat,1)
+
+        allocate(obsx(nprofiles))
+        allocate(obsy(nprofiles))
+
+        do i=1,nprofiles
+            call baseState%convertLatLonToIJ(obslat(i),obslon(i),obsx(i),obsy(i))
+        end do
 
         nprofiles = size(obsx,1)
 
@@ -517,6 +536,8 @@ module rttovObservationOperator_mod
         print '(A,I6,A,I4,A,I4,A,I4,A,I4,A,F8.2,A)','Successfully ran RTTOV TL for ',nprofiles,&
             ' profiles (',obsx(1),',',obsy(1),') to (',obsx(nprofiles),',',obsy(nprofiles),') in ',finish-start,' seconds'
 
+        deallocate(obsx)
+        deallocate(obsy)
     end subroutine
 
     subroutine doAdjoint(this, baseState, obs, deltaY, deltaX)
@@ -524,17 +545,18 @@ module rttovObservationOperator_mod
 
         class(RttovObservationOperator) :: this
 
-        class(Atmos3DDataSet), pointer    :: baseState
-        class(SatelliteObservation), pointer :: obs
-        real(real64), dimension(:,:), pointer     :: deltaY
-        class(Atmos3DDataSet), pointer    :: deltaX
+        class(Atmos3DDataSet),        pointer :: baseState
+        class(SatelliteObservation),  pointer :: obs
+        real(real64), dimension(:,:), pointer :: deltaY
+        class(Atmos3DDataSet),        pointer :: deltaX
 
+        real(real64), dimension(:), pointer :: obslat, obslon
         real(real64), dimension(:), pointer :: obsx, obsy
 
         integer          :: nprofiles,nz,nabsorbers
         real(real64), pointer :: obsptr(:), obsptr_tl(:)
 
-        integer :: errStat, prof, z, obsnum, chanprofnum
+        integer :: i, errStat, prof, z, obsnum, chanprofnum
 
         real(real64) :: x, y
 
@@ -550,8 +572,17 @@ module rttovObservationOperator_mod
 
         obsLoci => obs%getObsLoci()
 
-        obsx => obsLoci(SO_PIX_DIM,:)
-        obsy => obsLoci(SO_SCAN_DIM,:)
+        obslat => obsLoci(SO_LAT_DIM,:)
+        obslon => obsLoci(SO_LON_DIM,:)
+
+        nprofiles = size(obslat,1)
+
+        allocate(obsx(nprofiles))
+        allocate(obsy(nprofiles))
+
+        do i=1,nprofiles
+            call baseState%convertLatLonToIJ(obslat(i),obslon(i),obsx(i),obsy(i))
+        end do
 
         nprofiles = size(obsx,1)
 
@@ -662,6 +693,8 @@ module rttovObservationOperator_mod
             &' profiles (',nint(obsx(1)),',',nint(obsy(1)),') to (',nint(obsx(nprofiles)),',',&
             &nint(obsy(nprofiles)),') in ',finish-start,' seconds'
 
+        deallocate(obsx)
+        deallocate(obsy)
     end subroutine
 
     subroutine setRttovAtmosphere(this, baseState, x, y, profile, cld_profile, adjoint, deltaXopt)
@@ -679,9 +712,6 @@ module rttovObservationOperator_mod
 
         integer :: j, nz, allocstat
 
-        real(real64) :: lu_index
-
-        integer :: water_class
         logical :: isAdjoint
 
         class(DataExtent), pointer :: zExtent
@@ -886,22 +916,9 @@ module rttovObservationOperator_mod
             profile%s2m%v = baseState%getValue2D(V10_VAR,x,y)
         end if
 
-        ! Surface type and water type
-        lu_index = baseState%getValue2D(LU_INDEX_VAR,x,y)
-
-        if (baseState%getLandCatCount() .eq. 20 .or. baseState%getLandCatCount() .eq. 21) then
-           water_class = 17
-        elseif (baseState%getLandCatCount() .eq. 24) then
-           water_class = 16
-        else
-            write(msgstr,*) 'Unknown number of land categories: ', &
-                baseState%getLandCatCount(),', RTTOV obs op cannot continue.'
-            call error(msgstr)
-        endif
-
         profile%skin%fastem(:) = 0.0
         ! rttov,surftype 0=land, 1=ocean, 2=sea-ice
-        if (nint(lu_index) .eq. water_class) then
+        if (.not. baseState%isLand(x,y)) then
             profile%skin%surftype = 1
             profile%skin%watertype = 1 ! 0=fresh water, 1=ocean water
 

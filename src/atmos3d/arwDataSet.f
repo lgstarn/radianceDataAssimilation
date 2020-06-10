@@ -34,6 +34,7 @@ module ArwDataSet_mod
         private
 
             integer      :: time
+            integer      :: istart, jstart
             integer      :: map_proj
             real(real64) :: truelat1,truelat2,stdlon
             real(real64) :: pole_lat,pole_lon
@@ -118,7 +119,7 @@ module ArwDataSet_mod
 
         class(ParallelInfo),    pointer    :: pinfo
 
-        integer :: nxl,nyl,nzl,nt,z
+        integer :: xe,ye,nxl,nyl,nzl,nt,z
 
         integer :: i,j,k,cursor,ndims,nz_val,si,ei
 
@@ -529,6 +530,9 @@ module ArwDataSet_mod
 
         call debug('Now finalizing the WRF data set')
 
+        call latVar%getLocalExtentRange(1,this%istart,xe,nxl)
+        call latVar%getLocalExtentRange(2,this%jstart,ye,nyl)
+
         call this%loadWrfDataSet(pinfo,grid,&!westEastDim,southNorthDim,bottomTopDim,         &
             & pLevelVar,tVar,qvaporVar,uVar,vVar,wVar,cldfraVar,cwmVar,qcloudVar,qiceVar,   &
             & qrainVar,qsnowVar,qgraupVar,qhailVar,dzVar,u10Var,v10Var,tSurfVar,soilTypeVar,&
@@ -830,11 +834,22 @@ module ArwDataSet_mod
         lonPtr => this%getVariable2D(A3D_LON_VAR)
 
         call dllToIJ(this%map_proj,this%truelat1,this%truelat2,this%stdlon,&
-                     & lonPtr(1,1),latPtr(1,1),this%pole_lat,this%pole_lon,1.0d0,1.0d0,&
-                     & this%dx,this%dy,this%latinc,this%loninc,this%cen_lat,this%cen_lon,lat,lon,loc)
+                     & latPtr(1,1),lonPtr(1,1),this%pole_lat,this%pole_lon,&
+                     & dble(this%istart),dble(this%jstart),this%dx,this%dy,&
+                     & this%latinc,this%loninc,this%cen_lat,this%cen_lon,  &
+                     & lat,lon,loc)
 
         y = loc(1)
         x = loc(2)
+
+        ! make the x and y integers if they are close enough
+        if (abs(x - nint(x)) < 0.01) then
+            x = nint(x)
+        end if
+
+        if (abs(y - nint(y)) < 0.01) then
+            y = nint(y)
+        end if
     end subroutine
 
     include 'wrf_user_latlon_routines.f'

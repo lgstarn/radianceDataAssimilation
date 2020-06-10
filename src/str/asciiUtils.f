@@ -44,7 +44,7 @@ module asciiUtils_mod
             tmp = ntokens(line)
             if (ny > 1) then
                 if (tmp .ne. nx) then
-                    print *, 'Error: line ',ny,' had more columns than the previous lines'
+                    print *, 'Error: line ',ny,' had more columns than the previous lines:',tmp,nx
                     stop
                 end if
             end if

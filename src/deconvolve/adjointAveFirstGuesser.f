@@ -17,6 +17,10 @@ module adjointAveFirstGuesser_mod
     use scannedObservationOperator_mod
     use scannedObservationBundle_mod
 
+    use atmos3dDataSet_mod
+
+    use parallelInfo_mod
+
     use mpiUtils_mod
 
     implicit none
@@ -26,6 +30,9 @@ module adjointAveFirstGuesser_mod
     public :: AdjointAveFirstGuesser
 
     type, extends(FirstGuesser) :: AdjointAveFirstGuesser
+
+        class(Atmos3dDataSet), pointer :: modelState
+
         contains
             procedure :: adjointAveFirstGuesserConstructor
 
@@ -36,10 +43,17 @@ module adjointAveFirstGuesser_mod
 
     contains
 
-    subroutine adjointAveFirstGuesserConstructor(this)
+    subroutine adjointAveFirstGuesserConstructor(this,modelState)
         implicit none
 
-        class(AdjointAveFirstGuesser) :: this
+        class(AdjointAveFirstGuesser)            :: this
+        class(Atmos3dDataSet), optional, pointer :: modelState
+
+        if (present(modelState)) then
+            this%modelState => modelState
+        else
+            this%modelState => null()
+        end if
     end subroutine
 
     subroutine adjointAveFirstGuesserDestructor(this)
@@ -48,11 +62,12 @@ module adjointAveFirstGuesser_mod
         type(AdjointAveFirstGuesser)  :: this
     end subroutine
 
-    subroutine populateFirstGuess(this,obsBundle,firstGuess)
+    subroutine populateFirstGuess(this,pinfo,obsBundle,firstGuess)
         implicit none
 
         class(AdjointAveFirstGuesser) :: this
 
+        class(ParallelInfo),               pointer :: pinfo
         class(ScannedObservationBundle),   pointer :: obsBundle
         class(DataSet),                    pointer :: firstGuess
 
@@ -66,10 +81,14 @@ module adjointAveFirstGuesser_mod
         class(Observation),                pointer :: obs
 
         class(DataSet),                    pointer :: tmpState
+        class(DataSet),                    pointer :: landState
         class(DataExtent),                 pointer :: mobsExtent
         class(DataExtent),                 pointer :: nobsExtent
         class(DataVariable),               pointer :: tbVar1
         class(DataVariable),               pointer :: tbVar2
+        class(DataVariable),               pointer :: landVar
+        class(DataVariable),               pointer :: luIndexVar
+        class(DataVariable),               pointer :: luIndexVar_global
         class(DataVariable),               pointer :: obsQcVar
 
         integer :: i, ind1, ind2, j, nchan, npts
@@ -77,18 +96,24 @@ module adjointAveFirstGuesser_mod
         integer      :: nloc
         real(real64) :: mslon
 
-
         real(real64), pointer :: output(:,:)
 
         real(real64), pointer :: obsData(:,:)
+        real(real64), pointer :: obsLoci(:,:)
 
         real(real64), pointer :: tb1(:,:)
         real(real64), pointer :: tb2(:,:)
+        real(real64), pointer :: land(:,:)
+        real(real64), pointer :: luIndex(:,:)
 
         integer,      pointer :: qcCodes(:,:)
 
+        real(real64) :: x, y
+        integer      :: lu_val
+
         class(SatelliteObservation), pointer :: firstGuess_so
         class(SatelliteObservation), pointer :: tmpState_so
+        class(SatelliteObservation), pointer :: landState_so
 
         select type (firstGuess)
             class is (SatelliteObservation)
@@ -98,11 +123,21 @@ module adjointAveFirstGuesser_mod
         end select
 
         tmpState_so => firstGuess_so%cloneSatObs(shallow=.false.,copyData=.true.)
-
-        tmpState => tmpState_so
+        tmpState    => tmpState_so
 
         tbVar1 => firstGuess_so%getObsDataVar()
         tbVar2 =>   tmpState_so%getObsDataVar()
+
+        if (associated(this%modelState)) then
+            landState_so      => firstGuess_so%cloneSatObs(shallow=.false.,copyData=.true.)
+            landState         => landState_so
+            landVar           => landState_so%getObsDataVar()
+            luIndexVar        => this%modelState%getVariable(LU_INDEX_VAR)
+            luIndexVar_global => luIndexVar%gatherToGlobal(pinfo,'landVar')
+            call luIndexVar_global%getArray(luIndex)
+            call landVar%getArray(land)
+            land = 0.0d0
+        end if
 
         call tbVar1%getArray(tb1)
         call tbVar2%getArray(tb2)
@@ -169,6 +204,32 @@ module adjointAveFirstGuesser_mod
 
             call obsOp_conv%adjoint(tmpState, obs, output, tmpState)
 
+            if (associated(this%modelState)) then
+                obsLoci => obs%getObsLoci()
+
+                do ind2=1,size(obsData,2)
+                    call this%modelState%convertLatLonToIJ(obsLoci(SO_LAT_DIM,ind2),obsLoci(SO_LON_DIM,ind2),&
+                        x,y)
+
+                    if (nint(x) < 1                .or. nint(y) <= 1               .or. &
+                        nint(x) >= size(luIndex,1) .or. nint(y) >= size(luIndex,2)) then
+
+                        output(:,ind2) = 1.d0
+                        cycle
+                    end if
+
+                    lu_val = nint(luIndex(nint(x),nint(y)))
+
+                    if (this%modelState%isLand(lu_val)) then
+                        output(:,ind2) = 1.d0
+                    else
+                        output(:,ind2) = 0.d0
+                    end if
+                end do
+
+                call obsOp_conv%adjoint(landState, obs, output, landState)
+            end if
+
             deallocate(output)
         end do
 
@@ -197,6 +258,13 @@ module adjointAveFirstGuesser_mod
                 end if
             end do
         end do
+
+        if (associated(this%modelState)) then
+            landVar => landVar%clone(copyData=.true.)
+            call landVar%setName('landAmount')
+            call firstGuess%addVariablePointer(landVar)
+            deallocate(landState)
+        end if
 
         deallocate(tmpState)
     end subroutine

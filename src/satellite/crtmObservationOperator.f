@@ -1012,9 +1012,9 @@ module crtmObservationOperator_mod
 !!                end select
 !
         if (isAdjoint) then
-            lu_index = input%getValue2D(LU_INDEX_VAR,x,y)
+            lu_index = input%getValue2D(LU_INDEX_VAR,dble(nint(x)),dble(nint(y)))
 
-            if (input%getLandCatCount() .eq. 20) then
+            if (input%getLandCatCount() .eq. 20 .or. input%getLandCatCount() .eq. 21) then
                 water_class = 17
                 snow_class  = 15
             elseif (input%getLandCatCount() .eq. 24) then
@@ -1034,9 +1034,9 @@ module crtmObservationOperator_mod
                 call input%spreadValue2D(T_SURF_VAR, x,y,sfc(profile)%Land_Temperature)
             end if
         else
-            lu_index = input%getValue2D(LU_INDEX_VAR,x,y)
+            lu_index = input%getValue2D(LU_INDEX_VAR,dble(nint(x)),dble(nint(y)))
 
-            if (input%getLandCatCount() .eq. 20) then
+            if (input%getLandCatCount() .eq. 20 .or. input%getLandCatCount() .eq. 21) then
                 water_class = 17
                 snow_class  = 15
             elseif (input%getLandCatCount() .eq. 24) then

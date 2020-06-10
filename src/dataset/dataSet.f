@@ -10207,14 +10207,13 @@ module dataSet_mod
         end if
     end subroutine
 
-    subroutine writeToFile(this,pinfo,writer,writeDTypeNum)
+    subroutine writeToFile(this,pinfo,writer)
         implicit none
 
         class(DataSet)                     :: this
 
         class(ParallelInfo),    pointer    :: pinfo
         class(DataArrayWriter), pointer    :: writer
-        integer,  optional,     intent(in) :: writeDTypeNum
 
         class(DataDimension), pointer :: ddim
         class(DataVariable),  pointer :: dvar
@@ -10235,7 +10234,7 @@ module dataSet_mod
 
         do i=1,size(varNames)
             dvar => this%getVariableByName(varNames(i))
-            call writer%writeVariable(pinfo,dvar,writeDTypeNum=writeDTypeNum)
+            call writer%writeVariable(pinfo,dvar)
         end do
     end subroutine
 

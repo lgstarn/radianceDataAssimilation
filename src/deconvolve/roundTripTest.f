@@ -27,6 +27,7 @@ program roundTripTest
 
     ! from package obs
     use observer_mod
+    use obsQcCodes_mod
     use observation_mod
     use observationBundle_mod
     use observationOperator_mod
@@ -91,8 +92,6 @@ program roundTripTest
     class(SatelliteObservationOperator), pointer :: obsOpRtm
     class(SatelliteObservation),         pointer :: obs_modelRes
     class(DataSet),                      pointer :: obs_dataSet
-
-    class(Atmos3dDataSet),               pointer :: trueState => null()
 
     class(DataVariable),                 pointer :: columnNormsVar
     class(DataSet),                      pointer :: columnNorms
@@ -324,20 +323,20 @@ program roundTripTest
 
     inquire(file = rtmOutputFile, exist=rtmOutExists)
     if (rtmOutExists) then
-        call debug('RTM output file ' // trim(rtmOutputFile) // &
-            & ' already exists - reusing it.')
+        call error('RTM output file ' // trim(rtmOutputFile) // &
+            & ' already exists.')
 
-        allocate(ncReader)
-        call ncReader%netcdfDataArrayReaderConstructor(rtmOutputFile)
-
-        reader => ncReader
-
-        call obs_modelRes%satelliteObservationConstructor(platform,reader)
-
-        call obs_modelRes%loadSatObsFromFile(pinfo)
-
-        write(msgstr,*) '   Loaded the existing RTM file from ',trim(rtmOutputFile)
-        call print(msgstr)
+!        allocate(ncReader)
+!        call ncReader%netcdfDataArrayReaderConstructor(rtmOutputFile)
+!
+!        reader => ncReader
+!
+!        call obs_modelRes%satelliteObservationConstructor(platform,reader)
+!
+!        call obs_modelRes%loadSatObsFromFile(pinfo)
+!
+!        write(msgstr,*) '   Loaded the existing RTM file from ',trim(rtmOutputFile)
+!        call print(msgstr)
     else
         call debug('The RTM output file does not exist - regenerating.')
 
@@ -362,7 +361,7 @@ program roundTripTest
         tbVar => obs_modelRes%addVariable(pinfo,'Brightness_Temperatures',tb,&
             chanExtent,latVar%getExtentNumber(1),latVar%getExtentNumber(2))
 
-        tb = -999.
+        tb = QC_NOVALUE
 
         call obs_modelRes%loadSatelliteObservation_tb3d(pinfo,latVar,lonVar,tbVar)
 
@@ -459,7 +458,7 @@ program roundTripTest
     ! now get the first guess
     firstGuess_ds => obs_modelRes%clone(shallow=.false.,copyData=.true.)
 
-    fg => getFirstGuesser(ADJOINT_AVE_FG)
+    fg => getFirstGuesser(ADJOINT_AVE_FG,trueAtmosState)
 
     select type (firstGuess_ds)
         class is (SatelliteObservation)
@@ -468,7 +467,7 @@ program roundTripTest
             call error('Unknown first guess type')
     end select
 
-    call fg%populateFirstGuess(scannedObsBundle,firstGuess_ds)
+    call fg%populateFirstGuess(pinfo,scannedObsBundle,firstGuess_ds)
 
     fgOutputFile = trim(fgOutputPrefix) // '_fg.nc'
 

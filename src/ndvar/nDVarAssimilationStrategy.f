@@ -133,7 +133,7 @@ module nDVarAssimilationStrategy_mod
         real(real64) :: pencost
         real(real64) :: gradnorm
 
-        real(real64), parameter :: bfactor = 2.0d0
+        real(real64), parameter :: bfactor = 1.0d0
 
         ! get the pointers from the options class
         converter => theProblem%getDatasetVectorConverter()

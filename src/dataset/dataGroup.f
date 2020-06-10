@@ -1865,7 +1865,9 @@ module dataGroup_mod
 
         deleted = this%variables%delete(var%getName())
 
-        deallocate(var)
+        if (.not. deleted) then
+            deallocate(var)
+        end if
     end subroutine
 
     subroutine addVariablePointer(this,var,checkName,checkType,checkDim)

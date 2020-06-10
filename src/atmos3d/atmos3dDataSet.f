@@ -174,6 +174,16 @@ module atmos3dDataSet_mod
             ! convert a given lat lon to i/j coordinates
             procedure(convertLatLonToIJAbstract), deferred :: convertLatLonToIJ
 
+
+            ! get whether the point is land (if false, it is water or ocean)
+            generic   :: isLand => &
+                isLand_xy, &
+                isLand_lu
+
+            procedure, private :: isLand_xy
+            procedure, private :: isLand_lu
+
+
             ! get the 10m wind direction in degrees east from north
             procedure :: getWind10mDirection
 
@@ -894,6 +904,43 @@ module atmos3dDataSet_mod
 
         value = dptr3d(z,x,y)
     end function
+
+    function isLand_xy(this,x,y) result(isLand)
+        implicit none
+
+        class(Atmos3DDataSet) :: this
+
+        real(real64), intent(in) :: x,y
+
+        logical :: isLand
+
+        real(real64) :: lu_index
+
+        ! Surface type and water type for the nearest x/y point
+        lu_index = this%getValue2D(LU_INDEX_VAR,dble(nint(x)),dble(nint(y)))
+
+        isLand = this%isLand_lu(nint(lu_index))
+    end function
+
+    function isLand_lu(this,lu_index) result(isLand)
+        implicit none
+
+        class(Atmos3DDataSet) :: this
+
+        integer, intent(in)   :: lu_index
+
+        logical :: isLand
+
+        if (this%getLandCatCount() .eq. 20 .or. this%getLandCatCount() .eq. 21) then
+            isLand = lu_index /= 17 .and. lu_index /= 21
+        elseif (this%getLandCatCount() .eq. 24) then
+            isLand = lu_index /= 16
+        else
+            write(msgstr,*) 'Unknown number of land categories: ', this%getLandCatCount()
+            call error(msgstr)
+        endif
+    end function
+
 
     function getWind10mDirection(this,x,y) result(wdir)
         implicit none

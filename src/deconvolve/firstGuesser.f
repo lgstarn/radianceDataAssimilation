@@ -1,5 +1,6 @@
 module FirstGuesser_mod
     use dataSet_mod
+    use parallelInfo_mod
     use scannedObservationBundle_mod
 
     implicit none
@@ -12,13 +13,15 @@ module FirstGuesser_mod
     end type
 
     abstract interface
-        subroutine populateFirstGuess_abs(this,obsBundle,firstGuess)
+        subroutine populateFirstGuess_abs(this,pinfo,obsBundle,firstGuess)
 
             import FirstGuesser
+            import ParallelInfo
             import DataSet
             import ScannedObservationBundle
 
-            class(FirstGuesser)    :: this
+            class(FirstGuesser)                      :: this
+            class(ParallelInfo),             pointer :: pinfo
             class(ScannedObservationBundle), pointer :: obsBundle
             class(DataSet),                  pointer :: firstGuess
         end subroutine

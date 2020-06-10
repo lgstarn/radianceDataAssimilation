@@ -276,16 +276,23 @@ module dataVariable_mod
 
         character(:), allocatable :: gname
 
-        gname = this%name
+        allocate(character(len=len_trim(this%name)) :: gname)
+
+        gname(:) = trim(this%name)
     end function
 
     subroutine setName(this,name)
         implicit none
 
-        class(DataVariable)       :: this
-        character(:), allocatable :: name
+        class(DataVariable)          :: this
+        character(len=*), intent(in) :: name
 
-        this%name = name
+        if (allocated(this%name)) then
+            deallocate(this%name)
+        end if
+
+        allocate(character(len=len_trim(name)) :: this%name)
+        this%name(:) = trim(name)
     end subroutine
 
     function getLocalExtentCount(this,dimNum) result(dimCount)
