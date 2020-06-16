@@ -459,6 +459,8 @@ module ArwDataSet_mod
 
         w(:,:,:,1:1) = 0.5*(w_stag(:,:,1:nzl,1:1) + w_stag(:,:,2:nzl+1,1:1))
 
+        ! FIXME: should the stag vars be deleted here?
+
         u10Var => this%loadVariable(pinfo, U10_VAR, u10, &
             & westEastDim, southNorthDim, timeDim, 'U10', squeeze=.true., &
             & loadDTypeNum=REAL_TYPE_NUM)
@@ -508,6 +510,9 @@ module ArwDataSet_mod
         dimMapping = (/3,1,2/)
 
         call pLevelVar%transpose(dimMapping)
+        call     phVar%transpose(dimMapping)
+        call    phbVar%transpose(dimMapping)
+        call     dzVar%transpose(dimMapping)
         call      tVar%transpose(dimMapping)
         call qvaporVar%transpose(dimMapping)
         call      uVar%transpose(dimMapping)

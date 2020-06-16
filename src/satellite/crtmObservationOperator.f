@@ -676,7 +676,7 @@ module crtmObservationOperator_mod
                         if (.not. doLimitCloud .or. sum(this%dptr(1:nz)) .ge. 1d-8) then
                             kcloud = kcloud + 1
                             atm(profile)%Cloud(kcloud)%Type = WATER_CLOUD
-                            atm(profile)%Cloud(kcloud)%Water_Content = this%cptr*this%dptr
+                            atm(profile)%Cloud(kcloud)%Water_Content = max(this%cptr*this%dptr,0.d0)
                             hydroclass(icloud) = kcloud
                         end if
                     case (2)
@@ -685,7 +685,7 @@ module crtmObservationOperator_mod
                         if (.not. doLimitCloud .or. sum(this%dptr(1:nz)) .ge. 1d-8) then
                             kcloud = kcloud + 1
                             atm(profile)%Cloud(kcloud)%Type = ICE_CLOUD
-                            atm(profile)%Cloud(kcloud)%Water_Content = this%cptr*this%dptr
+                            atm(profile)%Cloud(kcloud)%Water_Content = max(this%cptr*this%dptr,0.d0)
                             hydroclass(icloud) = kcloud
                         end if
                     case (3)
@@ -694,7 +694,7 @@ module crtmObservationOperator_mod
                         if (.not. doLimitCloud .or. sum(this%dptr(1:nz)) .ge. 1d-8) then
                             kcloud = kcloud + 1
                             atm(profile)%Cloud(kcloud)%Type = RAIN_CLOUD
-                            atm(profile)%Cloud(kcloud)%Water_Content = this%cptr*this%dptr
+                            atm(profile)%Cloud(kcloud)%Water_Content = max(this%cptr*this%dptr,0.d0)
                             hydroclass(icloud) = kcloud
                         end if
                     case (4)
@@ -703,7 +703,7 @@ module crtmObservationOperator_mod
                         if (.not. doLimitCloud .or. sum(this%dptr(1:nz)) .ge. 1d-8) then
                             kcloud = kcloud + 1
                             atm(profile)%Cloud(kcloud)%Type = SNOW_CLOUD
-                            atm(profile)%Cloud(kcloud)%Water_Content = this%cptr*this%dptr
+                            atm(profile)%Cloud(kcloud)%Water_Content = max(this%cptr*this%dptr,0.d0)
                             hydroclass(icloud) = kcloud
                         end if
                     !case (5)
