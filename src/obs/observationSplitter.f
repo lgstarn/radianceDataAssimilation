@@ -162,7 +162,6 @@ module observationSplitter_mod
         deallocate(obs_sizes)
         deallocate(obs_offsets)
         deallocate(localinds)
-        !deallocate(obsLociGlobalVar)
 
         newObject = .true.
     end subroutine

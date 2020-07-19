@@ -99,15 +99,22 @@ module gmiObservationBundle_mod
 
         allocate(tmpobs1)
         call tmpobs1%gmiObservationConstructor(pinfo,orbitFile,1)
-        obsptr1 => tmpobs1; obsptr2 => this%gmiObs1
+        obsptr1 => tmpobs1
         call obsProcessor%applyChain(pinfo,obsptr1,obsptr2,PRIOR_STAGE)
-        deallocate(tmpobs1)
+        select type(obsptr2)
+            type is (GmiObservation)
+                this%gmiObs1 => obsptr2
+        end select
+
 
         allocate(tmpobs2)
         call tmpobs2%gmiObservationConstructor(pinfo,orbitFile,2)
-        obsptr1 => tmpobs2; obsptr2 => this%gmiObs2
+        obsptr1 => tmpobs2
         call obsProcessor%applyChain(pinfo,obsptr1,obsptr2,PRIOR_STAGE)
-        deallocate(tmpobs2)
+        select type(obsptr2)
+            type is (GmiObservation)
+                this%gmiObs2 => obsptr2
+        end select
 
         obs_cs1 => this%gmiObs1
         obs_cs2 => this%gmiObs2
