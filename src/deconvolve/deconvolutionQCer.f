@@ -31,8 +31,6 @@ module deconvolutionQCer_mod
     subroutine deconvolutionQCerConstructor(this)
         class(DeconvolutionQCer) :: this
 
-        write(msgstr,*) 'in deconv qc constructor'
-        call print(msgstr)
         ! for now, do nothing
     end subroutine
 
@@ -60,9 +58,6 @@ module deconvolutionQCer_mod
 
         class(SatelliteObservation), pointer :: satObs
 
-        print *,'now qcing the deconv'
-        print *,'nobs dim:',obsIn%getSensorName()
-
         select type(obsIn)
             class is (SatelliteObservation)
                 satObs => obsIn
@@ -72,11 +67,7 @@ module deconvolutionQCer_mod
         end select
 
         obsData => obsIn%getObsData()
-        print *,'shape of obs data',shape(obsData)
         owners => obsIn%getObsOwners()
-
-        print *, 'shape of owners:',shape(owners),associated(obsIn)
-        !print *,'npasses:',obsIn%getNPassesQC()
 
         do k=1,size(obsData,2)
             if (owners(k) == pinfo%getRank()) then
@@ -90,8 +81,5 @@ module deconvolutionQCer_mod
 
         obsOut => obsIn
         newObject = .false.
-
-        !print *,'after1:'
-        !print *, 'after:',obsIn%getNPassesQC(),minval(obsData),maxval(obsData)
     end subroutine
 end module

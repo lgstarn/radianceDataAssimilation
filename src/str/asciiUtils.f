@@ -6,10 +6,57 @@ module asciiUtils_mod
 
     private
 
+    public :: load1DRealFile
     public :: load2DRealFile
     public :: int2str
 
     contains
+
+    subroutine load1DRealFile(filename,ny,data1d)
+        implicit none
+
+        character(len=*), intent(in)  :: filename
+        integer,          intent(out) :: ny
+        real(real64),     pointer     :: data1d(:)
+
+        character(1024) :: line
+        integer         :: io
+
+        integer         :: i, j, tmp
+
+        logical :: fileExists
+
+        ny = 0
+
+        inquire(file=filename,exist=fileExists)
+
+        if (.not. fileExists) then
+            print *,'Error: could not read the file ',trim(filename)
+            stop
+        end if
+
+        open(unit=92, file=filename)
+        do
+            read(92,'(A)',iostat=io) line
+            if (io/=0) exit
+            ny = ny + 1
+            tmp = ntokens(line)
+            if (ny > 1) then
+                if (tmp .ne. 1) then
+                    print *, 'Error: line ',ny,' had more than 1 column(',tmp,'). load1DRealFile cannot be used.'
+                    stop
+                end if
+            end if
+        end do
+        close(92)
+
+        allocate(data1d(ny))
+        open(unit=92, file=filename)
+        do i = 1,ny
+            read(92,*) data1d(i)
+        end do
+        close(92)
+    end subroutine
 
     subroutine load2DRealFile(filename,nx,ny,data2d)
         implicit none

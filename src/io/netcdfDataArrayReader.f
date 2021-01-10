@@ -63,8 +63,8 @@ module netcdfDataArrayReader_mod
         result(dimn)
 
         use mpi
+        !use netcdf
         use netcdf
-        use pnetcdf
 
         implicit none
 
@@ -94,140 +94,144 @@ module netcdfDataArrayReader_mod
 
         ! assume initParallel() has already been called
         if (pinfo%getParallelType() == LOCAL_PARALLEL_TYPE) then
-            rcode = nf90_open(this%getLocation(), nf_nowrite, fid)
-            call ncCheck(rcode,'Opening the file ' // trim(this%getLocation()))
-
-            rcode = nf90_inq_varid(fid, locationInFile, vid)
-            if (rcode /= 0) then
-                if (isRequired) then
-                    call ncCheck(rcode,'Reading the variable id for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            rcode = nf90_inquire_variable(fid, vid, ndims=ndims)
-            if (rcode /= 0) then
-                if (isRequired) then
-                    call ncCheck(rcode,'Reading the number of dims for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            allocate(dids(ndims))
-
-            rcode = nf90_inquire_variable(fid, vid, dimids=dids)
-            if (rcode /= 0) then
-                if (isRequired) then
-                    call ncCheck(rcode,'Reading the dimension IDs for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            if (dimNum < 1 .or. dimNum > ndims) then
-                if (isRequired) then
-                    call error('Invalid dimension number for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()) // ' - dim #' // &
-                        & int2str(dimNum) // '/' // int2str(ndims))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            rcode = nf90_inquire_dimension(fid, dids(dimNum), len=dimn)
-            if (rcode /= 0) then
-                if (isRequired) then
-                    call ncCheck(rcode,'Reading the dimension length for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            rcode = nf90_close(fid)
-            call ncCheck(rcode,'Closing the file ' // trim(this%getLocation()))
+            rcode = nf90_open(this%getLocation(), nf90_nowrite, fid)
+            call ncCheck(rcode,'Opening the local file ' // trim(this%getLocation()))
         else
-            rcode = nfmpi_open(pinfo%getCommunicator(), this%getLocation(), &
-                nf_nowrite, MPI_INFO_NULL, fid)
-            call ncCheck(rcode,'Opening the file ' // trim(this%getLocation()))
-
-            rcode = nfmpi_inq_varid(fid, locationInFile, vid)
-            if (rcode /= 0) then
-                if (isRequired) then
-                    call ncCheck(rcode,'Reading the variable id for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            rcode = nfmpi_inq_varndims(fid, vid, ndims)
-            if (rcode /= 0) then
-                if (isRequired) then
-                    call ncCheck(rcode,'Reading the number of dims for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            allocate(dids(ndims))
-
-            rcode = nfmpi_inq_vardimid(fid, vid, dids)
-            if (rcode /= 0) then
-                if (isRequired) then
-                    call ncCheck(rcode,'Reading the dimension IDs for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            if (dimNum < 1 .or. dimNum > ndims) then
-                if (isRequired) then
-                    call error('Invalid dimension number for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()) // ' - dim #' // &
-                        & int2str(dimNum) // '/' // int2str(ndims))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            rcode = nfmpi_inq_dimlen(fid, dids(dimNum), dimn_kind)
-            if (rcode /= 0) then
-                if (isRequired) then
-                    call ncCheck(rcode,'Reading the dimension length for ' // trim(locationInFile) // &
-                        & ' in the file ' // trim(this%getLocation()))
-                else
-                    dimn = -1
-                    return
-                end if
-            end if
-
-            dimn = int(dimn_kind)
-
-            rcode = nfmpi_close(fid)
-            call ncCheck(rcode,'Closing the file ' // trim(this%getLocation()))
+            ! netcdf version 4.7.1 and higher don't seem to play nice with this older style of opening a file for reading.
+            ! the following gets the error "Attempt to use feature that was not turned on when netCDF was built"
+            !rcode = nf90mpi_open(pinfo%getCommunicator(), this%getLocation(), &
+            !    nf90_nowrite, MPI_INFO_NULL, fid)
+            rcode = nf90_open(this%getLocation(), IOR(NF90_NOWRITE, NF90_MPIIO), fid, &
+                comm = pinfo%getCommunicator(), info = MPI_INFO_NULL)
+            call ncCheck(rcode,'Opening the parallel file ' // trim(this%getLocation()))
         end if
+
+        rcode = nf90_inq_varid(fid, locationInFile, vid)
+        if (rcode /= 0) then
+            if (isRequired) then
+                call ncCheck(rcode,'Reading the variable id for ' // trim(locationInFile) // &
+                    & ' in the file ' // trim(this%getLocation()))
+            else
+                dimn = -1
+                return
+            end if
+        end if
+
+        rcode = nf90_inquire_variable(fid, vid, ndims=ndims)
+        if (rcode /= 0) then
+            if (isRequired) then
+                call ncCheck(rcode,'Reading the number of dims for ' // trim(locationInFile) // &
+                    & ' in the file ' // trim(this%getLocation()))
+            else
+                dimn = -1
+                return
+            end if
+        end if
+
+        allocate(dids(ndims))
+
+        rcode = nf90_inquire_variable(fid, vid, dimids=dids)
+        if (rcode /= 0) then
+            if (isRequired) then
+                call ncCheck(rcode,'Reading the dimension IDs for ' // trim(locationInFile) // &
+                    & ' in the file ' // trim(this%getLocation()))
+            else
+                dimn = -1
+                return
+            end if
+        end if
+
+        if (dimNum < 1 .or. dimNum > ndims) then
+            if (isRequired) then
+                call error('Invalid dimension number for ' // trim(locationInFile) // &
+                    & ' in the file ' // trim(this%getLocation()) // ' - dim #' // &
+                    & int2str(dimNum) // '/' // int2str(ndims))
+            else
+                dimn = -1
+                return
+            end if
+        end if
+
+        rcode = nf90_inquire_dimension(fid, dids(dimNum), len=dimn)
+        if (rcode /= 0) then
+            if (isRequired) then
+                call ncCheck(rcode,'Reading the dimension length for ' // trim(locationInFile) // &
+                    & ' in the file ' // trim(this%getLocation()))
+            else
+                dimn = -1
+                return
+            end if
+        end if
+
+        rcode = nf90_close(fid)
+        call ncCheck(rcode,'Closing the file ' // trim(this%getLocation()))
+
+!        rcode = nf90_inq_varid(fid, locationInFile, vid)
+!        if (rcode /= 0) then
+!            if (isRequired) then
+!                call ncCheck(rcode,'Reading the variable id for ' // trim(locationInFile) // &
+!                    & ' in the file ' // trim(this%getLocation()))
+!            else
+!                dimn = -1
+!                return
+!            end if
+!        end if
+!
+!        rcode = nf90_inq_varndims(fid, vid, ndims)
+!        if (rcode /= 0) then
+!            if (isRequired) then
+!                call ncCheck(rcode,'Reading the number of dims for ' // trim(locationInFile) // &
+!                    & ' in the file ' // trim(this%getLocation()))
+!            else
+!                dimn = -1
+!                return
+!            end if
+!        end if
+!
+!        allocate(dids(ndims))
+!
+!        rcode = nf90_inq_vardimid(fid, vid, dids)
+!        if (rcode /= 0) then
+!            if (isRequired) then
+!                call ncCheck(rcode,'Reading the dimension IDs for ' // trim(locationInFile) // &
+!                    & ' in the file ' // trim(this%getLocation()))
+!            else
+!                dimn = -1
+!                return
+!            end if
+!        end if
+!
+!        if (dimNum < 1 .or. dimNum > ndims) then
+!            if (isRequired) then
+!                call error('Invalid dimension number for ' // trim(locationInFile) // &
+!                    & ' in the file ' // trim(this%getLocation()) // ' - dim #' // &
+!                    & int2str(dimNum) // '/' // int2str(ndims))
+!            else
+!                dimn = -1
+!                return
+!            end if
+!        end if
+!
+!        rcode = nf90_inq_dimlen(fid, dids(dimNum), dimn_kind)
+!        if (rcode /= 0) then
+!            if (isRequired) then
+!                call ncCheck(rcode,'Reading the dimension length for ' // trim(locationInFile) // &
+!                    & ' in the file ' // trim(this%getLocation()))
+!            else
+!                dimn = -1
+!                return
+!            end if
+!        end if
+!
+!        dimn = int(dimn_kind)
+!
+!        rcode = nf90_close(fid)
+!        call ncCheck(rcode,'Closing the file ' // trim(this%getLocation()))
     end function
 
     subroutine loadAttribute_netcdf(this,pinfo,attr,aname,locationInFile,required)
         use mpi
-        use pnetcdf
+        use netcdf
 
         implicit none
 
@@ -251,7 +255,6 @@ module netcdfDataArrayReader_mod
         integer :: fid
         integer :: attlen
         integer :: rcode
-        integer(kind=kindnum) :: attlen_kind
 
         character(len=1), dimension(:), pointer :: data ! A pointer to a Fortran string
 
@@ -265,11 +268,11 @@ module netcdfDataArrayReader_mod
             isRequired = .true.
         end if
 
-        rcode = nfmpi_open(pinfo%getCommunicator(), this%getLocation(), &
-            nf_nowrite, MPI_INFO_NULL, fid)
+        rcode = nf90_open(this%getLocation(), IOR(NF90_NOWRITE, NF90_MPIIO), fid, &
+            comm = pinfo%getCommunicator(), info = MPI_INFO_NULL)
         call ncCheck(rcode,'Opening the file ' // trim(this%getLocation()))
 
-        rcode = nfmpi_inq_attlen(fid, nf_global, attr%getName(), attlen_kind)
+        rcode = nf90_inquire_attribute(fid, nf90_global, attr%getName(), len=attlen)
 
         if (isRequired) then
             call ncCheck(rcode,'Reading the required attribute length for ' // trim(attr%getName()))
@@ -277,8 +280,7 @@ module netcdfDataArrayReader_mod
 
         ! if not required and not found, just return without doing anything
 
-        if (rcode == nf_noerr) then
-            attlen = int(attlen_kind)
+        if (rcode == nf90_noerr) then
 
             if (attr%getDataTypeNum() /= STRINGS_TYPE_NUM .and. &
                 attr%getDataTypeNum() /= STRING_TYPE_NUM) then
@@ -293,7 +295,7 @@ module netcdfDataArrayReader_mod
                 case(STRING_TYPE_NUM : STRINGS_TYPE_NUM)
 
                     allocate(character(len=attlen) :: attval)
-                    rcode = nfmpi_get_att_text(fid, nf_global, attr%getName(), attval)
+                    rcode = nf90_get_att(fid, nf90_global, attr%getName(), attval)
                     call ncCheck(rcode,'Reading the text attribute ' // trim(attr%getName()))
                     call attr%addString(attval)
 
@@ -303,37 +305,37 @@ module netcdfDataArrayReader_mod
 
                 case (BYTE_TYPE_NUM)
 
-                    rcode = nfmpi_get_att_int1(fid, nf_global, attr%getName(), dbytes)
+                    rcode = nf90_get_att(fid, nf90_global, attr%getName(), dbytes)
                     call ncCheck(rcode,'Reading the byte attribute ' // trim(attr%getName()))
                     call attr%setNumericValue(dbytes(1))
 
                 case (SHORT_TYPE_NUM)
 
-                    rcode = nfmpi_get_att_int2(fid, nf_global, attr%getName(), dshorts)
+                    rcode = nf90_get_att(fid, nf90_global, attr%getName(), dshorts)
                     call ncCheck(rcode,'Reading the short attribute ' // trim(attr%getName()))
                     call attr%setNumericValue(dshorts(1))
 
                 case (INT_TYPE_NUM)
 
-                    rcode = nfmpi_get_att_int(fid, nf_global, attr%getName(), dints)
+                    rcode = nf90_get_att(fid, nf90_global, attr%getName(), dints)
                     call ncCheck(rcode,'Reading the int attribute ' // trim(attr%getName()))
                     call attr%setNumericValue(dints(1))
 
                 case (LONG_TYPE_NUM)
 
-                    rcode = nfmpi_get_att_int8(fid, nf_global, attr%getName(), dlongs)
+                    rcode = nf90_get_att(fid, nf90_global, attr%getName(), dlongs)
                     call ncCheck(rcode,'Reading the long attribute ' // trim(attr%getName()))
                     call attr%setNumericValue(dlongs(1))
 
                 case (REAL_TYPE_NUM)
 
-                    rcode = nfmpi_get_att_real(fid, nf_global, attr%getName(), dreals)
+                    rcode = nf90_get_att(fid, nf90_global, attr%getName(), dreals)
                     call ncCheck(rcode,'Reading the real attribute ' // trim(attr%getName()))
                     call attr%setNumericValue(dreals(1))
 
                 case (DOUBLE_TYPE_NUM)
 
-                    rcode = nfmpi_get_att_double(fid, nf_global, attr%getName(), ddbles)
+                    rcode = nf90_get_att(fid, nf90_global, attr%getName(), ddbles)
                     call ncCheck(rcode,'Reading the double attribute ' // trim(attr%getName()))
                     call attr%setNumericValue(ddbles(1))
 
@@ -343,7 +345,7 @@ module netcdfDataArrayReader_mod
             end select
         end if
 
-        rcode = nfmpi_close(fid)
+        rcode = nf90_close(fid)
         call ncCheck(rcode,'Closing the file ' // trim(this%getLocation()))
      end subroutine
 
@@ -610,7 +612,7 @@ module netcdfDataArrayReader_mod
     subroutine loadDistributedArray(this,pinfo,dArray,locationInFile,required,loadDTypeNum)
 
         use mpi
-        use pnetcdf
+        use netcdf
 
         implicit none
 
@@ -622,8 +624,8 @@ module netcdfDataArrayReader_mod
         logical,          optional, intent(in)  :: required
         integer,          optional, intent(in)  :: loadDTypeNum
 
-        integer(kindnum), allocatable :: data_count(:)
-        integer(kindnum), allocatable :: data_offset(:)
+        integer, allocatable :: data_count(:)
+        integer, allocatable :: data_offset(:)
 
         integer :: fid
         integer :: attlen
@@ -653,11 +655,11 @@ module netcdfDataArrayReader_mod
             isRequired = .true.
         end if
 
-        rcode = nfmpi_open(pinfo%getCommunicator(), this%getLocation(), &
-            nf_nowrite, MPI_INFO_NULL, fid)
+        rcode = nf90_open(this%getLocation(), IOR(NF90_NOWRITE, NF90_MPIIO), fid, &
+            comm = pinfo%getCommunicator(), info = MPI_INFO_NULL)
         call ncCheck(rcode,'Opening the file ' // trim(this%getLocation()))
 
-        rcode = nfmpi_inq_varid(fid, locationInFile, vid)
+        rcode = nf90_inq_varid(fid, locationInFile, vid)
 
         if (isRequired) then
             call ncCheck(rcode,'Reading the variable id for ' // trim(locationInFile) // &
@@ -665,6 +667,11 @@ module netcdfDataArrayReader_mod
         elseif (rcode < 0) then
             return
         end if
+
+        rcode = nf90_var_par_access(fid, vid, nf90_collective)
+
+        call ncCheck(rcode,'Setting collective access for ' // trim(locationInFile) // &
+                & ' in the file ' // trim(this%getLocation()))
 
         dShape => dArray%getDataShape()
 
@@ -687,8 +694,7 @@ module netcdfDataArrayReader_mod
                 else
                     allocate(bptr(dArray%getLocalTotalSize()))
                 end if
-                rcode = nfmpi_get_vara_int1_all(fid, vid, data_offset, &
-                    data_count, bptr)
+                rcode = nf90_get_var(fid, vid, bptr, start = data_offset, count = data_count)
                 call ncCheck(rcode,'Reading MPI byte variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
 
@@ -702,8 +708,7 @@ module netcdfDataArrayReader_mod
                 else
                     allocate(sptr(dArray%getLocalTotalSize()))
                 end if
-                rcode = nfmpi_get_vara_int2_all(fid, vid, data_offset, &
-                    data_count, sptr)
+                rcode = nf90_get_var(fid, vid, sptr, start = data_offset, count = data_count)
                 call ncCheck(rcode,'Reading MPI short variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
 
@@ -718,8 +723,7 @@ module netcdfDataArrayReader_mod
                 else
                     allocate(iptr(dArray%getLocalTotalSize()))
                 end if
-                rcode = nfmpi_get_vara_int_all(fid, vid, data_offset, &
-                    data_count, iptr)
+                rcode = nf90_get_var(fid, vid, iptr, start = data_offset, count = data_count)
                 call ncCheck(rcode,'Reading MPI int variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
 
@@ -735,8 +739,7 @@ module netcdfDataArrayReader_mod
                 else
                     allocate(lptr(dArray%getLocalTotalSize()))
                 end if
-                rcode = nfmpi_get_vara_int8_all(fid, vid, data_offset, &
-                    data_count, lptr)
+                rcode = nf90_get_var(fid, vid, lptr, start = data_offset, count = data_count)
                 call ncCheck(rcode,'Reading MPI long variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
 
@@ -752,8 +755,7 @@ module netcdfDataArrayReader_mod
                 else
                     allocate(rptr(dArray%getLocalTotalSize()))
                 end if
-                rcode = nfmpi_get_vara_real_all(fid, vid, data_offset, &
-                    data_count, rptr)
+                rcode = nf90_get_var(fid, vid, rptr, start = data_offset, count = data_count)
                 call ncCheck(rcode,'Reading MPI real variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
 
@@ -768,8 +770,7 @@ module netcdfDataArrayReader_mod
                 else
                     allocate(dptr(dArray%getLocalTotalSize()))
                 end if
-                rcode = nfmpi_get_vara_double_all(fid, vid, data_offset, &
-                    data_count, dptr)
+                rcode = nf90_get_var(fid, vid, dptr, start = data_offset, count = data_count)
                 call ncCheck(rcode,'Reading MPI double variable data for ' // &
                     & trim(locationInFile) // ' in the file ' // trim(this%getLocation()))
 

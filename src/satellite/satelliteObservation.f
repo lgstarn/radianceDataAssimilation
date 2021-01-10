@@ -26,9 +26,9 @@ module satelliteObservation_mod
 
     private
 
-    !character(*), public, parameter :: TB_VAR_NAME      = 'Brightness_Temperatures'
-    !character(*), public, parameter :: LAT_VAR_NAME     = 'Latitude'
-    !character(*), public, parameter :: LON_VAR_NAME     = 'Longitude'
+    character(*), public, parameter :: TB_VAR_NAME      = 'Brightness_Temperatures'
+    character(*), public, parameter :: LAT_VAR_NAME     = 'Latitude'
+    character(*), public, parameter :: LON_VAR_NAME     = 'Longitude'
     character(*), public, parameter :: SC_LAT_VAR_NAME  = 'Spacecraft_Latitude'
     character(*), public, parameter :: SC_LON_VAR_NAME  = 'Spacecraft_Longitude'
     !character(*), public, parameter :: QUALITY_VAR_NAME = 'Quality'
@@ -369,18 +369,20 @@ module satelliteObservation_mod
     end subroutine
 
     ! Migrate the lat/lon/tb format to the obsData/obsLoci format. NOTE: latVar, lonVar, and tbVar
-    ! will be deleted if they exist!
-    subroutine loadSatelliteObservation_tb3d(this, pinfo, latVar, lonVar, tbVar)
+    ! will be deleted if they exist if deleteVars is true (which is the default)
+    subroutine loadSatelliteObservation_tb3d(this, pinfo, latVar, lonVar, tbVar, qc3dVar, deleteVars)
 
         implicit none
 
-        class(SatelliteObservation)  :: this
+        class(SatelliteObservation)   :: this
 
-        class(ParallelInfo), pointer :: pinfo
+        class(ParallelInfo), pointer  :: pinfo
 
-        class(DataVariable), pointer :: tbVar
-        class(DataVariable), pointer :: latVar
-        class(DataVariable), pointer :: lonVar
+        class(DataVariable), pointer  :: tbVar
+        class(DataVariable), pointer  :: latVar
+        class(DataVariable), pointer  :: lonVar
+        class(DataVariable), optional, pointer  :: qc3dVar
+        logical, optional, intent(in) :: deleteVars
 
         integer :: nobs_l(1)
         integer, allocatable :: allnobs(:)
@@ -396,6 +398,9 @@ module satelliteObservation_mod
         real(real64), pointer :: lon_dble(:,:)
         real(real64), pointer :: tb_dble(:,:,:)
 
+        integer, pointer :: qc3d(:,:,:)
+        integer, pointer :: qcCodes(:,:)
+
         integer :: i, j, ierr
         integer :: pixs, pixe
         integer :: scans, scane
@@ -403,7 +408,7 @@ module satelliteObservation_mod
         integer :: nchan_l, npix_l, nscan_l
         integer :: chnum, iobs, nobs_s
 
-        logical :: isReal
+        logical :: isReal, shouldDelete, hasQc
 
         class(DataDimension), pointer :: mobsDim
         class(DataDimension), pointer :: nobsDim
@@ -415,11 +420,25 @@ module satelliteObservation_mod
 
         class(DataVariable), pointer    :: obsDataVar
         class(DataVariable), pointer    :: obsLociVar
+        class(DataVariable), pointer    :: qcCodesVar
 
         if (tbVar%getDataTypeNum() == REAL_TYPE_NUM) then
             isReal = .true.
         else
             isReal = .false.
+        end if
+
+        if (present(deleteVars)) then
+            shouldDelete = deleteVars
+        else
+            shouldDelete = .true.
+        end if
+
+        if (present(qc3dVar)) then
+            hasQc = .true.
+            call qc3dVar%getArray(qc3d)
+        else
+            hasQc = .false.
         end if
 
         if (isReal) then
@@ -504,6 +523,10 @@ module satelliteObservation_mod
             & mobsExtent, nobsExtent)
         obsLociVar => this%addVariable(pinfo,OBS_LOCI_VAR_NAME, obsLoci, &
             & nlociExtent, nobsExtent)
+        if (hasQc) then
+            qcCodesVar => this%addVariable(pinfo,QC_CODES_VAR_NAME, qcCodes, &
+                & mobsExtent, nobsExtent)
+        end if
 
         iobs = 0
 
@@ -526,24 +549,35 @@ module satelliteObservation_mod
                     else
                         obsData(chnum,iobs) = tb_dble(chnum,i,j)
                     end if
+
+                    if (hasQc) then
+                        qcCodes(chnum,iobs) = qc3d(chnum,i,j)
+                    end if
                 end do
             end do
         end do
 
-        ! now that the lat/lon/tb have been migrated to the 2d obsLoci/obsData format, remove them
-        if (this%hasVariable(latVar%getName())) then
-            call this%deleteVariable(latVar)
+
+        if (shouldDelete) then
+            ! now that the lat/lon/tb have been migrated to the 2d obsLoci/obsData format, remove them
+            if (this%hasVariable(latVar%getName())) then
+                call this%deleteVariable(latVar)
+            end if
+
+            if (this%hasVariable(lonVar%getName())) then
+                call this%deleteVariable(lonVar)
+            end if
+
+            if (this%hasVariable(tbVar%getName())) then
+                call this%deleteVariable(tbVar)
+            end if
         end if
 
-        if (this%hasVariable(lonVar%getName())) then
-            call this%deleteVariable(lonVar)
+        if (hasQc) then
+            call this%loadSatelliteObservation(pinfo,obsDataVar,obsLociVar,qcCodesVar=qcCodesVar)
+        else
+            call this%loadSatelliteObservation(pinfo,obsDataVar,obsLociVar)
         end if
-
-        if (this%hasVariable(tbVar%getName())) then
-            call this%deleteVariable(tbVar)
-        end if
-
-        call this%loadSatelliteObservation(pinfo,obsDataVar,obsLociVar)
     end subroutine
 
     subroutine loadSatelliteObservation(this, pinfo, obsDataVar, obsLociVar, &

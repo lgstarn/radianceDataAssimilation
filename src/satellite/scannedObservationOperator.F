@@ -362,7 +362,6 @@ module scannedObservationOperator_mod
                     end if
                 end do
 
-
                 write(msgstr,*) 'Now creating the PETSc matrices... ch ', &
                     & chind+obs%getChannelOffset(), ' max on/off diag: ', &
                     & maxondiag, '/', maxoffdiag
@@ -373,7 +372,11 @@ module scannedObservationOperator_mod
                 s1_g = nobs_global
                 s2_l = nx_local*ny_local
                 s2_g = nx_global*ny_global
+
                 call MatSetSizes(hMat, s1_l, s2_l, s1_g, s2_g, ierr)
+                if (ierr /= 0) then
+                    stop
+                end if
                 call MatSetType(hMat,MATMPIAIJ,ierr)
                 call MatMPIAIJSetPreallocation(hMat, -1, d_nnz(:,chind), &
                                                    & -1, o_nnz(:,chind),ierr)
@@ -461,10 +464,10 @@ module scannedObservationOperator_mod
                     rowComputed = .false.
                     call obs%setQCCode(chind, i, QC_UPDT_FWDOP)
                     cycle
-                else if (tin > 1.2) then
-                    write(msgstr,*) 'The computed row sum was too large:', tin,&
-                        pinfo%getRank(),il,chind,d_nnz(il,chind),o_nnz(il,chind),lat,lon
-                    call print(msgstr,forceOutput=.true.)
+                else if (tin > 3.0) then
+                    !write(msgstr,*) 'The computed row sum was too large:', tin,&
+                    !    pinfo%getRank(),il,chind,d_nnz(il,chind),o_nnz(il,chind),lat,lon
+                    !call print(msgstr,forceOutput=.true.)
                     rowComputed = .false.
                     call obs%setQCCode(chind, i, QC_UPDT_FWDOP)
                     cycle
@@ -475,7 +478,7 @@ module scannedObservationOperator_mod
 
                 call MatSetValues(hmat,one,izs,oind,xinds(1:oind),fvals(1:oind),ADD_VALUES,ierr)
 
-                if (mod(il,100) == 0) then
+                if (mod(il,1000) == 0) then
                     write(msgstr,*) 'Rank',pinfo%getRank(),'chnum:',chind+obs%getChannelOffset(),&
                         & 'completed obs',il,'/',nobs_local
                     call print(msgstr,forceOutput=.true.)
@@ -527,8 +530,6 @@ module scannedObservationOperator_mod
                 ind = 0
 
                 call columnNormsVar%getArray(colNormsData)
-
-                print *,'size of colNormsData:',shape(colNormsData)
 
                 do kj=1,ny_global
                     do ki=1,nx_global
@@ -763,7 +764,7 @@ module scannedObservationOperator_mod
 
         integer :: choffset
 
-        real(real64) :: mval
+        real(real64) :: mval, minv, maxv
 
         select type(obs)
             class is (ScannedObservation)
@@ -806,6 +807,23 @@ module scannedObservationOperator_mod
 
         call inputDataVar%getArray(inputData)
 
+!        do chind=1,this%nposting_channels
+!            minv =  999.
+!            maxv = -999.
+!            do i=1,size(inputData,2)
+!                if (qcCodes(chind,i) <= QC_OBEVAL .and. &
+!                    inputData(chind+obs_so%getChannelOffset(),i) > 0) then
+!
+!                    minv = min(minv,inputData(chind+obs_so%getChannelOffset(),i))
+!                    maxv = max(maxv,inputData(chind+obs_so%getChannelOffset(),i))
+!                end if
+!            end do
+!
+!            print *,'the min/max for chind',chind,'is ',minv,maxv
+!        end do
+
+!        print *,'computing the xvar:',this%xVarName,minval(inputData),maxval(inputData)
+
         do chind=1,this%nposting_channels
             hmat => this%nextMatrix()
 
@@ -825,6 +843,23 @@ module scannedObservationOperator_mod
             end do
             call VecRestoreArrayReadF90(this%sooData%yvec,dptr1d,ierr)
         end do
+
+!        minv =  999.
+!        maxv = -999.
+!
+!        do chind=1,this%nposting_channels
+!            minv =  999.
+!            maxv = -999.
+!            do i=1,size(output,2)
+!                if (output(chind,i) /= QC_NOVALUE) then
+!                    minv = min(minv,output(chind,i))
+!                    maxv = max(maxv,output(chind,i))
+!                end if
+!            end do
+!
+!            print *,'the min/max output for chind',chind,'is ',minv,maxv
+!        end do
+
     end subroutine
 
     subroutine tangentLinear(this, baseState, obs, deltaX, deltaY)

@@ -162,9 +162,9 @@ module adjointAveFirstGuesser_mod
                 cycle
             end if
 
-            write(msgstr,*) 'in bundle ',i,'passes qc:',obs%getNPassesQC(),&
-                nchan*npts
-            call print(msgstr)
+            !write(msgstr,*) 'in bundle ',i,'passes qc:',obs%getNPassesQC(),&
+            !    nchan*npts,associated(this%modelState)
+            !call print(msgstr)
 
             allocate(output(nchan,npts))
 
@@ -182,11 +182,11 @@ module adjointAveFirstGuesser_mod
             !     end do
             ! end do
 
-            do ind1=1,nchan
-                write(msgstr,*) 'min/max value for channel ',ind1+obs_so%getChannelOffset(),&
-                    ':',minval(output(ind1,:)),maxval(output(ind1,:))
-                call print(msgstr)
-            end do
+            !do ind1=1,nchan
+            !    write(msgstr,*) 'min/max value for channel ',ind1+obs_so%getChannelOffset(),&
+            !        ':',minval(output(ind1,:)),maxval(output(ind1,:))
+            !    call print(msgstr)
+            !end do
 
             call obsOp_conv%adjoint(firstGuess, obs, output, firstGuess)
 
@@ -233,19 +233,19 @@ module adjointAveFirstGuesser_mod
             deallocate(output)
         end do
 
-        do i=1,size(tb1,1)
-            write(msgstr,*) 'min/max value for channel ',i,':',minval(tb1(i,:)),&
-                maxval(tb1(i,:)),minval(tb2(i,:)),maxval(tb2(i,:))
-            call print(msgstr)
-        end do
+        !do i=1,size(tb1,1)
+        !    write(msgstr,*) 'min/max value for channel ',i,':',minval(tb1(i,:)),&
+        !        maxval(tb1(i,:)),minval(tb2(i,:)),maxval(tb2(i,:))
+        !    call print(msgstr)
+        !end do
 
         where (tb2 > 0.d0) tb1 = tb1/tb2
 
-        do i=1,size(tb1,1)
-            write(msgstr,*) 'min/max value for channel ',i,':',minval(tb1(i,:)),&
-                maxval(tb1(i,:))
-            call print(msgstr)
-        end do
+        !do i=1,size(tb1,1)
+        !    write(msgstr,*) 'min/max value for channel ',i,':',minval(tb1(i,:)),&
+        !        maxval(tb1(i,:))
+        !    call print(msgstr)
+        !end do
 
         qcCodes => firstGuess_so%getQcCodes()
 

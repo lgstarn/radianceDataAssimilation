@@ -404,6 +404,7 @@ module conicalScanningObsOperator_mod
                 !end do
             end do
         end do
+
     end subroutine
 
     subroutine getRowData(this,pinfo,doCount,obs_so,inputGrid,obsnum,il,chind,scLat,scLon,&
@@ -896,8 +897,6 @@ module conicalScanningObsOperator_mod
             end do
         end do
 
-        !print *,'found nnz:',pinfo%getRank(),minval(d_nnz),maxval(d_nnz),minval(o_nnz),maxval(o_nnz)
-
         ! switch back the minLat/minLon to be consistent with maxLat/maxLon
         where(minLat == 999) minLat = -999
         where(minLon == 999) minLon = -999
@@ -1342,7 +1341,11 @@ module conicalScanningObsOperator_mod
         end if
 
         ! check if we can reuse the values from a previous channel to improve performance
-        canReuse = obs_cs%getFovCross(ch1) == obs_cs%getFovCross(ch2) .and. &
-                  &obs_cs%getFovAlong(ch1) == obs_cs%getFovAlong(ch2)
+        ! currently commented out due to bug in QC checking - a reused channel won't necessary have
+        ! the same QC values set. This is a limitation of the design of qc codes as an array rather than
+        ! as a class-level method and should be addressed through a redesign of this aspect
+        !canReuse = obs_cs%getFovCross(ch1) == obs_cs%getFovCross(ch2) .and. &
+        !          &obs_cs%getFovAlong(ch1) == obs_cs%getFovAlong(ch2)
+        canReuse = .false.
     end function
 end module

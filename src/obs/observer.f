@@ -215,6 +215,7 @@ module observer_mod
         real(8),             dimension(:),   pointer :: yout_ptr, yptr
         real(8),             dimension(:,:), pointer :: hxData
         real(8), contiguous, dimension(:,:), pointer :: obsData
+        real(8), contiguous, dimension(:,:), pointer :: obsLoci
 
         integer :: i, j, k
         integer :: lcursor
@@ -276,6 +277,7 @@ module observer_mod
 
             ! now set the yptr 1D pointer to the actual observation data
             obsData => obs%getObsData()
+            obsLoci => obs%getObsLoci()
             yptr(1:cursorLen) => obsData(:,:)
 
             lcursor = 0
@@ -286,15 +288,16 @@ module observer_mod
                     ! for obs that pass QC
                     if (obs%passesQC(j, k)) then
                         ! set yout = y - H(x) for the observation data yptr and H(x) as yout
+
+                        !write(993,'(F12.6,F12.6,I8,F12.6,F12.6,F12.6,F12.6)') yptr(lcursor),&
+                        !    yout_ptr(cursorStart),j,obsLoci(:,k)
+
                         if (doApplyDiff) then
                             yout_ptr(cursorStart) = yptr(lcursor) - yout_ptr(cursorStart)
                         end if
                     else
                         yout_ptr(cursorStart) = 0.d0
                     end if
-
-                    !write(993,'(F12.6,F12.6,I8,F12.6,F12.6,F12.6,F12.6)') &
-                    !    &yout_ptr(cursorStart)+yptr(lcursor),yptr(lcursor),j,obs%obsLoci(:,k)
 
                     cursorStart = cursorStart + 1
                 end do

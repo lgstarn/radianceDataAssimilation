@@ -119,7 +119,7 @@ module netcdfDataArrayWriter_mod
             if (fileExists) then
                 rcode = nfmpi_open(pinfo%getCommunicator(), this%getLocation(), &
                     nf_write, MPI_INFO_NULL, fid)
-               call ncCheck(rcode,'Opening the file ' // trim(this%getLocation()))
+                call ncCheck(rcode,'Opening the file ' // trim(this%getLocation()))
 
                 rcode = nfmpi_redef(fid)
                 call ncCheck(rcode,'Putting the file ' // trim(this%getLocation()) // &

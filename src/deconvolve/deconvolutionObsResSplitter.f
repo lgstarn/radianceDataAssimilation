@@ -73,7 +73,7 @@ module deconvolutionObsResSplitter_mod
         real(real64), intent(in)  :: lociVals(ndim,nloci)
         integer,      intent(out) :: owners(nloci)
 
-        integer :: i, scanInd
+        integer :: i, scanInd, scannum, minScan, maxScan
 
         if (ndim /= 1) then
             call error('deconvolutionObsResSplitter only applicable for ndim = 1, not for ' // &
@@ -81,23 +81,26 @@ module deconvolutionObsResSplitter_mod
         end if
 
         scanInd = 1
+        ! scanRanges of 0 has the global start minus 1
+        minScan = this%scanRanges(0)
+        maxScan = maxval(this%scanRanges)
 
-        ! lociVals will come in sorted, and scanRanges is sorted, so we can speed things
-        ! up quite a bit by caching the index
+        ! scanRanges is sorted, so we can speed things up quite a bit by caching the index
         do i=1,nloci
-            if (lociVals(1,i) <= this%scanRanges(scanInd)) then
+            scannum = lociVals(1,i)
+
+            if (scannum <= minScan .or. scannum > maxScan) then
+                ! out of global range
+                owners(i) = -1
+            elseif (scannum > this%scanRanges(scanInd-1) .and. scannum <= this%scanRanges(scanInd)) then
                 ! subtract 1 as MPI rank is zero-based
                 owners(i) = scanInd - 1
             else
-                ! check if we would go beyond the edge of scanRanges
-                if (scanInd + 1 > size(this%scanRanges)) then
-                    call error('Invalid scanRanges: ' // int2str(nint(lociVals(1,i))) // ' was larger than ' // &
-                        int2str(this%scanRanges(scanInd)) // ', but there are only ' // &
-                        int2str(size(this%scanRanges)) // ' total scanRanges and cannot increment.')
-                end if
-
-                ! since no, time to increment scanInd
+                ! not in range of scanInd, but not out of global range. Increment to next scanInd
                 scanInd = scanInd + 1
+
+                ! and don't forget to update this owner
+                owners(i) = scanInd - 1
             end if
         end do
     end subroutine

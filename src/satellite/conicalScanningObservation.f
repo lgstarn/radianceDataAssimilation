@@ -25,9 +25,9 @@ module conicalScanningObservation_mod
 
     private
 
-    character(*), public, parameter :: TB_VAR_NAME      = 'Brightness_Temperatures'
-    character(*), public, parameter :: LAT_VAR_NAME     = 'Latitude'
-    character(*), public, parameter :: LON_VAR_NAME     = 'Longitude'
+    !character(*), public, parameter :: TB_VAR_NAME      = 'Brightness_Temperatures'
+    !character(*), public, parameter :: LAT_VAR_NAME     = 'Latitude'
+    !character(*), public, parameter :: LON_VAR_NAME     = 'Longitude'
 
     type, extends(ScannedObservation), public :: ConicalScanningObservation
         !private

@@ -292,42 +292,6 @@ module scannedObservation_mod
         scanDistance = this%scanDistance
     end function
 
-!    function getGrid(this) result(grid)
-!        implicit none
-!
-!        class(ScannedObservation)  :: this
-!
-!        class(DataGrid), pointer :: grid
-!
-!        if (.not. this%gridded) then
-!            call error('Called getGrid before findGrid')
-!        else
-!            grid => this%grid
-!        end if
-!    end function
-
-!    subroutine findGrid(this,pinfo,dimsToTriangulate)
-!        implicit none
-!
-!        class(ScannedObservation)     :: this
-!
-!        class(ParallelInfo), pointer  :: pinfo
-!
-!        class(DataVariable), pointer  :: lat
-!        class(DataVariable), pointer  :: lon
-!        integer,             optional :: dimsToTriangulate(2)
-!
-!        lat => this%getLatVar()
-!        lon => this%getLonVar()
-!
-!        allocate(this%grid)
-!        call this%grid%regularTriangularLatLonGridConstructor(lat,lon,dimsToTriangulate)
-!
-!        call this%grid%tile(pinfo)
-!
-!        this%gridded = .true.
-!    end subroutine
-
     function cloneScannedObs(this,shallow,copyData) result(soptr)
         implicit none
 
