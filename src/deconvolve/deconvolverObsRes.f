@@ -279,7 +279,6 @@ program deconvolverObsRes
         !call print('    [NSplit] is total # of split files, of which this program will compute a single file.')
         call print('    [BHalf file] is the square-root (SVD) of the single column first guess error covariance matrix.')
         call endParallel()
-        return
     end if
 
     call getArg(1, orbitFile)
